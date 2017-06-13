@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/IF678.iml" filepath="$PROJECT_DIR$/IF678.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ChatFX.iml" filepath="$PROJECT_DIR$/ChatFX.iml" />
     </modules>
   </component>
 </project>
