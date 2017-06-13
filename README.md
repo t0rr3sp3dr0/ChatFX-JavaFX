@@ -1,1 +1,1 @@
-# IF678-JavaFX
+# ChatFX-JavaFX
