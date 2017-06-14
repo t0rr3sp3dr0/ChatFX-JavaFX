@@ -1,8 +1,8 @@
-package systems.singularity.chatfx;
+package systems.singularity.chatfx.util;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
-import systems.singularity.chatfx.util.Pair;
+import systems.singularity.chatfx.util.java.Pair;
 
 import java.io.IOException;
 import java.net.*;

@@ -1,4 +1,4 @@
-package systems.singularity.chatfx;
+package systems.singularity.chatfx.util.groups;
 
 /**
  * Created by pedro on 6/8/17.

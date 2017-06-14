@@ -1,4 +1,4 @@
-package systems.singularity.chatfx.util;
+package systems.singularity.chatfx.util.java;
 
 /**
  * Created by pedro on 6/13/17.

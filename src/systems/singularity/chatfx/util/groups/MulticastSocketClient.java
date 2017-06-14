@@ -1,4 +1,4 @@
-package systems.singularity.chatfx;
+package systems.singularity.chatfx.util.groups;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
