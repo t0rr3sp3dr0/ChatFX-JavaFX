@@ -103,7 +103,7 @@ public final class Protocol {
         }
 
         public interface Callback {
-            public abstract void onCallback(double bytesSent, long estimatedTime, long sequence);
+            void onCallback(double bytesSent, long estimatedTime, long sequence);
         }
     }
 
@@ -164,12 +164,12 @@ public final class Protocol {
         }
 
         public interface FileRequestHandler {
-            public abstract @NotNull
+            @NotNull
             File onFileRequest(Map<String, String> headers);
         }
 
         public interface Callback {
-            public abstract void onCallback(double bytesReceived, long estimatedTime, long sequence);
+            void onCallback(double bytesReceived, long estimatedTime, long sequence);
         }
     }
 }

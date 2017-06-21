@@ -3,6 +3,7 @@ package systems.singularity.chatfx.util;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import systems.singularity.chatfx.util.java.Pair;
+import systems.singularity.chatfx.util.java.ResizableBlockingQueue;
 
 import java.io.IOException;
 import java.net.*;
@@ -18,7 +19,6 @@ import java.util.concurrent.BlockingQueue;
  */
 public final class RDT {
     private static final int MTU = 1024;
-    private static final int WINDOW_SIZE = 4;
     private static final Map<Integer, Receiver> receivers = new HashMap<>();
     private static final Map<Pair<InetAddress, Integer>, Sender> senders = new HashMap<>();
 
@@ -70,15 +70,16 @@ public final class RDT {
 
     private static final class Connection {
         public final PriorityQueue<Packet> packets;
-        public final BlockingQueue<Integer> window;
+        public final ResizableBlockingQueue<Integer> window;
 
         public Boolean fin = false;
         public Integer seq = -1;
         public Integer ack = -1;
+        public Integer repeatedCount = 0;
 
         public Connection() throws UnknownHostException {
             this.packets = new PriorityQueue<>();
-            this.window = new ArrayBlockingQueue<>(RDT.WINDOW_SIZE, true);
+            this.window = new ResizableBlockingQueue<>(4);
         }
     }
 
@@ -86,7 +87,7 @@ public final class RDT {
         private final int port;
         private final InetAddress address;
         private final DatagramSocket socket = new DatagramSocket();
-        private final BlockingQueue<String> queue = new ArrayBlockingQueue<>(Short.MAX_VALUE);
+        private final BlockingQueue<byte[]> queue = new ArrayBlockingQueue<>(Short.MAX_VALUE);
         private final RDT.Connection connection = new Connection();
 
         private Sender(InetAddress address, int port) throws SocketException, UnknownHostException {
@@ -98,7 +99,7 @@ public final class RDT {
             this.socket.setSoTimeout(60);
         }
 
-        public void sendMessage(String message) throws InterruptedException {
+        public void sendMessage(byte[] message) throws InterruptedException {
             this.queue.put(message);
         }
 
@@ -122,22 +123,20 @@ public final class RDT {
 
             while (true)
                 try {
-                    String message = queue.take();
+                    byte[] message = queue.take();
 
                     Boolean ack = false;
                     Boolean fin = false;
-                    Integer len = message.length();
+                    Integer len = message.length;
                     Integer seq = this.connection.seq;
                     Integer port = this.port;
 
-                    byte[] bytes = message.getBytes();
-
-                    for (int i = 0; i < Math.ceil((double) bytes.length / RDT.MTU); i++) {
-                        this.connection.window.put(seq = ++this.connection.seq);
+                    for (int i = 0; i < Math.ceil((double) message.length / RDT.MTU); i++) {
+                        this.connection.window.add(seq = ++this.connection.seq);
 
                         byte[] payload = new byte[8 + RDT.MTU];
 
-                        fin = i + 1 == Math.ceil((double) bytes.length / RDT.MTU);
+                        fin = i + 1 == Math.ceil((double) message.length / RDT.MTU);
 
                         payload[0] = (byte) ((fin ? 0b01000000 : 0b00000000) | ((len >> 24) & 0b00111111));
                         payload[1] = (byte) (len >> 16);
@@ -149,17 +148,17 @@ public final class RDT {
                         payload[7] = port.byteValue();
 
                         if (!fin)
-                            System.arraycopy(bytes, i * RDT.MTU, payload, 8, RDT.MTU);
+                            System.arraycopy(message, i * RDT.MTU, payload, 8, RDT.MTU);
                         else
-                            System.arraycopy(bytes, i * RDT.MTU, payload, 8, bytes.length % RDT.MTU);
+                            System.arraycopy(message, i * RDT.MTU, payload, 8, message.length % RDT.MTU);
 
                         DatagramPacket packet = new DatagramPacket(payload, payload.length, this.address, this.port);
                         socket.send(packet);
 
-                        System.err.printf("%d\tFIN(%b)\tSEQ(%d)\n", message.hashCode(), fin, seq);
+                        System.err.printf("%d\tFIN(%b)\tSEQ(%d)\n", Arrays.hashCode(message), fin, seq);
                     }
 
-                    System.err.printf("%d\tFIN\n", message.hashCode());
+                    System.err.printf("%d\tFIN\n", Arrays.hashCode(message));
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
                     break;
@@ -167,7 +166,16 @@ public final class RDT {
         }
 
         public void onACK(final int seq) {
-            this.connection.window.removeIf(integer -> integer <= seq);
+            synchronized (this.connection.window) {
+                if (!this.connection.window.contains(seq)) {
+                    if (++this.connection.repeatedCount == 2)
+                        this.connection.window.resize(-8);
+                } else {
+                    this.connection.repeatedCount = 0;
+                    this.connection.window.removeIf(integer -> integer <= seq);
+                    this.connection.window.resize(32);
+                }
+            }
         }
     }
 
