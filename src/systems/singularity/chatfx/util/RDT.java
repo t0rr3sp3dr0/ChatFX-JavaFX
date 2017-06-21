@@ -155,6 +155,8 @@ public final class RDT {
                         DatagramPacket packet = new DatagramPacket(payload, payload.length, this.address, this.port);
                         socket.send(packet);
 
+                        new Timer(new Packet(seq, payload), 1000).start();
+
                         System.err.printf("%d\tFIN(%b)\tSEQ(%d)\n", Arrays.hashCode(message), fin, seq);
                     }
 
@@ -166,14 +168,51 @@ public final class RDT {
         }
 
         public void onACK(final int seq) {
+            System.err.printf("Received\nACK(%d)\n", seq);
+
             synchronized (this.connection.window) {
                 if (!this.connection.window.contains(seq)) {
                     if (++this.connection.repeatedCount == 2)
                         this.connection.window.resize(-8);
+                    System.err.printf("Repeated\tACK(%d)\n%d\n", seq, this.connection.repeatedCount);
                 } else {
                     this.connection.repeatedCount = 0;
                     this.connection.window.removeIf(integer -> integer <= seq);
-                    this.connection.window.resize(32);
+                    this.connection.window.resize(4);
+                    System.err.printf("Unexpected\tACK(%d)\n", seq);
+                }
+            }
+        }
+
+        private final class Timer extends Thread {
+            private final Packet packet;
+            private final int timeout;
+
+            public Timer(@NotNull Packet packet, int timeout) {
+                this.packet = packet;
+                this.timeout = timeout;
+            }
+
+            @Override
+            public void run() {
+                super.run();
+
+                try {
+                    Thread.sleep(this.timeout);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                synchronized (Sender.this.connection.window) {
+                    if (Sender.this.connection.window.contains(this.packet.seq))
+                        try {
+                            System.err.printf("Timeout\tSEQ(%d)\n", this.packet.seq);
+                            Sender.this.socket.send(new DatagramPacket(this.packet.bytes, this.packet.bytes.length, Sender.this.address, Sender.this.port));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } finally {
+                            new Timer(this.packet, this.timeout).start();
+                        }
                 }
             }
         }
@@ -246,6 +285,12 @@ public final class RDT {
                             } else
                                 System.out.printf("Unexpected SEQ(%d)\t%d(%d)\n", seq, connection.hashCode(), connection.seq);
                             RDT.getSender(packet.getAddress(), port).sendACK(seq);
+
+                            try {
+                                Thread.sleep(250);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 } catch (IOException e) {
