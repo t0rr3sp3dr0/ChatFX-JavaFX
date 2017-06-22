@@ -69,7 +69,7 @@ public final class Protocol {
 
             try (OutputStream outputStream = socket.getOutputStream()) {
                 try (FileInputStream fileInputStream = new FileInputStream(file)) {
-                    byte[] bytes = new byte[Constants.getMTU()];
+                    byte[] bytes = new byte[Constant.MTU];
 
                     outputStream.write(String.format("Content-Length: %d\n", file.length()).getBytes());
                     outputStream.write(String.format("Content-Disposition: attachment; filename=\"%s\"\n", file.getName()).getBytes());
@@ -132,7 +132,7 @@ public final class Protocol {
                 final Map<String, String> headers = getHeaders(inputStream);
                 final File file = fileRequestHandler.onFileRequest(headers);
 
-                final byte[] bytes = new byte[Constants.getMTU()];
+                final byte[] bytes = new byte[Constant.MTU];
                 Long contentLength = Long.parseLong(headers.get("Content-Length"));
 
                 try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {

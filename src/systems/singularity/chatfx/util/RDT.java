@@ -18,7 +18,6 @@ import java.util.concurrent.BlockingQueue;
  * Created by pedro on 6/8/17.
  */
 public final class RDT {
-    private static final int MTU = 1024;
     private static final Map<Integer, Receiver> receivers = new HashMap<>();
     private static final Map<Pair<InetAddress, Integer>, Sender> senders = new HashMap<>();
 
@@ -53,6 +52,10 @@ public final class RDT {
         }
     }
 
+    public static boolean ignore(double probability) {
+        return Math.random() <= probability;
+    }
+
     private static final class Packet implements Comparable<Packet> {
         public final int seq;
         public final byte[] bytes;
@@ -65,6 +68,12 @@ public final class RDT {
         @Override
         public int compareTo(Packet o) {
             return (this.seq < o.seq) ? -1 : ((this.seq == o.seq) ? 0 : 1);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return this == o || o instanceof Packet && seq == ((Packet) o).seq;
+
         }
     }
 
@@ -89,6 +98,7 @@ public final class RDT {
         private final DatagramSocket socket = new DatagramSocket();
         private final BlockingQueue<byte[]> queue = new ArrayBlockingQueue<>(Short.MAX_VALUE);
         private final RDT.Connection connection = new Connection();
+        private final Timer timer = new Timer();
 
         private Sender(InetAddress address, int port) throws SocketException, UnknownHostException {
             super();
@@ -106,7 +116,7 @@ public final class RDT {
         public void sendACK(Integer seq) throws IOException {
             Integer port = this.port;
 
-            byte[] payload = new byte[8 + RDT.MTU];
+            byte[] payload = new byte[8 + Constant.MTU];
             payload[0] = (byte) 0b10000000;
             payload[4] = (byte) (seq >> 8);
             payload[5] = seq.byteValue();
@@ -115,6 +125,13 @@ public final class RDT {
 
             DatagramPacket packet = new DatagramPacket(payload, payload.length, this.address, this.port);
             socket.send(packet);
+        }
+
+        @Override
+        public synchronized void start() {
+            super.start();
+
+            this.timer.start();
         }
 
         @Override
@@ -131,12 +148,14 @@ public final class RDT {
                     Integer seq = this.connection.seq;
                     Integer port = this.port;
 
-                    for (int i = 0; i < Math.ceil((double) message.length / RDT.MTU); i++) {
-                        this.connection.window.add(seq = ++this.connection.seq);
+                    for (int i = 0; i < Math.ceil((double) message.length / Constant.MTU); i++) {
+                        synchronized (this.connection.window) {
+                            this.connection.window.add(seq = ++this.connection.seq);
+                        }
 
-                        byte[] payload = new byte[8 + RDT.MTU];
+                        byte[] payload = new byte[8 + Constant.MTU];
 
-                        fin = i + 1 == Math.ceil((double) message.length / RDT.MTU);
+                        fin = i + 1 == Math.ceil((double) message.length / Constant.MTU);
 
                         payload[0] = (byte) ((fin ? 0b01000000 : 0b00000000) | ((len >> 24) & 0b00111111));
                         payload[1] = (byte) (len >> 16);
@@ -148,16 +167,20 @@ public final class RDT {
                         payload[7] = port.byteValue();
 
                         if (!fin)
-                            System.arraycopy(message, i * RDT.MTU, payload, 8, RDT.MTU);
+                            System.arraycopy(message, i * Constant.MTU, payload, 8, Constant.MTU);
                         else
-                            System.arraycopy(message, i * RDT.MTU, payload, 8, message.length % RDT.MTU);
+                            System.arraycopy(message, i * Constant.MTU, payload, 8, message.length % Constant.MTU);
 
-                        DatagramPacket packet = new DatagramPacket(payload, payload.length, this.address, this.port);
-                        socket.send(packet);
+                        if (!RDT.ignore(Constant.SENDER_LOSS_PROBABILITY)) {
+                            DatagramPacket packet = new DatagramPacket(payload, payload.length, this.address, this.port);
+                            socket.send(packet);
 
-                        new Timer(new Packet(seq, payload), 1000).start();
+                            System.err.printf("%d\tFIN(%b)\tSEQ(%d)\n", Arrays.hashCode(message), fin, seq);
+                        } else
+                            System.err.printf("%d\tLOST\tSEQ(%d)\n", Arrays.hashCode(message), seq);
 
-                        System.err.printf("%d\tFIN(%b)\tSEQ(%d)\n", Arrays.hashCode(message), fin, seq);
+
+                        this.timer.watch(new Packet(seq, payload));
                     }
 
                     System.err.printf("%d\tFIN\n", Arrays.hashCode(message));
@@ -168,52 +191,65 @@ public final class RDT {
         }
 
         public void onACK(final int seq) {
-            System.err.printf("Received\nACK(%d)\n", seq);
-
-            synchronized (this.connection.window) {
-                if (!this.connection.window.contains(seq)) {
-                    if (++this.connection.repeatedCount == 2)
-                        this.connection.window.resize(-8);
-                    System.err.printf("Repeated\tACK(%d)\n%d\n", seq, this.connection.repeatedCount);
-                } else {
+            if (!this.connection.window.contains(seq)) {
+                System.err.printf("Repeated\tACK(%d)\n%d\n", seq, ++this.connection.repeatedCount);
+                if (this.connection.repeatedCount == 3) {
                     this.connection.repeatedCount = 0;
-                    this.connection.window.removeIf(integer -> integer <= seq);
-                    this.connection.window.resize(4);
-                    System.err.printf("Unexpected\tACK(%d)\n", seq);
+                    this.connection.window.resize(-32);
                 }
+            } else {
+                this.connection.ack = Math.max(this.connection.ack, seq);
+                this.connection.repeatedCount = 0;
+                this.connection.window.removeIf(integer -> integer <= seq);
+                this.connection.window.resize(4);
+                System.err.printf("Received\tACK(%d)\n", seq);
             }
         }
 
         private final class Timer extends Thread {
-            private final Packet packet;
-            private final int timeout;
+            private final PriorityQueue<Pair<Long, Packet>> heap = new PriorityQueue<>();
+            private int timeout = 100;
 
-            public Timer(@NotNull Packet packet, int timeout) {
-                this.packet = packet;
-                this.timeout = timeout;
+            private Timer() {
+                // Avoid class instantiation
             }
 
             @Override
             public void run() {
                 super.run();
 
-                try {
-                    Thread.sleep(this.timeout);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                synchronized (Sender.this.connection.window) {
-                    if (Sender.this.connection.window.contains(this.packet.seq))
-                        try {
-                            System.err.printf("Timeout\tSEQ(%d)\n", this.packet.seq);
-                            Sender.this.socket.send(new DatagramPacket(this.packet.bytes, this.packet.bytes.length, Sender.this.address, Sender.this.port));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } finally {
-                            new Timer(this.packet, this.timeout).start();
+                while (true) {
+                    synchronized (this.heap) {
+                        while (this.heap.size() > 0 && this.heap.peek().first <= System.currentTimeMillis()) {
+                            Packet packet = this.heap.poll().second;
+                            if (Sender.this.connection.ack < packet.seq)
+                                try {
+                                    System.err.printf("Timeout\tSEQ(%d)\n", packet.seq);
+                                    Sender.this.socket.send(new DatagramPacket(packet.bytes, packet.bytes.length, Sender.this.address, Sender.this.port));
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                } finally {
+                                    this.heap.add(new Pair<>(System.currentTimeMillis() + this.timeout, packet));
+                                }
                         }
+                    }
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
+            }
+
+            public void watch(Packet packet) {
+                synchronized (this.heap) {
+                    this.heap.add(new Pair<>(System.currentTimeMillis() + this.timeout, packet));
+                }
+            }
+
+            public void setTimeout(int timeout) {
+                this.timeout = timeout;
             }
         }
     }
@@ -239,9 +275,12 @@ public final class RDT {
 
             while (true) {
                 try {
-                    byte[] payload = new byte[8 + RDT.MTU];
+                    byte[] payload = new byte[8 + Constant.MTU];
                     DatagramPacket packet = new DatagramPacket(payload, payload.length);
                     socket.receive(packet);
+
+                    if (RDT.ignore(Constant.RECEIVER_LOSS_PROBABILITY))
+                        continue;
 
                     final Boolean ack = ((payload[0] >> 7) & 0b1) != 0;
                     final Boolean fin = ((payload[0] >> 6) & 0b1) != 0;
@@ -263,33 +302,42 @@ public final class RDT {
 
                         //noinspection SynchronizationOnLocalVariableOrMethodParameter
                         synchronized (connection) {
-                            if (seq - 1 >= connection.seq) {
-                                connection.packets.add(new Packet(seq, Arrays.copyOfRange(payload, 8, 8 + RDT.MTU)));
-                                System.out.printf("%d\tFIN(%b)\tSEQ(%d)\n", connection.hashCode(), fin, seq);
+                            Packet pkt = new Packet(seq, Arrays.copyOfRange(payload, 8, 8 + Constant.MTU));
 
-                                connection.fin = connection.fin || fin;
-                                connection.seq = Math.max(connection.seq, seq);
-
-                                if (connection.packets.size() == Math.ceil((double) len / RDT.MTU)) {
-                                    byte[] bytes = new byte[len];
-                                    for (int i = 0; i < connection.seq; i++)
-                                        System.arraycopy(connection.packets.poll().bytes, 0, bytes, i * RDT.MTU, RDT.MTU);
-                                    System.arraycopy(connection.packets.poll().bytes, 0, bytes, connection.seq * RDT.MTU, len % RDT.MTU);
-
-                                    OnReceiveListener listener;
-                                    if ((listener = this.onReceiveListeners.get(null)) != null)
-                                        listener.onReceive(packet.getAddress(), bytes);
-                                    if ((listener = this.onReceiveListeners.get(packet.getAddress())) != null)
-                                        listener.onReceive(packet.getAddress(), bytes);
-                                }
-                            } else
+                            if (seq < connection.seq || connection.packets.contains(pkt)) {
                                 System.out.printf("Unexpected SEQ(%d)\t%d(%d)\n", seq, connection.hashCode(), connection.seq);
-                            RDT.getSender(packet.getAddress(), port).sendACK(seq);
+                                RDT.getSender(packet.getAddress(), port).sendACK(connection.seq);
+                                continue;
+                            }
 
-                            try {
-                                Thread.sleep(250);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
+                            if (seq - 1 >= connection.seq) {
+                                connection.packets.add(pkt);
+                                System.out.printf("%d\tFIN(%b)\tSEQ(%d)\n", connection.hashCode(), fin, seq);
+                            }
+
+                            int packetsCount = (int) Math.ceil((double) len / Constant.MTU);
+                            if (!connection.fin && connection.packets.size() == packetsCount) {
+                                byte[] bytes = new byte[len];
+                                for (int i = 0; i < packetsCount - 1; i++)
+                                    System.arraycopy(connection.packets.poll().bytes, 0, bytes, i * Constant.MTU, Constant.MTU);
+
+                                Packet finPacket = connection.packets.poll();
+                                connection.seq = finPacket.seq;
+                                connection.fin = true;
+                                RDT.getSender(packet.getAddress(), port).sendACK(finPacket.seq);
+                                System.arraycopy(finPacket.bytes, 0, bytes, connection.seq * Constant.MTU, len % Constant.MTU);
+
+                                OnReceiveListener listener;
+                                if ((listener = this.onReceiveListeners.get(null)) != null)
+                                    listener.onReceive(packet.getAddress(), bytes);
+                                if ((listener = this.onReceiveListeners.get(packet.getAddress())) != null)
+                                    listener.onReceive(packet.getAddress(), bytes);
+                            }
+
+                            if (seq - 1 == connection.seq) {
+                                connection.seq++;
+                                connection.fin = fin;
+                                RDT.getSender(packet.getAddress(), port).sendACK(seq);
                             }
                         }
                     }
