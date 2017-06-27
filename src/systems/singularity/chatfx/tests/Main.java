@@ -11,10 +11,17 @@ import java.net.UnknownHostException;
  */
 public class Main {
     public static void main(String[] args) throws SocketException, UnknownHostException, InterruptedException {
+        new RDT.RTT.Echo(4321).start();
+
         RDT.Receiver receiver = RDT.getReceiver(1234);
         RDT.Sender sender = RDT.getSender(InetAddress.getByName("localhost"), 1234);
 
         receiver.setOnReceiveListener(null, (address, bytes) -> System.out.println(new String(bytes).trim()));
+
+//        sender.sendMessage("Message 1".getBytes());
+//        sender.sendMessage("Message 2".getBytes());
+//        sender.sendMessage("Message 3".getBytes());
+//        sender.sendMessage("Message 4".getBytes());
 
         sender.sendMessage(("Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec ullamcorper nulla non metus auctor fringilla. Curabitur blandit tempus porttitor.\n" +
                 "\n" +

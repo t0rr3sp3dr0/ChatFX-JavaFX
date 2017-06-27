@@ -2,6 +2,7 @@ package systems.singularity.chatfx.util;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
+import systems.singularity.chatfx.util.java.OnEventListener;
 import systems.singularity.chatfx.util.java.Pair;
 import systems.singularity.chatfx.util.java.ResizableBlockingQueue;
 
@@ -81,9 +82,9 @@ public final class RDT {
         public final PriorityQueue<Packet> packets;
         public final ResizableBlockingQueue<Integer> window;
 
-        public Boolean fin = false;
         public Integer seq = -1;
         public Integer ack = -1;
+        public Integer fin = -1;
         public Integer repeatedCount = 0;
 
         public Connection() throws UnknownHostException {
@@ -93,18 +94,24 @@ public final class RDT {
     }
 
     public static final class Sender extends Thread {
-        private final int port;
         private final InetAddress address;
+        private final int port;
+
         private final DatagramSocket socket = new DatagramSocket();
         private final BlockingQueue<byte[]> queue = new ArrayBlockingQueue<>(Short.MAX_VALUE);
         private final RDT.Connection connection = new Connection();
         private final Timer timer = new Timer();
+        private final RDT.RTT.Probe probe;
 
         private Sender(InetAddress address, int port) throws SocketException, UnknownHostException {
             super();
 
-            this.port = port;
             this.address = address;
+            this.port = port;
+
+            this.probe = new RTT.Probe(address, 4321);
+            this.probe.setOnTimeoutChanged(objects -> Sender.this.timer.setTimeout((Integer) objects[0]));
+            this.probe.start();
 
             this.socket.setSoTimeout(60);
         }
@@ -208,7 +215,7 @@ public final class RDT {
 
         private final class Timer extends Thread {
             private final PriorityQueue<Pair<Long, Packet>> heap = new PriorityQueue<>();
-            private int timeout = 100;
+            private int timeout = 1;
 
             private Timer() {
                 // Avoid class instantiation
@@ -218,6 +225,7 @@ public final class RDT {
             public void run() {
                 super.run();
 
+                //noinspection InfiniteLoopStatement
                 while (true) {
                     synchronized (this.heap) {
                         while (this.heap.size() > 0 && this.heap.peek().first <= System.currentTimeMillis()) {
@@ -304,7 +312,7 @@ public final class RDT {
                         synchronized (connection) {
                             Packet pkt = new Packet(seq, Arrays.copyOfRange(payload, 8, 8 + Constant.MTU));
 
-                            if (seq < connection.seq || connection.packets.contains(pkt)) {
+                            if (seq <= connection.fin || seq < connection.seq || connection.packets.contains(pkt)) {
                                 System.out.printf("Unexpected SEQ(%d)\t%d(%d)\n", seq, connection.hashCode(), connection.seq);
                                 RDT.getSender(packet.getAddress(), port).sendACK(connection.seq);
                                 continue;
@@ -316,16 +324,16 @@ public final class RDT {
                             }
 
                             int packetsCount = (int) Math.ceil((double) len / Constant.MTU);
-                            if (!connection.fin && connection.packets.size() == packetsCount) {
+                            if (connection.packets.size() == packetsCount) {
                                 byte[] bytes = new byte[len];
                                 for (int i = 0; i < packetsCount - 1; i++)
                                     System.arraycopy(connection.packets.poll().bytes, 0, bytes, i * Constant.MTU, Constant.MTU);
 
                                 Packet finPacket = connection.packets.poll();
                                 connection.seq = finPacket.seq;
-                                connection.fin = true;
                                 RDT.getSender(packet.getAddress(), port).sendACK(finPacket.seq);
-                                System.arraycopy(finPacket.bytes, 0, bytes, connection.seq * Constant.MTU, len % Constant.MTU);
+                                System.arraycopy(finPacket.bytes, 0, bytes, (connection.seq - (connection.fin + 1)) * Constant.MTU, len % Constant.MTU);
+                                connection.fin = connection.seq;
 
                                 OnReceiveListener listener;
                                 if ((listener = this.onReceiveListeners.get(null)) != null)
@@ -336,7 +344,6 @@ public final class RDT {
 
                             if (seq - 1 == connection.seq) {
                                 connection.seq++;
-                                connection.fin = fin;
                                 RDT.getSender(packet.getAddress(), port).sendACK(seq);
                             }
                         }
@@ -354,6 +361,115 @@ public final class RDT {
 
         public interface OnReceiveListener {
             void onReceive(InetAddress address, byte[] bytes);
+        }
+    }
+
+    public static final class RTT {
+        private RTT() {
+            // Avoid class instantiation
+        }
+
+        public static final class Echo extends Thread {
+            private final int port;
+
+            public Echo(int port) {
+                this.port = port;
+            }
+
+            @Override
+            public void run() {
+                super.run();
+
+                try {
+                    DatagramSocket datagramSocket = new DatagramSocket(this.port);
+                    byte[] probeData = new byte[1];
+
+                    //noinspection InfiniteLoopStatement
+                    while (true) {
+                        DatagramPacket probePacket = new DatagramPacket(probeData, probeData.length);
+                        datagramSocket.receive(probePacket);
+                        datagramSocket.send(new DatagramPacket(probeData, probeData.length, probePacket.getAddress(), probePacket.getPort()));
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        public static final class Probe extends Thread {
+            private static final double ALPHA = 0.125;
+            private static final double BETA = 0.250;
+
+            private final InetAddress address;
+            private final int port;
+
+            private int timeout = 1;
+            private double sample = 0;
+            private double estimated = 0;
+            private double deviation = 0;
+
+            private OnEventListener onRTTFailed = null;
+            private OnEventListener onTimeoutChanged = null;
+
+            public Probe(InetAddress address, int port) {
+                this.address = address;
+                this.port = port;
+            }
+
+            @Override
+            public void run() {
+                super.run();
+
+                try {
+                    DatagramSocket socket = new DatagramSocket();
+
+                    byte seq = Byte.MIN_VALUE;
+                    byte[] bytes = {seq};
+
+                    //noinspection InfiniteLoopStatement
+                    while (true)
+                        try {
+                            DatagramPacket packet = new DatagramPacket(bytes, bytes.length, this.address, this.port);
+                            socket.setSoTimeout(this.timeout);
+
+                            this.sample = System.nanoTime();
+                            socket.send(packet);
+                            do {
+                                socket.receive(packet);
+                            } while (bytes[0] != seq);
+                            this.sample = System.nanoTime() - this.sample;
+
+                            this.estimated = (1 - Probe.ALPHA) * this.estimated + Probe.ALPHA * this.sample;
+                            this.deviation = (1 - Probe.BETA) * this.deviation + Probe.BETA * Math.abs(this.sample - this.estimated);
+
+                            int timeout = Math.max((int) (Math.round(this.estimated + 4 * this.deviation) / 1e6), 1);
+                            if (this.onTimeoutChanged != null && timeout != this.timeout)
+                                this.onTimeoutChanged.onEvent(timeout);
+                            this.timeout = timeout;
+                        } catch (SocketTimeoutException e) {
+                            if (this.onRTTFailed != null)
+                                this.onRTTFailed.onEvent();
+                        } finally {
+                            bytes[0] = ++seq;
+
+                            try {
+                                Thread.sleep(250);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            public void setOnRTTFailed(OnEventListener onRTTFailed) {
+                this.onRTTFailed = onRTTFailed;
+            }
+
+            public void setOnTimeoutChanged(OnEventListener onTimeoutChanged) {
+                this.onTimeoutChanged = onTimeoutChanged;
+            }
         }
     }
 }
