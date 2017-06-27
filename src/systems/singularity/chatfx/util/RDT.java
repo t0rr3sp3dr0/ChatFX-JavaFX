@@ -199,16 +199,16 @@ public final class RDT {
 
         public void onACK(final int seq) {
             if (!this.connection.window.contains(seq)) {
-                System.err.printf("Repeated\tACK(%d)\n%d\n", seq, ++this.connection.repeatedCount);
+                System.err.printf("Repeated\tACK(%d)\n", seq);
                 if (this.connection.repeatedCount == 3) {
                     this.connection.repeatedCount = 0;
-                    this.connection.window.resize(-32);
+                    this.connection.window.resize(0.5, 0);
                 }
             } else {
                 this.connection.ack = Math.max(this.connection.ack, seq);
                 this.connection.repeatedCount = 0;
                 this.connection.window.removeIf(integer -> integer <= seq);
-                this.connection.window.resize(4);
+                this.connection.window.resize(1, 1);
                 System.err.printf("Received\tACK(%d)\n", seq);
             }
         }

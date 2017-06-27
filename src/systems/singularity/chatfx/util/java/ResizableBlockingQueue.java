@@ -20,9 +20,9 @@ public class ResizableBlockingQueue<E> {
         this.capacity = capacity;
     }
 
-    public void resize(int factor) {
+    public void resize(double coefficient, double constant) {
         synchronized (this.queue) {
-            this.capacity = Math.max(Math.min(this.capacity + factor, Integer.MAX_VALUE), 4);
+            this.capacity = (int) Math.max(Math.min((this.capacity * coefficient) + constant, ResizableBlockingQueue.MAX_SIZE), ResizableBlockingQueue.MIN_SIZE);
         }
     }
 
