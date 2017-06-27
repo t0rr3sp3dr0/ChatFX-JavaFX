@@ -53,7 +53,7 @@ public final class RDT {
         }
     }
 
-    public static boolean ignore(double probability) {
+    public static boolean dispose(double probability) {
         return Math.random() <= probability;
     }
 
@@ -178,13 +178,13 @@ public final class RDT {
                         else
                             System.arraycopy(message, i * Constant.MTU, payload, 8, message.length % Constant.MTU);
 
-                        if (!RDT.ignore(Constant.SENDER_LOSS_PROBABILITY)) {
+                        if (!RDT.dispose(Constant.SENDER_LOSS_PROBABILITY)) {
                             DatagramPacket packet = new DatagramPacket(payload, payload.length, this.address, this.port);
                             socket.send(packet);
 
                             System.err.printf("%d\tFIN(%b)\tSEQ(%d)\n", Arrays.hashCode(message), fin, seq);
                         } else
-                            System.err.printf("%d\tLOST\tSEQ(%d)\n", Arrays.hashCode(message), seq);
+                            System.err.printf("%d\tDISPOSED\tSEQ(%d)\n", Arrays.hashCode(message), seq);
 
 
                         this.timer.watch(new Packet(seq, payload));
@@ -287,14 +287,16 @@ public final class RDT {
                     DatagramPacket packet = new DatagramPacket(payload, payload.length);
                     socket.receive(packet);
 
-                    if (RDT.ignore(Constant.RECEIVER_LOSS_PROBABILITY))
-                        continue;
-
                     final Boolean ack = ((payload[0] >> 7) & 0b1) != 0;
                     final Boolean fin = ((payload[0] >> 6) & 0b1) != 0;
                     final Integer len = (((payload[0] & 0b00111111) << 24) & 0xFF000000) | ((payload[1] << 16) & 0x00FF0000) | ((payload[2] << 8) & 0x0000FF00) | (payload[3] & 0x000000FF);
                     final Integer seq = ((payload[4] << 8) & 0xFF00) | (payload[5] & 0x00FF);
                     final Integer port = ((payload[6] << 8) & 0xFF00) | (payload[7] & 0x00FF);
+
+                    if (RDT.dispose(Constant.RECEIVER_LOSS_PROBABILITY)) {
+                        System.out.printf("%d\tDISPOSED\tSEQ(%d)\n", packet.getAddress().hashCode(), seq);
+                        continue;
+                    }
 
                     if (ack)
                         RDT.getSender(packet.getAddress(), port).onACK(seq);
@@ -313,7 +315,7 @@ public final class RDT {
                             Packet pkt = new Packet(seq, Arrays.copyOfRange(payload, 8, 8 + Constant.MTU));
 
                             if (seq <= connection.fin || seq < connection.seq || connection.packets.contains(pkt)) {
-                                System.out.printf("Unexpected SEQ(%d)\t%d(%d)\n", seq, connection.hashCode(), connection.seq);
+                                System.out.printf("\nUnexpected SEQ(%d)\t%d(%d)\n%b\t%b\t%b\n\n", seq, connection.hashCode(), connection.seq, seq <= connection.fin, seq < connection.seq, connection.packets.contains(pkt));
                                 RDT.getSender(packet.getAddress(), port).sendACK(connection.seq);
                                 continue;
                             }
@@ -343,8 +345,10 @@ public final class RDT {
                             }
 
                             if (seq - 1 == connection.seq) {
-                                connection.seq++;
-                                RDT.getSender(packet.getAddress(), port).sendACK(seq);
+                                for (int i = seq; connection.packets.contains(new Packet(i, null)); i++)
+                                    connection.seq++;
+
+                                RDT.getSender(packet.getAddress(), port).sendACK(connection.seq - 1);
                             }
                         }
                     }
