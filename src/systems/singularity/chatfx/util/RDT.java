@@ -190,6 +190,9 @@ public final class RDT {
                         this.timer.watch(new Packet(seq, payload));
                     }
 
+                    //noinspection StatementWithEmptyBody
+                    while (this.connection.window.size() > 0) ;
+
                     System.err.printf("%d\tFIN\n", Arrays.hashCode(message));
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
