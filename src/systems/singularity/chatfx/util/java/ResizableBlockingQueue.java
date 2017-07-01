@@ -75,4 +75,8 @@ public class ResizableBlockingQueue<E> {
             });
         }
     }
+
+    public int size() {
+        return this.queue.size();
+    }
 }
