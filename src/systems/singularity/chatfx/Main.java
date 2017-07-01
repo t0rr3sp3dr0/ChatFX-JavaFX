@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 import systems.singularity.chatfx.db.Database;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.sql.Connection;
 
 public class Main extends Application {
@@ -32,14 +33,23 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root, 285, 109));
         primaryStage.show();
 
-        String documents = System.getProperty("user.home") + File.separator + "Documents" + File.separator;
-        File file = new File(documents + "ChatFX");
+        String chatFX = defaultDirectory() + File.separator + "ChatFX" + File.separator;
+        File file = new File(chatFX);
         if (!file.exists())
             file.mkdir();
 
-        String chatFX = file.getPath() + File.separator;
         Database.createDatabase( chatFX + "ChatFX.db");
 
+    }
 
+    private static String defaultDirectory()
+    {
+        String OS = System.getProperty("os.name").toUpperCase();
+        if (OS.contains("WIN"))
+            return System.getenv("APPDATA");
+        else if (OS.contains("MAC"))
+            return Paths.get(System.getProperty("user.home"),"Library", "Application Support").toString();
+        else
+            return Paths.get(System.getProperty("user.home"), ".local").toString();
     }
 }
