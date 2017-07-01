@@ -1,39 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="430.0" minWidth="720.0"
-      prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8">
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="430.0" minWidth="720.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systems.singularity.chatfx.controllers.MainController">
     <children>
         <MenuBar>
             <menus>
                 <Menu mnemonicParsing="false" text="File">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Close"/>
+                        <MenuItem mnemonicParsing="false" text="Close" />
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edit">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="Delete"/>
+                        <MenuItem mnemonicParsing="false" text="Delete" />
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">
                     <items>
-                        <MenuItem mnemonicParsing="false" text="About"/>
+                        <MenuItem mnemonicParsing="false" text="About" />
                     </items>
                 </Menu>
             </menus>
         </MenuBar>
-        <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="720.0" prefHeight="400.0"
-              prefWidth="600.0">
+        <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="720.0" prefHeight="400.0" prefWidth="600.0">
             <children>
-                <ListView maxWidth="200.0" minHeight="400.0" minWidth="200.0" prefHeight="200.0" prefWidth="200.0"/>
-                <TabPane maxHeight="Infinity" maxWidth="Infinity" minHeight="-Infinity" minWidth="-Infinity"
-                         prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" HBox.hgrow="ALWAYS">
+                <ListView fx:id="lv_users" maxWidth="200.0" minHeight="400.0" minWidth="200.0" prefHeight="200.0" prefWidth="200.0" />
+                <TabPane fx:id="tp_chats" maxHeight="Infinity" maxWidth="Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" HBox.hgrow="ALWAYS">
                     <tabs>
                         <Tab text="Untitled Tab 1">
                             <content>
@@ -41,194 +39,146 @@
                                     <children>
                                         <ToolBar prefHeight="40.0" prefWidth="200.0">
                                             <items>
-                                                <Button alignment="CENTER" mnemonicParsing="false"
-                                                        textAlignment="CENTER">
+                                                <Button alignment="CENTER" mnemonicParsing="false" textAlignment="CENTER">
                                                     <font>
-                                                        <Font name="System Bold" size="13.0"/>
+                                                        <Font name="System Bold" size="13.0" />
                                                     </font>
                                                     <graphic>
-                                                        <ImageView fitHeight="17.0" fitWidth="17.0" pickOnBounds="true"
-                                                                   preserveRatio="true"/>
+                                                        <ImageView fitHeight="17.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../icons/ic_delete.png" />
+                                             </image></ImageView>
                                                     </graphic>
                                                 </Button>
-                                                <Button alignment="CENTER" mnemonicParsing="false"
-                                                        textAlignment="CENTER">
+                                                <Button alignment="CENTER" mnemonicParsing="false" textAlignment="CENTER">
                                                     <font>
-                                                        <Font name="System Bold" size="13.0"/>
+                                                        <Font name="System Bold" size="13.0" />
                                                     </font>
                                                     <graphic>
-                                                        <ImageView fitHeight="17.0" fitWidth="17.0" pickOnBounds="true"
-                                                                   preserveRatio="true"/>
-                                                    </graphic>
-                                                </Button>
-                                                <Button alignment="CENTER" mnemonicParsing="false"
-                                                        textAlignment="CENTER">
-                                                    <font>
-                                                        <Font name="System Bold" size="13.0"/>
-                                                    </font>
-                                                    <graphic>
-                                                        <ImageView fitHeight="17.0" fitWidth="17.0" pickOnBounds="true"
-                                                                   preserveRatio="true"/>
-                                                    </graphic>
-                                                </Button>
-                                                <Button alignment="CENTER" layoutX="88.0" layoutY="11.0"
-                                                        mnemonicParsing="false" textAlignment="CENTER">
-                                                    <font>
-                                                        <Font name="System Bold" size="13.0"/>
-                                                    </font>
-                                                    <graphic>
-                                                        <ImageView fitHeight="17.0" fitWidth="17.0" pickOnBounds="true"
-                                                                   preserveRatio="true"/>
+                                                        <ImageView fitHeight="17.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../icons/ic_folder.png" />
+                                             </image></ImageView>
                                                     </graphic>
                                                 </Button>
                                             </items>
                                         </ToolBar>
                                         <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                                             <children>
-                                                <VBox minHeight="300.0" minWidth="296.0" prefHeight="300.0"
-                                                      prefWidth="296.0" HBox.hgrow="ALWAYS">
+                                                <VBox minHeight="300.0" minWidth="296.0" prefHeight="300.0" prefWidth="296.0" HBox.hgrow="ALWAYS">
                                                     <children>
-                                                        <TextArea prefHeight="200.0" prefWidth="200.0"
-                                                                  VBox.vgrow="ALWAYS">
+                                                        <TextArea fx:id="ta_chat" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                                                             <VBox.margin>
-                                                                <Insets bottom="4.0"/>
+                                                                <Insets bottom="4.0" />
                                                             </VBox.margin>
                                                         </TextArea>
-                                                        <HBox maxHeight="27.0" minHeight="27.0" prefHeight="27.0"
-                                                              prefWidth="200.0">
+                                                        <HBox maxHeight="27.0" minHeight="27.0" prefHeight="27.0" prefWidth="200.0">
                                                             <children>
-                                                                <TextField HBox.hgrow="ALWAYS">
+                                                                <TextField fx:id="tf_message" HBox.hgrow="ALWAYS">
                                                                     <HBox.margin>
-                                                                        <Insets right="4.0"/>
+                                                                        <Insets right="4.0" />
                                                                     </HBox.margin>
                                                                 </TextField>
-                                                                <Button alignment="CENTER" mnemonicParsing="false"
-                                                                        textAlignment="CENTER">
+                                                                <Button fx:id="bt_send" alignment="CENTER" mnemonicParsing="false" textAlignment="CENTER">
                                                                     <font>
-                                                                        <Font name="System Bold" size="13.0"/>
+                                                                        <Font name="System Bold" size="13.0" />
                                                                     </font>
                                                                     <graphic>
-                                                                        <ImageView fitHeight="17.0" fitWidth="17.0"
-                                                                                   pickOnBounds="true"
-                                                                                   preserveRatio="true"/>
+                                                                        <ImageView fitHeight="17.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true" />
                                                                     </graphic>
                                                                     <HBox.margin>
-                                                                        <Insets left="4.0"/>
+                                                                        <Insets left="4.0" />
                                                                     </HBox.margin>
                                                                 </Button>
                                                             </children>
                                                             <VBox.margin>
-                                                                <Insets top="4.0"/>
+                                                                <Insets top="4.0" />
                                                             </VBox.margin>
                                                         </HBox>
                                                     </children>
                                                     <HBox.margin>
-                                                        <Insets bottom="8.0" left="8.0" right="4.0" top="8.0"/>
+                                                        <Insets bottom="8.0" left="8.0" right="4.0" top="8.0" />
                                                     </HBox.margin>
                                                 </VBox>
-                                                <VBox maxWidth="200.0" minHeight="300.0" minWidth="200.0"
-                                                      prefHeight="300.0" prefWidth="200.0">
+                                                <VBox maxWidth="200.0" minHeight="300.0" minWidth="200.0" prefHeight="300.0" prefWidth="200.0">
                                                     <children>
-                                                        <ListView prefHeight="200.0" prefWidth="200.0"
-                                                                  VBox.vgrow="ALWAYS">
+                                                        <ListView fx:id="lv_files" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                                                             <VBox.margin>
-                                                                <Insets bottom="4.0"/>
+                                                                <Insets bottom="4.0" />
                                                             </VBox.margin>
                                                         </ListView>
                                                         <HBox maxHeight="34.0" prefHeight="100.0" prefWidth="200.0">
                                                             <children>
                                                                 <VBox prefHeight="200.0" prefWidth="100.0">
                                                                     <children>
-                                                                        <HBox maxHeight="17.0" prefHeight="100.0"
-                                                                              prefWidth="200.0">
+                                                                        <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
                                                                             <children>
-                                                                                <Label alignment="CENTER"
-                                                                                       maxWidth="Infinity"
-                                                                                       text="Progress"
-                                                                                       textAlignment="CENTER"
-                                                                                       HBox.hgrow="ALWAYS"/>
+                                                                                <Label alignment="CENTER" maxWidth="Infinity" text="Progress" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                                                                             </children>
                                                                         </HBox>
-                                                                        <HBox maxHeight="17.0" prefHeight="100.0"
-                                                                              prefWidth="200.0">
+                                                                        <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
                                                                             <children>
-                                                                                <Label alignment="CENTER"
-                                                                                       maxWidth="Infinity" text="50%"
-                                                                                       textAlignment="CENTER"
-                                                                                       HBox.hgrow="ALWAYS"/>
+                                                                                <Label alignment="CENTER" maxWidth="Infinity" text="50%" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                                                                             </children>
                                                                         </HBox>
                                                                     </children>
                                                                 </VBox>
                                                                 <VBox prefHeight="200.0" prefWidth="100.0">
                                                                     <children>
-                                                                        <HBox maxHeight="17.0" prefHeight="100.0"
-                                                                              prefWidth="200.0">
+                                                                        <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
                                                                             <children>
-                                                                                <Label alignment="CENTER"
-                                                                                       maxWidth="Infinity" text="ETA"
-                                                                                       textAlignment="CENTER"
-                                                                                       HBox.hgrow="ALWAYS"/>
+                                                                                <Label alignment="CENTER" maxWidth="Infinity" text="ETA" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                                                                             </children>
                                                                         </HBox>
-                                                                        <HBox maxHeight="17.0" prefHeight="100.0"
-                                                                              prefWidth="200.0">
+                                                                        <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
                                                                             <children>
-                                                                                <Label alignment="CENTER"
-                                                                                       maxWidth="Infinity" text="1s"
-                                                                                       textAlignment="CENTER"
-                                                                                       HBox.hgrow="ALWAYS"/>
+                                                                                <Label alignment="CENTER" maxWidth="Infinity" text="1s" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                                                                             </children>
                                                                         </HBox>
                                                                     </children>
                                                                 </VBox>
                                                                 <VBox prefHeight="200.0" prefWidth="100.0">
                                                                     <children>
-                                                                        <HBox maxHeight="17.0" prefHeight="100.0"
-                                                                              prefWidth="200.0">
+                                                                        <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
                                                                             <children>
-                                                                                <Label alignment="CENTER"
-                                                                                       maxWidth="Infinity" text="RTT"
-                                                                                       textAlignment="CENTER"
-                                                                                       HBox.hgrow="ALWAYS"/>
+                                                                                <Label alignment="CENTER" maxWidth="Infinity" text="RTT" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                                                                             </children>
                                                                         </HBox>
-                                                                        <HBox maxHeight="17.0" prefHeight="100.0"
-                                                                              prefWidth="200.0">
+                                                                        <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
                                                                             <children>
-                                                                                <Label alignment="CENTER"
-                                                                                       maxWidth="Infinity" text="0.5ms"
-                                                                                       textAlignment="CENTER"
-                                                                                       HBox.hgrow="ALWAYS"/>
+                                                                                <Label alignment="CENTER" maxWidth="Infinity" text="0.5ms" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                                                                             </children>
                                                                         </HBox>
                                                                     </children>
                                                                 </VBox>
                                                             </children>
                                                             <VBox.margin>
-                                                                <Insets bottom="4.0" top="4.0"/>
+                                                                <Insets bottom="4.0" top="4.0" />
                                                             </VBox.margin>
                                                         </HBox>
-                                                        <ProgressBar prefWidth="200.0" progress="0.0">
+                                                        <ProgressBar fx:id="progress" prefWidth="200.0" progress="0.0">
                                                             <VBox.margin>
-                                                                <Insets bottom="4.0" top="4.0"/>
+                                                                <Insets bottom="4.0" top="4.0" />
                                                             </VBox.margin>
                                                         </ProgressBar>
-                                                        <HBox maxHeight="27.0" minHeight="27.0" prefHeight="27.0"
-                                                              prefWidth="200.0">
+                                                        <HBox maxHeight="27.0" minHeight="27.0" prefHeight="27.0" prefWidth="200.0">
                                                             <children>
-                                                                <Button alignment="CENTER" contentDisplay="CENTER"
-                                                                        maxWidth="Infinity" minWidth="-Infinity"
-                                                                        mnemonicParsing="false" text="Choose File"
-                                                                        textAlignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                                                <Button fx:id="bt_file" alignment="CENTER" contentDisplay="CENTER" maxWidth="Infinity" minWidth="-Infinity" mnemonicParsing="false" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+                                                   <graphic>
+                                                      <ImageView fitHeight="17.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
+                                                         <image>
+                                                            <Image url="@../icons/ic_attach_file.png" />
+                                                         </image>
+                                                      </ImageView>
+                                                   </graphic></Button>
                                                             </children>
                                                             <VBox.margin>
-                                                                <Insets top="4.0"/>
+                                                                <Insets top="4.0" />
                                                             </VBox.margin>
                                                         </HBox>
                                                     </children>
                                                     <HBox.margin>
-                                                        <Insets bottom="8.0" left="4.0" right="8.0" top="8.0"/>
+                                                        <Insets bottom="8.0" left="4.0" right="8.0" top="8.0" />
                                                     </HBox.margin>
                                                 </VBox>
                                             </children>
@@ -239,7 +189,7 @@
                         </Tab>
                         <Tab text="Untitled Tab 2">
                             <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                             </content>
                         </Tab>
                     </tabs>

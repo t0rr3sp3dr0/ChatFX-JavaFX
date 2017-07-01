@@ -1,62 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="91.0" maxWidth="-Infinity" minHeight="-Infinity"
-      minWidth="-Infinity" prefHeight="91.0" prefWidth="285.0" xmlns="http://javafx.com/javafx/8">
+
+<VBox maxHeight="91.0" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="91.0" prefWidth="285.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systems.singularity.chatfx.controllers.OpenServerController">
     <children>
         <HBox minWidth="256.0" prefHeight="0.0" prefWidth="0.0">
             <children>
-                <Label alignment="CENTER_RIGHT" maxHeight="Infinity" maxWidth="64.0" minWidth="64.0" text="IP"
-                       HBox.hgrow="ALWAYS">
+                <Label alignment="CENTER_RIGHT" maxHeight="Infinity" maxWidth="64.0" minWidth="64.0" text="IP" HBox.hgrow="ALWAYS">
                     <HBox.margin>
-                        <Insets right="2.0"/>
+                        <Insets right="2.0" />
                     </HBox.margin>
                 </Label>
-                <TextField editable="false" text="127.0.0.1" HBox.hgrow="ALWAYS">
+                <TextField fx:id="tf_ip" editable="false" text="127.0.0.1" HBox.hgrow="ALWAYS">
                     <HBox.margin>
-                        <Insets left="2.0"/>
+                        <Insets left="2.0" />
                     </HBox.margin>
                 </TextField>
             </children>
             <VBox.margin>
-                <Insets bottom="2.0" left="4.0" right="4.0" top="4.0"/>
+                <Insets bottom="2.0" left="4.0" right="4.0" top="4.0" />
             </VBox.margin>
         </HBox>
         <HBox minWidth="256.0" prefHeight="0.0" prefWidth="0.0">
             <children>
-                <Label alignment="CENTER_RIGHT" maxHeight="Infinity" maxWidth="64.0" minWidth="64.0" text="Port"
-                       HBox.hgrow="ALWAYS">
+                <Label alignment="CENTER_RIGHT" maxHeight="Infinity" maxWidth="64.0" minWidth="64.0" text="Port" HBox.hgrow="ALWAYS">
                     <HBox.margin>
-                        <Insets right="2.0"/>
+                        <Insets right="2.0" />
                     </HBox.margin>
                 </Label>
-                <TextField HBox.hgrow="ALWAYS">
+                <TextField fx:id="tf_port" HBox.hgrow="ALWAYS">
                     <HBox.margin>
-                        <Insets left="2.0"/>
+                        <Insets left="2.0" />
                     </HBox.margin>
                 </TextField>
             </children>
             <VBox.margin>
-                <Insets bottom="2.0" left="4.0" right="4.0" top="2.0"/>
+                <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
             </VBox.margin>
         </HBox>
         <HBox prefHeight="0.0" prefWidth="0.0">
             <children>
                 <Label alignment="CENTER_RIGHT" maxWidth="64.0" minWidth="64.0">
                     <HBox.margin>
-                        <Insets right="2.0"/>
+                        <Insets right="2.0" />
                     </HBox.margin>
                 </Label>
-                <Button maxWidth="Infinity" mnemonicParsing="false" text="Open Server" HBox.hgrow="ALWAYS">
+                <Button fx:id="bt_open" maxWidth="Infinity" mnemonicParsing="false" text="Open Server" HBox.hgrow="ALWAYS">
                     <HBox.margin>
-                        <Insets left="2.0"/>
+                        <Insets left="2.0" />
                     </HBox.margin>
                 </Button>
             </children>
             <VBox.margin>
-                <Insets bottom="4.0" left="4.0" right="4.0" top="2.0"/>
+                <Insets bottom="4.0" left="4.0" right="4.0" top="2.0" />
             </VBox.margin>
         </HBox>
     </children>
