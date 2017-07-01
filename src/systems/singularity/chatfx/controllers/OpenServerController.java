@@ -1,9 +1,13 @@
 package systems.singularity.chatfx.controllers;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -29,7 +33,13 @@ public class OpenServerController implements Initializable{
 
         bt_open.setOnAction( e -> {
             try {
-                //Abrir conexão com o Server
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/server.fxml"));
+                final Parent root = fxmlLoader.load();
+
+                Stage stage = new Stage();
+                stage.setTitle("Server");
+                stage.setScene(new Scene(root, 600, 400));
+                stage.show();
 
             } catch (Exception e1) {
                 e1.printStackTrace();

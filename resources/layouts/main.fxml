@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="430.0" minWidth="720.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systems.singularity.chatfx.controllers.MainController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="430.0" minWidth="720.0" prefHeight="430.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systems.singularity.chatfx.controllers.MainController">
     <children>
         <MenuBar>
             <menus>
@@ -79,12 +79,15 @@
                                                                         <Insets right="4.0" />
                                                                     </HBox.margin>
                                                                 </TextField>
-                                                                <Button fx:id="bt_send" alignment="CENTER" mnemonicParsing="false" textAlignment="CENTER">
+                                                                <Button fx:id="bt_send" alignment="CENTER" maxHeight="30.0" maxWidth="30.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" textAlignment="CENTER">
                                                                     <font>
                                                                         <Font name="System Bold" size="13.0" />
                                                                     </font>
                                                                     <graphic>
-                                                                        <ImageView fitHeight="17.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true" />
+                                                                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                         <image>
+                                                            <Image url="@../icons/ic_send.png" />
+                                                         </image></ImageView>
                                                                     </graphic>
                                                                     <HBox.margin>
                                                                         <Insets left="4.0" />
@@ -163,13 +166,18 @@
                                                         </ProgressBar>
                                                         <HBox maxHeight="27.0" minHeight="27.0" prefHeight="27.0" prefWidth="200.0">
                                                             <children>
-                                                                <Button fx:id="bt_file" alignment="CENTER" contentDisplay="CENTER" maxWidth="Infinity" minWidth="-Infinity" mnemonicParsing="false" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+                                                                <Button fx:id="bt_file" alignment="CENTER" contentDisplay="CENTER" maxHeight="31.0" maxWidth="200.0" minWidth="-Infinity" mnemonicParsing="false" prefHeight="31.0" prefWidth="200.0" textAlignment="CENTER" HBox.hgrow="ALWAYS">
                                                    <graphic>
-                                                      <ImageView fitHeight="17.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
-                                                         <image>
-                                                            <Image url="@../icons/ic_attach_file.png" />
-                                                         </image>
-                                                      </ImageView>
+                                                      <HBox maxHeight="31.0" maxWidth="200.0" prefHeight="31.0" prefWidth="200.0">
+                                                         <children>
+                                                            <Label fx:id="lb_filename" alignment="CENTER" contentDisplay="CENTER" maxHeight="31.0" maxWidth="180.0" prefHeight="31.0" prefWidth="180.0" text="choose file" textAlignment="CENTER" />
+                                                            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                                                               <image>
+                                                                  <Image url="@../icons/ic_attach_file.png" />
+                                                               </image>
+                                                            </ImageView>
+                                                         </children>
+                                                      </HBox>
                                                    </graphic></Button>
                                                             </children>
                                                             <VBox.margin>

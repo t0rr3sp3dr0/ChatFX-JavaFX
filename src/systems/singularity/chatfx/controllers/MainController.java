@@ -3,8 +3,12 @@ package systems.singularity.chatfx.controllers;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
+import java.io.File;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
@@ -34,6 +38,9 @@ public class MainController implements Initializable {
     private ListView<?> lv_files;
 
     @FXML
+    private Label lb_filename;
+
+    @FXML
     private TextField tf_message;
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -49,10 +56,31 @@ public class MainController implements Initializable {
     }
 
     private void sendMessage() {
+
     }
 
     private void sendFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        File file = fileChooser.showOpenDialog(bt_file.getScene().getWindow());
+        if(file != null) {
+            lb_filename.setText(file.getName());
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Send file");
+            alert.setHeaderText("Are you sure?");
+            Button OKButton = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
+            OKButton.setText("Yes");
+            Button CancelButton = (Button) alert.getDialogPane().lookupButton(ButtonType.CANCEL);
+            CancelButton.setText("No");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                //enviar o arquivo
+            }
+            else {
+                lb_filename.setText("");
+                file = null;
+            }
+        }
     }
-
-
 }

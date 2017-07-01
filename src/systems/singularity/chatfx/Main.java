@@ -5,6 +5,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import systems.singularity.chatfx.db.Database;
+
+import java.io.File;
+import java.sql.Connection;
 
 public class Main extends Application {
 
@@ -14,9 +18,28 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/layouts/sample.fxml"));
-        primaryStage.setTitle("Hello World");
-        primaryStage.setScene(new Scene(root, 300, 275));
+
+        //Initialize server
+//        Parent root = FXMLLoader.load(getClass().getResource("/layouts/open_server.fxml"));
+//        primaryStage.setTitle("Open Server");
+//        primaryStage.setScene(new Scene(root, 285, 109));
+//        primaryStage.show();
+
+
+        //Initialize client
+        Parent root = FXMLLoader.load(getClass().getResource("/layouts/login.fxml"));
+        primaryStage.setTitle("Login");
+        primaryStage.setScene(new Scene(root, 285, 109));
         primaryStage.show();
+
+        String documents = System.getProperty("user.home") + File.separator + "Documents" + File.separator;
+        File file = new File(documents + "ChatFX");
+        if (!file.exists())
+            file.mkdir();
+
+        String chatFX = file.getPath() + File.separator;
+        Database.createDatabase( chatFX + "ChatFX.db");
+
+
     }
 }

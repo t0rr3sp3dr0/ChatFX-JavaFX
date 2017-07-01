@@ -11,7 +11,7 @@ public class Database {
 
     private Database(String path) {
         try {
-            connection = ConnectionFactory.createConnection(path);
+            this.connection = ConnectionFactory.createConnection(path);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -24,6 +24,7 @@ public class Database {
                 DatabaseMetaData metaData = connection.getMetaData();
                 ourInstance = new Database(url);
                 //conexão criada
+                ourInstance.connection.close();
             }
         } catch (SQLException e) {
             e.printStackTrace();
