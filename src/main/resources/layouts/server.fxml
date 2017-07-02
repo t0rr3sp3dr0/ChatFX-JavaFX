@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<TableView xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="systems.singularity.chatfx.server.controllers.ServerController" fx:id="tv_users"
+           maxHeight="300.0" maxWidth="600.0" prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8">
+    <columns>
+        <TableColumn fx:id="tc_username" prefWidth="95.0" text="username"/>
+        <TableColumn fx:id="tc_ip" prefWidth="199.0" text="ip"/>
+        <TableColumn fx:id="tc_chat" prefWidth="86.0" text="chat port "/>
+        <TableColumn fx:id="tc_file" prefWidth="77.0" text="file port"/>
+        <TableColumn fx:id="tc_rtt" prefWidth="73.0" text="rtt port"/>
+        <TableColumn fx:id="tc_status" prefWidth="69.0" text="status"/>
+    </columns>
+</TableView>
