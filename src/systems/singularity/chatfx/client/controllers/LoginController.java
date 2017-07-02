@@ -1,6 +1,5 @@
-package systems.singularity.chatfx.controllers;
+package systems.singularity.chatfx.client.controllers;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -8,9 +7,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import systems.singularity.chatfx.Main;
-import systems.singularity.chatfx.db.UserRepository;
-import systems.singularity.chatfx.structs.User;
+import systems.singularity.chatfx.server.db.UserRepository;
+import systems.singularity.chatfx.server.structs.User;
 import systems.singularity.chatfx.util.java.Utilities;
 
 import java.io.IOException;
@@ -37,6 +35,7 @@ public class LoginController implements Initializable {
 
                 if (!tf_user.getText().isEmpty() && !tf_pass.getText().isEmpty() && tf_pass.getText().length() >= 8) {
                     try {
+                        //ajustar para o RDT
                         User user = new UserRepository().get(new User(0, tf_user.getText(), "", "", (short)0, (short)0, (short)0, false));
                         String password = Utilities.MD5(tf_pass.getText());
                         if (user != null) {
@@ -79,14 +78,12 @@ public class LoginController implements Initializable {
         } catch (Exception e1) {
             e1.printStackTrace();
         }
-
     }
 
     private void login(User user) {
         //ir para a tela principal
         try {
             user.setStatus(true);
-            Main.user = user;
             new UserRepository().update(user);
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/main.fxml"));
             final Parent root = fxmlLoader.load();
@@ -97,7 +94,7 @@ public class LoginController implements Initializable {
             stage.show();
 
             stage.setOnCloseRequest(e -> {
-                Main.user.setStatus(false);
+                user.setStatus(false);
                 try {
                     new UserRepository().update(user);
                 } catch (SQLException e1) {

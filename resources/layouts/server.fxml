@@ -5,7 +5,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<TableView fx:controller="systems.singularity.chatfx.controllers.ServerController" fx:id="tv_users" maxHeight="300.0" maxWidth="600.0" prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<TableView fx:controller="systems.singularity.chatfx.server.controllers.ServerController" fx:id="tv_users" maxHeight="300.0" maxWidth="600.0" prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <columns>
       <TableColumn fx:id="tc_username" prefWidth="95.0" text="username" />
       <TableColumn fx:id="tc_ip" prefWidth="199.0" text="ip" />

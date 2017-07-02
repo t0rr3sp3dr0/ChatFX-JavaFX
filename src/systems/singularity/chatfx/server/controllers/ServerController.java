@@ -1,4 +1,4 @@
-package systems.singularity.chatfx.controllers;
+package systems.singularity.chatfx.server.controllers;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -6,8 +6,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import systems.singularity.chatfx.db.UserRepository;
-import systems.singularity.chatfx.structs.User;
+import systems.singularity.chatfx.server.db.UserRepository;
+import systems.singularity.chatfx.server.structs.User;
 
 import java.net.URL;
 import java.sql.SQLException;
@@ -43,6 +43,7 @@ public class ServerController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
 
         updateTable();
 

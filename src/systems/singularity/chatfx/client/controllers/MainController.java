@@ -1,4 +1,4 @@
-package systems.singularity.chatfx.controllers;
+package systems.singularity.chatfx.client.controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
