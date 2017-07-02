@@ -7,7 +7,6 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.Map;
 
 /**
  * Created by pedro on 6/10/17.
@@ -19,24 +18,24 @@ public class Main {
         RDT.Receiver receiver = RDT.getReceiver(1234);
         RDT.Sender sender = RDT.getSender(InetAddress.getByName("192.168.43.43"), 1234);
 
-        receiver.setOnReceiveListener(null, (address, bytes) -> {
-            System.out.println("\t" + address.toString());
+//        receiver.setOnReceiveListener(null, (address, bytes) -> {
+//            System.out.println("\t" + address.toString());
+//
+//            Map<String, String> headers = Protocol.extractHeaders(bytes);
+//            final long contentLength = Long.parseLong(headers.get("Content-Length"));
+//
+//            Protocol.Downloader downloader = Protocol.getDownloader(headers);
+//            downloader.setCallback((bytesReceived, elapsedTime, sequence) -> {
+//                if (bytesReceived == contentLength)
+//                    System.out.println("FINISHED");
+//                else
+//                    System.out.println((elapsedTime / 1e9) + "s");
+//            });
+//            downloader.add(Protocol.extractData(bytes));
+//        });
 
-            Map<String, String> headers = Protocol.extractHeaders(bytes);
-            final long contentLength = Long.parseLong(headers.get("Content-Length"));
-
-            Protocol.Downloader downloader = Protocol.getDownloader(headers);
-            downloader.setCallback((bytesReceived, estimatedTime, sequence) -> {
-                if (bytesReceived == contentLength)
-                    System.out.println("FINISHED");
-                else
-                    System.out.println(estimatedTime);
-            });
-            downloader.add(Protocol.extractData(bytes));
-        });
-
-        new Protocol.Uploader(sender, "", new File("/Users/pedro/Downloads/go.src.tar.gz"), (bytesSent, estimatedTime, sequence) -> {
-            System.out.println(estimatedTime);
+        new Protocol.Uploader(sender, "", new File("/Users/pedro/Downloads/go.src.tar.gz"), (bytesSent, elapsedTime, sequence) -> {
+            System.out.println(bytesSent / (elapsedTime / 1e9) + "Bps");
         }).start();
 
 //        try {

@@ -89,7 +89,7 @@ public final class RDT {
 
         public Connection() throws UnknownHostException {
             this.packets = new PriorityQueue<>();
-            this.window = new ResizableBlockingQueue<>(Byte.MAX_VALUE);
+            this.window = new ResizableBlockingQueue<>(4);
         }
     }
 
@@ -409,7 +409,7 @@ public final class RDT {
         }
 
         public static final class Probe extends Thread {
-            private static final int MIN_TIMEOUT = 250;
+            private static final int MIN_TIMEOUT = 1;
             private static final double ALPHA = 0.125;
             private static final double BETA = 0.250;
 

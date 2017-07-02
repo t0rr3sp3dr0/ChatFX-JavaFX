@@ -115,15 +115,13 @@ public final class Protocol {
                     if (size <= 0)
                         break;
 
-                    System.out.printf("%d\t%d\t%d\t%d\t%d\n\t%d\n", bytes.length, bytes[bytes.length - 4], bytes[bytes.length - 3], bytes[bytes.length - 2], bytes[bytes.length - 1], bytes[bytes.length - 57345]);
-
                     sender.sendMessage(bytes);
-                    long estimatedTime = System.nanoTime() - startTime;
+                    long elapsedTime = System.nanoTime() - startTime;
                     writtenSize += size;
                     count++;
 
                     if (callback != null)
-                        callback.onCallback(writtenSize, estimatedTime, count);
+                        callback.onCallback(writtenSize, elapsedTime, count);
                 }
 
                 if (writtenSize != this.file.length())
@@ -136,7 +134,7 @@ public final class Protocol {
         }
 
         public interface Callback {
-            void onCallback(double bytesSent, long estimatedTime, long sequence);
+            void onCallback(double bytesSent, long elapsedTime, long sequence);
         }
     }
 
@@ -175,12 +173,12 @@ public final class Protocol {
                         continue;
 
                     fileOutputStream.write(bytes, 0, size);
-                    long estimatedTime = System.nanoTime() - startTime;
+                    long elapsedTime = System.nanoTime() - startTime;
                     readSize += size;
                     count++;
 
                     if (callback != null)
-                        callback.onCallback(readSize, estimatedTime, count);
+                        callback.onCallback(readSize, elapsedTime, count);
                 }
 
                 if (readSize != file.length())
@@ -201,7 +199,7 @@ public final class Protocol {
         }
 
         public interface Callback {
-            void onCallback(double bytesReceived, long estimatedTime, long sequence);
+            void onCallback(double bytesReceived, long elapsedTime, long sequence);
         }
     }
 }
