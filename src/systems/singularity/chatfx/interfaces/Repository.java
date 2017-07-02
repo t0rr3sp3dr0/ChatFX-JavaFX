@@ -17,5 +17,5 @@ public interface Repository<E> {
 
     List<E> getAll() throws SQLException;
 
-    E get(int id) throws SQLException;
+    E get(E e) throws SQLException;
 }

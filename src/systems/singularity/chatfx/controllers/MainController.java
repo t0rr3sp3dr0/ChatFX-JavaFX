@@ -80,6 +80,8 @@ public class MainController implements Initializable {
             //limpar o histórico
             clearChat();
         });
+
+
     }
 
     private void sendMessage() {

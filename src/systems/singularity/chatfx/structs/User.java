@@ -7,6 +7,7 @@ public class User {
     private int id;
     private String username;
     private String password;
+    private String address;
     private short port_chat;
     private short port_file;
     private short port_rtt;
@@ -14,10 +15,11 @@ public class User {
 
     public User() { }
 
-    public User(int id, String username, String password, short port_chat, short port_file, short port_rtt, boolean status) {
+    public User(int id, String username, String password, String address, short port_chat, short port_file, short port_rtt, boolean status) {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.address = address;
         this.port_chat = port_chat;
         this.port_file = port_file;
         this.port_rtt = port_rtt;
@@ -46,6 +48,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public short getPort_chat() {
