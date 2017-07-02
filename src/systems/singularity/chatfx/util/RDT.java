@@ -123,7 +123,7 @@ public final class RDT {
         public void sendACK(Integer seq) throws IOException {
             Integer port = this.port;
 
-            byte[] payload = new byte[8 + Constant.MTU];
+            byte[] payload = new byte[8 + Constants.MTU];
             payload[0] = (byte) 0b10000000;
             payload[4] = (byte) (seq >> 8);
             payload[5] = seq.byteValue();
@@ -155,14 +155,14 @@ public final class RDT {
                     Integer seq = this.connection.seq;
                     Integer port = this.port;
 
-                    for (int i = 0; i < Math.ceil((double) message.length / Constant.MTU); i++) {
+                    for (int i = 0; i < Math.ceil((double) message.length / Constants.MTU); i++) {
                         synchronized (this.connection.window) {
                             this.connection.window.add(seq = ++this.connection.seq);
                         }
 
-                        byte[] payload = new byte[8 + Constant.MTU];
+                        byte[] payload = new byte[8 + Constants.MTU];
 
-                        fin = i + 1 == Math.ceil((double) message.length / Constant.MTU);
+                        fin = i + 1 == Math.ceil((double) message.length / Constants.MTU);
 
                         payload[0] = (byte) ((fin ? 0b01000000 : 0b00000000) | ((len >> 24) & 0b00111111));
                         payload[1] = (byte) (len >> 16);
@@ -174,11 +174,11 @@ public final class RDT {
                         payload[7] = port.byteValue();
 
                         if (!fin)
-                            System.arraycopy(message, i * Constant.MTU, payload, 8, Constant.MTU);
+                            System.arraycopy(message, i * Constants.MTU, payload, 8, Constants.MTU);
                         else
-                            System.arraycopy(message, i * Constant.MTU, payload, 8, message.length % Constant.MTU);
+                            System.arraycopy(message, i * Constants.MTU, payload, 8, message.length % Constants.MTU);
 
-                        if (!RDT.dispose(Constant.SENDER_LOSS_PROBABILITY)) {
+                        if (!RDT.dispose(Constants.SENDER_LOSS_PROBABILITY)) {
                             DatagramPacket packet = new DatagramPacket(payload, payload.length, this.address, this.port);
                             socket.send(packet);
 
@@ -205,7 +205,7 @@ public final class RDT {
                 System.err.printf("Repeated\tACK(%d)\n", seq);
                 if (this.connection.repeatedCount == 3) {
                     this.connection.repeatedCount = 0;
-                    this.connection.window.resize(0.5, 0);
+                    this.connection.window.resize(0.875, 0);
                 }
             } else {
                 this.connection.ack = Math.max(this.connection.ack, seq);
@@ -286,7 +286,7 @@ public final class RDT {
 
             while (true) {
                 try {
-                    byte[] payload = new byte[8 + Constant.MTU];
+                    byte[] payload = new byte[8 + Constants.MTU];
                     DatagramPacket packet = new DatagramPacket(payload, payload.length);
                     socket.receive(packet);
 
@@ -296,7 +296,7 @@ public final class RDT {
                     final Integer seq = ((payload[4] << 8) & 0xFF00) | (payload[5] & 0x00FF);
                     final Integer port = ((payload[6] << 8) & 0xFF00) | (payload[7] & 0x00FF);
 
-                    if (RDT.dispose(Constant.RECEIVER_LOSS_PROBABILITY)) {
+                    if (RDT.dispose(Constants.RECEIVER_LOSS_PROBABILITY)) {
                         System.out.printf("%d\tDISPOSED\tSEQ(%d)\n", packet.getAddress().hashCode(), seq);
                         continue;
                     }
@@ -315,7 +315,7 @@ public final class RDT {
 
                         //noinspection SynchronizationOnLocalVariableOrMethodParameter
                         synchronized (connection) {
-                            Packet pkt = new Packet(seq, Arrays.copyOfRange(payload, 8, 8 + Constant.MTU));
+                            Packet pkt = new Packet(seq, Arrays.copyOfRange(payload, 8, 8 + Constants.MTU));
 
                             if (seq <= connection.fin || seq < connection.seq || connection.packets.contains(pkt)) {
                                 System.out.printf("\nUnexpected SEQ(%d)\t%d(%d)\n%b\t%b\t%b\n\n", seq, connection.hashCode(), connection.seq, seq <= connection.fin, seq < connection.seq, connection.packets.contains(pkt));
@@ -328,16 +328,16 @@ public final class RDT {
                                 System.out.printf("%d\tFIN(%b)\tSEQ(%d)\n", connection.hashCode(), fin, seq);
                             }
 
-                            int packetsCount = (int) Math.ceil((double) len / Constant.MTU);
+                            int packetsCount = (int) Math.ceil((double) len / Constants.MTU);
                             if (connection.packets.size() == packetsCount) {
                                 byte[] bytes = new byte[len];
                                 for (int i = 0; i < packetsCount - 1; i++)
-                                    System.arraycopy(connection.packets.poll().bytes, 0, bytes, i * Constant.MTU, Constant.MTU);
+                                    System.arraycopy(connection.packets.poll().bytes, 0, bytes, i * Constants.MTU, Constants.MTU);
 
                                 Packet finPacket = connection.packets.poll();
                                 connection.seq = finPacket.seq;
                                 RDT.getSender(packet.getAddress(), port).sendACK(finPacket.seq);
-                                System.arraycopy(finPacket.bytes, 0, bytes, (connection.seq - (connection.fin + 1)) * Constant.MTU, len % Constant.MTU);
+                                System.arraycopy(finPacket.bytes, 0, bytes, (connection.seq - (connection.fin + 1)) * Constants.MTU, len % Constants.MTU);
                                 connection.fin = connection.seq;
 
                                 OnReceiveListener listener;
@@ -404,13 +404,14 @@ public final class RDT {
         }
 
         public static final class Probe extends Thread {
+            private static final int MIN_TIMEOUT = 250;
             private static final double ALPHA = 0.125;
             private static final double BETA = 0.250;
 
             private final InetAddress address;
             private final int port;
 
-            private int timeout = 1;
+            private int timeout = 500;
             private double sample = 0;
             private double estimated = 0;
             private double deviation = 0;
@@ -449,11 +450,12 @@ public final class RDT {
                             this.estimated = (1 - Probe.ALPHA) * this.estimated + Probe.ALPHA * this.sample;
                             this.deviation = (1 - Probe.BETA) * this.deviation + Probe.BETA * Math.abs(this.sample - this.estimated);
 
-                            int timeout = Math.max((int) (Math.round(this.estimated + 4 * this.deviation) / 1e6), 1);
+                            int timeout = Math.max((int) (Math.round(this.estimated + 4 * this.deviation) / 1e6), Probe.MIN_TIMEOUT);
                             if (this.onTimeoutChanged != null && timeout != this.timeout)
                                 this.onTimeoutChanged.onEvent(timeout);
                             this.timeout = timeout;
                         } catch (SocketTimeoutException e) {
+                            System.out.println(e.getMessage());
                             if (this.onRTTFailed != null)
                                 this.onRTTFailed.onEvent();
                         } finally {
