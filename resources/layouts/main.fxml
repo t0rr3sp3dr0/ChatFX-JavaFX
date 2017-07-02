@@ -50,7 +50,7 @@
                                              </image></ImageView>
                                                     </graphic>
                                                 </Button>
-                                                <Button alignment="CENTER" mnemonicParsing="false" textAlignment="CENTER">
+                                                <Button fx:id="bt_showFolder" alignment="CENTER" mnemonicParsing="false" textAlignment="CENTER">
                                                     <font>
                                                         <Font name="System Bold" size="13.0" />
                                                     </font>

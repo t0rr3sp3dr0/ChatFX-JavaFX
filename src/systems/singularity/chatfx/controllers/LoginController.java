@@ -36,12 +36,17 @@ public class LoginController implements Initializable {
                     //  faz login
                     //}
 
-
-
                 } else {
                     Alert alert = new Alert(Alert.AlertType.WARNING);
                     alert.setTitle("Error");
-                    alert.setHeaderText("Please complete all fields right");
+                    String error = "";
+                    if(tf_user.getText().isEmpty())
+                        error = "Username field is invalid.";
+                    else if(tf_pass.getText().isEmpty())
+                        error = "Password field is invalid.";
+                    else if(tf_pass.getText().length() < 8)
+                        error = "Password field is invalid. Minimum of 8 characters.";
+                    alert.setHeaderText(error);
                     Button exitButton = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
                     exitButton.setText("OK");
                     alert.show();

@@ -26,6 +26,9 @@ public class MainController implements Initializable {
     private Button bt_file;
 
     @FXML
+    private Button bt_showFolder;
+
+    @FXML
     private TextArea ta_chat;
 
     @FXML
@@ -52,6 +55,10 @@ public class MainController implements Initializable {
         bt_file.setOnAction(e -> {
             //enviar o arquivo
             sendFile();
+        });
+
+        bt_showFolder.setOnAction(e -> {
+
         });
     }
 
