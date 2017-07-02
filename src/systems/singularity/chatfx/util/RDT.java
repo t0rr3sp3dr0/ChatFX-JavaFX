@@ -179,7 +179,9 @@ public final class RDT {
                         if (!fin)
                             System.arraycopy(message, i * Constants.MTU, payload, 8, Constants.MTU);
                         else
-                            System.arraycopy(message, i * Constants.MTU, payload, 8, message.length % Constants.MTU);
+                            System.arraycopy(message, i * Constants.MTU, payload, 8, message.length % Constants.MTU == 0 ? Constants.MTU : message.length % Constants.MTU);
+
+                        System.err.printf("\t\t%d\t%d\t%d\t%d\n", message.length, message[message.length - 1], payload.length, payload[payload.length - 1]);
 
                         if (!RDT.dispose(Constants.SENDER_LOSS_PROBABILITY)) {
                             DatagramPacket packet = new DatagramPacket(payload, payload.length, this.address, this.port);
@@ -340,7 +342,7 @@ public final class RDT {
                                 Packet finPacket = connection.packets.poll();
                                 connection.seq = finPacket.seq;
                                 RDT.getSender(packet.getAddress(), port).sendACK(finPacket.seq);
-                                System.arraycopy(finPacket.bytes, 0, bytes, (connection.seq - (connection.fin + 1)) * Constants.MTU, len % Constants.MTU);
+                                System.arraycopy(finPacket.bytes, 0, bytes, (connection.seq - (connection.fin + 1)) * Constants.MTU, len % Constants.MTU == 0 ? Constants.MTU : len % Constants.MTU);
                                 connection.fin = connection.seq;
 
                                 OnReceiveListener listener;

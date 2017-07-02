@@ -101,19 +101,21 @@ public final class Protocol {
             super.run();
 
             try (FileInputStream fileInputStream = new FileInputStream(this.file)) {
-                byte[] bytes = new byte[2 * Constants.MTU];
-
                 long writtenSize = 0;
                 int count = 0;
                 int size;
                 long startTime = System.nanoTime();
                 while (true) {
+                    byte[] bytes = new byte[2 * Constants.MTU];
+
                     byte[] header = String.format("Content-Length: %d\nContent-Disposition: attachment; filename=\"%s\"\nMessage-ID: %d\nPragma: %s\n\n", this.file.length(), this.file.getName(), this.file.hashCode(), this.pragma).getBytes();
                     System.arraycopy(header, 0, bytes, 0, header.length);
 
                     size = fileInputStream.read(bytes, header.length, bytes.length - header.length);
                     if (size <= 0)
                         break;
+
+                    System.out.printf("%d\t%d\t%d\t%d\t%d\n\t%d\n", bytes.length, bytes[bytes.length - 4], bytes[bytes.length - 3], bytes[bytes.length - 2], bytes[bytes.length - 1], bytes[bytes.length - 57345]);
 
                     sender.sendMessage(bytes);
                     long estimatedTime = System.nanoTime() - startTime;

@@ -17,7 +17,7 @@ public class Main {
         new RDT.RTT.Echo(4321).start();
 
         RDT.Receiver receiver = RDT.getReceiver(1234);
-        RDT.Sender sender = RDT.getSender(InetAddress.getByName("172.23.24.149"), 1234);
+        RDT.Sender sender = RDT.getSender(InetAddress.getByName("192.168.43.43"), 1234);
 
         receiver.setOnReceiveListener(null, (address, bytes) -> {
             System.out.println("\t" + address.toString());
