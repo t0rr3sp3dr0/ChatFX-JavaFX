@@ -89,7 +89,7 @@ public final class RDT {
 
         public Connection() throws UnknownHostException {
             this.packets = new PriorityQueue<>();
-            this.window = new ResizableBlockingQueue<>(4);
+            this.window = new ResizableBlockingQueue<>(Byte.MAX_VALUE);
         }
     }
 
@@ -454,7 +454,7 @@ public final class RDT {
                             if (this.onTimeoutChanged != null && timeout != this.timeout)
                                 this.onTimeoutChanged.onEvent(timeout);
                             this.timeout = timeout;
-                        } catch (SocketTimeoutException e) {
+                        } catch (IOException e) {
                             System.out.println(e.getMessage());
                             if (this.onRTTFailed != null)
                                 this.onRTTFailed.onEvent();

@@ -5,8 +5,8 @@ package systems.singularity.chatfx.util;
  */
 public final class Constants {
     public static final int MTU = 56 * 1024;
-    public static final double SENDER_LOSS_PROBABILITY = 0.03125;
-    public static final double RECEIVER_LOSS_PROBABILITY = 0.125;
+    public static final double SENDER_LOSS_PROBABILITY = 0;
+    public static final double RECEIVER_LOSS_PROBABILITY = 0;
 
     private Constants() {
         // Avoid class instantiation
