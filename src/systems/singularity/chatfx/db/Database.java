@@ -24,7 +24,6 @@ public class Database {
                 DatabaseMetaData metaData = connection.getMetaData();
                 ourInstance = new Database(url);
                 //conexão criada
-                ourInstance.connection.close();
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -34,7 +33,7 @@ public class Database {
     public static void createTable(String path) {
         String url =  "jdbc:sqlite:" + path;
         //ajustar o nome da tabela
-        String sql = "CREATE TABLE IF NOT EXISTS nomeTabela (id integer PRIMARY KEY);";
+        String sql = "CREATE TABLE IF NOT EXISTS bw_users (user_id integer PRIMARY KEY, user_username VARCHAR(16), user_password VARCHAR(32), user_portChat SMALLINT, user_portFile SMALLINT, user_portRtt SMALLINT, user_status BOOLEAN);";
         try (Connection connection = DriverManager.getConnection(url)) {
             Statement sttm = connection.createStatement();
             sttm.execute(sql);

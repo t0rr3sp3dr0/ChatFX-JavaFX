@@ -6,10 +6,15 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import systems.singularity.chatfx.db.Database;
+import systems.singularity.chatfx.db.UserRepository;
+import systems.singularity.chatfx.structs.User;
+import systems.singularity.chatfx.util.Constants;
+import systems.singularity.chatfx.util.java.Utilities;
 
 import java.io.File;
 import java.nio.file.Paths;
 import java.sql.Connection;
+import java.util.ArrayList;
 
 public class Main extends Application {
 
@@ -33,23 +38,29 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root, 285, 109));
         primaryStage.show();
 
-        String chatFX = defaultDirectory() + File.separator + "ChatFX" + File.separator;
-        File file = new File(chatFX);
+
+        File file = new File(Constants.chatFX);
         if (!file.exists())
             file.mkdir();
 
-        Database.createDatabase( chatFX + "ChatFX.db");
+
+
+        //Server Database
+        Database.createDatabase( Constants.chatFX + "ChatFX.db");
+        Database.createTable(Constants.chatFX + "ChatFX.db");
+        User user = new User(1, "edjan", "12345678", (short)2020, (short)2021, (short)2022, true);
+        new UserRepository().insert(new User(2, "pepeu", "12345678", (short)2020, (short)2021, (short)2022, true));
+        //boolean exists = new UserRepository().exists(user);
+        //user.setPassword("abcd1234");
+        //new UserRepository().update(user);
+        //ArrayList<User> users = (ArrayList<User>) new UserRepository().getAll();
+        //new UserRepository().remove(users.get(1));
+
+
+        //Client Database
+
 
     }
 
-    private static String defaultDirectory()
-    {
-        String OS = System.getProperty("os.name").toUpperCase();
-        if (OS.contains("WIN"))
-            return System.getenv("APPDATA");
-        else if (OS.contains("MAC"))
-            return Paths.get(System.getProperty("user.home"),"Library", "Application Support").toString();
-        else
-            return Paths.get(System.getProperty("user.home"), ".local").toString();
-    }
+
 }

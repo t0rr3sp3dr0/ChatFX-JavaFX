@@ -1,5 +1,9 @@
 package systems.singularity.chatfx.util;
 
+import systems.singularity.chatfx.util.java.Utilities;
+
+import java.io.File;
+
 /**
  * Created by pedro on 5/21/17.
  */
@@ -7,6 +11,7 @@ public final class Constants {
     public static final int MTU = 56 * 1024;
     public static final double SENDER_LOSS_PROBABILITY = 0;
     public static final double RECEIVER_LOSS_PROBABILITY = 0;
+    public static final String chatFX = Utilities.defaultDirectory() + File.separator + "ChatFX" + File.separator;
 
     private Constants() {
         // Avoid class instantiation

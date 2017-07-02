@@ -3,10 +3,18 @@ package systems.singularity.chatfx.controllers;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import systems.singularity.chatfx.util.Constants;
+import systems.singularity.chatfx.util.java.Utilities;
 
+import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -20,13 +28,16 @@ public class MainController implements Initializable {
     private Button bt_send;
 
     @FXML
-    private ListView<?> lv_users;
-
-    @FXML
     private Button bt_file;
 
     @FXML
     private Button bt_showFolder;
+
+    @FXML
+    private Button bt_clear;
+
+    @FXML
+    private ListView<?> lv_users;
 
     @FXML
     private TextArea ta_chat;
@@ -58,12 +69,20 @@ public class MainController implements Initializable {
         });
 
         bt_showFolder.setOnAction(e -> {
+            try {
+                Desktop.getDesktop().open(new File(Constants.chatFX));
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        });
 
+        bt_clear.setOnAction(e -> {
+            //limpar o histórico
+            clearChat();
         });
     }
 
     private void sendMessage() {
-
     }
 
     private void sendFile() {
@@ -89,5 +108,8 @@ public class MainController implements Initializable {
                 file = null;
             }
         }
+    }
+
+    private void clearChat() {
     }
 }
