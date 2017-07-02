@@ -118,6 +118,9 @@ public final class RDT {
 
         public void sendMessage(byte[] message) throws InterruptedException {
             this.queue.put(message);
+
+            //noinspection StatementWithEmptyBody
+            while (this.queue.contains(message)) ;
         }
 
         public void sendACK(Integer seq) throws IOException {

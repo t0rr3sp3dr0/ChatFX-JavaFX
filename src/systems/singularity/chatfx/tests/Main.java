@@ -1,14 +1,13 @@
 package systems.singularity.chatfx.tests;
 
-import systems.singularity.chatfx.util.Constants;
+import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Map;
 
 /**
  * Created by pedro on 6/10/17.
@@ -18,20 +17,27 @@ public class Main {
         new RDT.RTT.Echo(4321).start();
 
         RDT.Receiver receiver = RDT.getReceiver(1234);
-        RDT.Sender sender = RDT.getSender(InetAddress.getByName("169.254.184.203"), 1234);
+        RDT.Sender sender = RDT.getSender(InetAddress.getByName("172.23.24.149"), 1234);
 
-        receiver.setOnReceiveListener(null, (address, bytes) -> System.out.println(new String(bytes).trim()));
+        receiver.setOnReceiveListener(null, (address, bytes) -> {
+            System.out.println("\t" + address.toString());
 
-        try (FileInputStream fileInputStream = new FileInputStream(new File("/Users/pedro/Downloads/go.src.tar.gz"))) {
-            byte[] bytes = new byte[2 * Constants.MTU];
+            Map<String, String> headers = Protocol.extractHeaders(bytes);
+            final long contentLength = Long.parseLong(headers.get("Content-Length"));
 
-            while (fileInputStream.read(bytes) > 0)
-                sender.sendMessage(bytes);
+            Protocol.Downloader downloader = Protocol.getDownloader(headers);
+            downloader.setCallback((bytesReceived, estimatedTime, sequence) -> {
+                if (bytesReceived == contentLength)
+                    System.out.println("FINISHED");
+                else
+                    System.out.println(estimatedTime);
+            });
+            downloader.add(Protocol.extractData(bytes));
+        });
 
-            sender.sendMessage(new byte[]{});
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        new Protocol.Uploader(sender, "", new File("/Users/pedro/Downloads/go.src.tar.gz"), (bytesSent, estimatedTime, sequence) -> {
+            System.out.println(estimatedTime);
+        }).start();
 
 //        try {
 //            final FileOutputStream fileOutputStream = new FileOutputStream(new File("/home/CIN/phts/Desktop/" + receiver.hashCode()));

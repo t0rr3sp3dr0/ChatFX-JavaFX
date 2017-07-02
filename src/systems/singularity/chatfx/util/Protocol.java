@@ -2,9 +2,13 @@ package systems.singularity.chatfx.util;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
+import systems.singularity.chatfx.util.java.ResizableBlockingQueue;
 
-import java.io.*;
-import java.net.Socket;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,6 +16,8 @@ import java.util.Map;
  * Created by pedro on 5/21/17.
  */
 public final class Protocol {
+    private static final Map<String, Downloader> downloaders = new HashMap<>();
+
     /**
      * This protocol was based on HTTP protocol
      * The protocol is divided in tow sections: headers and body
@@ -23,16 +29,28 @@ public final class Protocol {
         // Avoid class instantiation
     }
 
-    public static Map<String, String> getHeaders(InputStream inputStream) throws IOException {
-        final byte[] bytes = new byte[1];
+    @Nullable
+    public static byte[] extractData(byte[] bytes) {
+        char c = '\0';
+        for (int i = 0; i < bytes.length; i++)
+            if (c == '\n' && bytes[i] == '\n' && i + 1 < bytes.length)
+                return Arrays.copyOfRange(bytes, i + 1, bytes.length);
+            else
+                c = (char) bytes[i];
+
+        return null;
+    }
+
+    @NotNull
+    public static Map<String, String> extractHeaders(@NotNull byte[] bytes) {
         final Map<String, String> headers = new HashMap<>();
 
         StringBuilder headerBuffer = new StringBuilder();
-        while (inputStream.read(bytes) > 0)
-            if (bytes[0] == '\n' && headerBuffer.charAt(headerBuffer.length() - 1) == '\n')
+        for (byte b : bytes)
+            if (b == '\n' && headerBuffer.charAt(headerBuffer.length() - 1) == '\n')
                 break;
             else
-                headerBuffer.append((char) bytes[0]);
+                headerBuffer.append((char) b);
 
         String rawHeaders = headerBuffer.toString().trim();
         System.err.println(rawHeaders);
@@ -46,19 +64,34 @@ public final class Protocol {
         return headers;
     }
 
+    @NotNull
+    public static Downloader getDownloader(@NotNull Map<String, String> headers) {
+        synchronized (Protocol.downloaders) {
+            Downloader downloader = Protocol.downloaders.get(headers.get("Message-ID"));
+            if (downloader == null) {
+                downloader = new Downloader(headers, new File("/Users/pedro/Desktop/" + headers.get("Content-Disposition").split("\"")[1]));
+                downloader.start();
+                Protocol.downloaders.put(headers.get("Message-ID"), downloader);
+            }
+            return downloader;
+        }
+    }
+
     /**
      * Sends file through connection
      * Firstly it sends, via headers, file's length and name
      * Then it streams the file in blocks of MTU size
      * Finally it verifies if the hole file has been transmitted
      */
-    public static final class Sender extends Thread {
-        private final Socket socket;
+    public static final class Uploader extends Thread {
+        private final RDT.Sender sender;
+        private final String pragma;
         private final File file;
         private final Callback callback;
 
-        public Sender(@NotNull Socket socket, @NotNull File file, @Nullable Callback callback) {
-            this.socket = socket;
+        public Uploader(@NotNull RDT.Sender sender, @NotNull String pragma, @NotNull File file, @Nullable Callback callback) {
+            this.sender = sender;
+            this.pragma = pragma;
             this.file = file;
             this.callback = callback;
         }
@@ -67,35 +100,33 @@ public final class Protocol {
         public void run() {
             super.run();
 
-            try (OutputStream outputStream = socket.getOutputStream()) {
-                try (FileInputStream fileInputStream = new FileInputStream(file)) {
-                    byte[] bytes = new byte[Constants.MTU];
+            try (FileInputStream fileInputStream = new FileInputStream(this.file)) {
+                byte[] bytes = new byte[2 * Constants.MTU];
 
-                    outputStream.write(String.format("Content-Length: %d\n", file.length()).getBytes());
-                    outputStream.write(String.format("Content-Disposition: attachment; filename=\"%s\"\n", file.getName()).getBytes());
-                    outputStream.write("\n".getBytes());
+                long writtenSize = 0;
+                int count = 0;
+                int size;
+                long startTime = System.nanoTime();
+                while (true) {
+                    byte[] header = String.format("Content-Length: %d\nContent-Disposition: attachment; filename=\"%s\"\nMessage-ID: %d\nPragma: %s\n\n", this.file.length(), this.file.getName(), this.file.hashCode(), this.pragma).getBytes();
+                    System.arraycopy(header, 0, bytes, 0, header.length);
 
-                    long writtenSize = 0;
-                    int count = 0;
-                    int size;
-                    long startTime = System.nanoTime();
-                    while ((size = fileInputStream.read(bytes)) > 0) {
-                        outputStream.write(bytes, 0, size);
-                        long estimatedTime = System.nanoTime() - startTime;
-                        writtenSize += size;
-                        count++;
+                    size = fileInputStream.read(bytes, header.length, bytes.length - header.length);
+                    if (size <= 0)
+                        break;
 
-                        if (callback != null)
-                            callback.onCallback(writtenSize, estimatedTime, count);
-                    }
+                    sender.sendMessage(bytes);
+                    long estimatedTime = System.nanoTime() - startTime;
+                    writtenSize += size;
+                    count++;
 
-                    if (writtenSize != file.length())
-                        throw new RuntimeException("Content Length Mismatch");
-
-                    outputStream.flush();
-                    outputStream.close();
+                    if (callback != null)
+                        callback.onCallback(writtenSize, estimatedTime, count);
                 }
-            } catch (IOException e) {
+
+                if (writtenSize != this.file.length())
+                    throw new RuntimeException("Content Length Mismatch");
+            } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
 
                 throw new RuntimeException(e);
@@ -113,49 +144,45 @@ public final class Protocol {
      * Then it reads the file from stream with a buffer of MTU size
      * Finally it verifies if the hole file has been recovered
      */
-    public static final class Receiver extends Thread {
-        private final Socket socket;
-        private final FileRequestHandler fileRequestHandler;
-        private final Callback callback;
+    public static final class Downloader extends Thread {
+        private final Map<String, String> headers;
+        private final File file;
+        private final ResizableBlockingQueue<byte[]> queue = new ResizableBlockingQueue<>(Integer.MAX_VALUE);
+        private Callback callback;
 
-        public Receiver(@NotNull Socket socket, @NotNull FileRequestHandler fileRequestHandler, @Nullable Callback callback) {
-            this.socket = socket;
-            this.fileRequestHandler = fileRequestHandler;
-            this.callback = callback;
+        public Downloader(@NotNull Map<String, String> headers, @NotNull File file) {
+            this.headers = headers;
+            this.file = file;
         }
 
         @Override
         public void run() {
             super.run();
 
-            try (InputStream inputStream = socket.getInputStream()) {
-                final Map<String, String> headers = getHeaders(inputStream);
-                final File file = fileRequestHandler.onFileRequest(headers);
+            try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+                long contentLength = Long.parseLong(headers.get("Content-Length"));
 
-                final byte[] bytes = new byte[Constants.MTU];
-                Long contentLength = Long.parseLong(headers.get("Content-Length"));
+                long readSize = 0;
+                int count = 0;
+                long startTime = System.nanoTime();
+                while (readSize < contentLength) {
+                    byte[] bytes = this.queue.remove();
 
-                try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
-                    long readSize = 0;
-                    int count = 0;
-                    long startTime = System.nanoTime();
-                    while (readSize < contentLength) {
-                        int size = inputStream.read(bytes);
-                        if (size == 0)
-                            continue;
+                    int size = (int) Math.min(bytes.length, contentLength - readSize);
+                    if (size == 0)
+                        continue;
 
-                        fileOutputStream.write(bytes, 0, size);
-                        long estimatedTime = System.nanoTime() - startTime;
-                        readSize += size;
-                        count++;
+                    fileOutputStream.write(bytes, 0, size);
+                    long estimatedTime = System.nanoTime() - startTime;
+                    readSize += size;
+                    count++;
 
-                        if (callback != null)
-                            callback.onCallback(readSize, estimatedTime, count);
-                    }
-
-                    if (readSize != file.length())
-                        throw new RuntimeException("Content Length Mismatch");
+                    if (callback != null)
+                        callback.onCallback(readSize, estimatedTime, count);
                 }
+
+                if (readSize != file.length())
+                    throw new RuntimeException("Content Length Mismatch");
             } catch (IOException e) {
                 e.printStackTrace();
 
@@ -163,9 +190,12 @@ public final class Protocol {
             }
         }
 
-        public interface FileRequestHandler {
-            @NotNull
-            File onFileRequest(Map<String, String> headers);
+        public void setCallback(@Nullable Callback callback) {
+            this.callback = callback;
+        }
+
+        public boolean add(byte[] bytes) {
+            return this.queue.add(bytes);
         }
 
         public interface Callback {
