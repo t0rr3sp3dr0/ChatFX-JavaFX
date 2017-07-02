@@ -1,5 +1,6 @@
-package systems.singularity.chatfx.db;
+package systems.singularity.chatfx.server.db;
 
+import systems.singularity.chatfx.util.ConnectionFactory;
 import java.sql.*;
 
 /**
@@ -34,34 +35,6 @@ public class Database {
         String url =  "jdbc:sqlite:" + path;
 
         String sql = "CREATE TABLE IF NOT EXISTS cf_users (user_id integer PRIMARY KEY, user_username VARCHAR(16), user_password VARCHAR(32), user_address VARCHAR(16), user_portChat SMALLINT, user_portFile SMALLINT, user_portRtt SMALLINT, user_status BOOLEAN);";
-        try (Connection connection = DriverManager.getConnection(url)) {
-            Statement sttm = connection.createStatement();
-            sttm.execute(sql);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void createClientTable(String path) {
-        String url =  "jdbc:sqlite:" + path;
-
-        String sql = "CREATE TABLE IF NOT EXISTS cf_messages (message_id integer PRIMARY KEY, message_group_id integer NULL, message_content VARCHAR, message_status BOOLEAN, message_timestamp DATETIME, message_author_id INTEGER NOT NULL);";
-        try (Connection connection = DriverManager.getConnection(url)) {
-            Statement sttm = connection.createStatement();
-            sttm.execute(sql);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        sql = "CREATE TABLE IF NOT EXISTS cf_groups (group_id integer PRIMARY KEY, group_name varchar(25));";
-        try (Connection connection = DriverManager.getConnection(url)) {
-            Statement sttm = connection.createStatement();
-            sttm.execute(sql);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        sql = "CREATE TABLE IF NOT EXISTS cf_members (member_id integer PRIMARY KEY, member_group_id integer NOT NULL, member_user_id integer NOT NULL);";
         try (Connection connection = DriverManager.getConnection(url)) {
             Statement sttm = connection.createStatement();
             sttm.execute(sql);

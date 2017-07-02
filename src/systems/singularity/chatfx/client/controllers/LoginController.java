@@ -8,7 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import systems.singularity.chatfx.server.db.UserRepository;
-import systems.singularity.chatfx.server.structs.User;
+import systems.singularity.chatfx.structs.User;
 import systems.singularity.chatfx.util.java.Utilities;
 
 import java.io.IOException;

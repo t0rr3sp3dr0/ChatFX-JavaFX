@@ -1,4 +1,4 @@
-package systems.singularity.chatfx.structs;
+package systems.singularity.chatfx.client.structs;
 
 /**
  * Created by caesa on 02/07/2017.
