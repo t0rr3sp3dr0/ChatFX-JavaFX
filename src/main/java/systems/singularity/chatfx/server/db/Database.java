@@ -9,6 +9,15 @@ import java.sql.*;
  */
 public class Database {
     private static Database ourInstance;
+
+    static {
+        try {
+            Class.forName("org.sqlite.JDBC");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     private Connection connection;
 
     private Database(String path) {
