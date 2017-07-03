@@ -355,9 +355,9 @@ public final class RDT {
 
                                 OnReceiveListener listener;
                                 if ((listener = this.onReceiveListeners.get(null)) != null)
-                                    listener.onReceive(packet.getAddress(), bytes);
+                                    listener.onReceive(packet.getAddress(), packet.getPort(), bytes);
                                 if ((listener = this.onReceiveListeners.get(packet.getAddress())) != null)
-                                    listener.onReceive(packet.getAddress(), bytes);
+                                    listener.onReceive(packet.getAddress(), packet.getPort(), bytes);
                             }
 
                             if (seq - 1 == connection.seq) {
@@ -380,7 +380,7 @@ public final class RDT {
         }
 
         public interface OnReceiveListener {
-            void onReceive(InetAddress address, byte[] bytes);
+            void onReceive(InetAddress address, int port, byte[] bytes);
         }
     }
 

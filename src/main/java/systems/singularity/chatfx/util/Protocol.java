@@ -81,12 +81,12 @@ public final class Protocol {
 
     public interface Receiver extends RDT.Receiver.OnReceiveListener {
         @Override
-        default void onReceive(InetAddress address, byte[] bytes) {
+        default void onReceive(InetAddress address, int port, byte[] bytes) {
             //noinspection ConstantConditions
-            onReceive(address, Protocol.extractHeaders(bytes), new String(Protocol.extractData(bytes)));
+            onReceive(address, port, Protocol.extractHeaders(bytes), new String(Protocol.extractData(bytes)));
         }
 
-        void onReceive(InetAddress address, Map<String, String> headers, String message);
+        void onReceive(InetAddress address, int port, Map<String, String> headers, String message);
     }
 
     /**
@@ -214,13 +214,7 @@ public final class Protocol {
     }
 
     public static final class Sender {
-        private final RDT.Sender sender;
-
-        public Sender(@NotNull RDT.Sender sender) {
-            this.sender = sender;
-        }
-
-        public void sendMessage(Map<String, String> headers, String message) throws InterruptedException {
+        public static void sendMessage(@NotNull RDT.Sender sender, @NotNull Map<String, String> headers, @NotNull String message) throws InterruptedException {
             StringBuilder stringBuilder = new StringBuilder();
             for (String key : headers.keySet())
                 stringBuilder.append(key).append(": ").append(headers.get(key)).append('\n');

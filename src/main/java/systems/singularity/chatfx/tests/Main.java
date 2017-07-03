@@ -6,8 +6,6 @@ import systems.singularity.chatfx.util.RDT;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by pedro on 6/10/17.
@@ -19,7 +17,7 @@ public class Main {
         RDT.Receiver receiver = RDT.getReceiver(1234);
         RDT.Sender sender = RDT.getSender(InetAddress.getByName("192.168.43.43"), 1234);
 
-        receiver.setOnReceiveListener(null, (Protocol.Receiver) (address, headers, message) -> {
+        receiver.setOnReceiveListener(null, (Protocol.Receiver) (address, port, headers, message) -> {
             System.out.println(address);
             System.out.println(headers.keySet());
             System.out.println(headers.values());

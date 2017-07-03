@@ -5,12 +5,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import systems.singularity.chatfx.models.User;
-import systems.singularity.chatfx.server.db.UserRepository;
 import systems.singularity.chatfx.util.Constants;
 
 import java.io.File;
-import java.util.ArrayList;
 
 /**
  * Created by caesa on 02/07/2017.
@@ -34,8 +31,8 @@ public class Main extends Application {
         primaryStage.show();
 
         //testes para o server
-        new UserRepository().insert(new User(1, "edjan", "12345678", "192.168.43.43", 2020, 2021, 2022, true));
-        new UserRepository().insert(new User(2, "pepeu", "12345678", "192.168.43.78", 2020, 2021, 2022, true));
+//        new UserRepository().insert(new User(1, "edjan", "12345678", "192.168.43.43", 2020, 2021, 2022, true));
+//        new UserRepository().insert(new User(2, "pepeu", "12345678", "192.168.43.78", 2020, 2021, 2022, true));
         //boolean exists = new UserRepository().exists(user);
         //user.setPassword("abcd1234");
         //new UserRepository().update(user);

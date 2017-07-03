@@ -15,6 +15,15 @@ import java.util.List;
  * Created by caesa on 02/07/2017.
  */
 public class UserRepository implements Repository<User> {
+    private static UserRepository ourInstance = new UserRepository();
+
+    private UserRepository() {
+        // Avoid class instantiation
+    }
+
+    public static UserRepository getInstance() {
+        return UserRepository.ourInstance;
+    }
 
     @Override
     public boolean exists(User user) throws SQLException {
