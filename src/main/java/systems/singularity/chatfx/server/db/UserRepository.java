@@ -42,9 +42,9 @@ public class UserRepository implements Repository<User> {
             statement.setString(1, user.getUsername());
             statement.setString(2, user.getPassword());
             statement.setString(3, user.getAddress());
-            statement.setInt(4, user.getPort_chat());
-            statement.setInt(5, user.getPort_file());
-            statement.setInt(6, user.getPort_rtt());
+            statement.setInt(4, user.getPortChat());
+            statement.setInt(5, user.getPortFile());
+            statement.setInt(6, user.getPortRtt());
             statement.setBoolean(7, user.getStatus());
             statement.executeUpdate();
         }
@@ -58,9 +58,9 @@ public class UserRepository implements Repository<User> {
             statement.setString(1, user.getUsername());
             statement.setString(2, user.getPassword());
             statement.setString(3, user.getAddress());
-            statement.setInt(4, user.getPort_chat());
-            statement.setInt(5, user.getPort_file());
-            statement.setInt(6, user.getPort_rtt());
+            statement.setInt(4, user.getPortChat());
+            statement.setInt(5, user.getPortFile());
+            statement.setInt(6, user.getPortRtt());
             statement.setBoolean(7, user.getStatus());
             statement.setInt(8, user.getId());
             statement.executeUpdate();

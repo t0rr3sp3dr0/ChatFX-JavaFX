@@ -30,11 +30,11 @@ public class MessageRepository implements Repository<Message> {
         PreparedStatement statement = conn.prepareStatement("INSERT INTO cf_messages (" +
                 "message_group_id, message_content, message_status, message_timestamp, message_author_id) " +
                 "VALUES (?, ?, ?, ?, ?);");
-        statement.setInt(1, message.getGroup_id());
+        statement.setInt(1, message.getGroupId());
         statement.setString(2, message.getContent());
         statement.setBoolean(3, message.isStatus());
         statement.setTime(4, message.getTime());
-        statement.setInt(5, message.getAuthor_id());
+        statement.setInt(5, message.getAuthorId());
         statement.executeUpdate();
     }
 
@@ -45,11 +45,11 @@ public class MessageRepository implements Repository<Message> {
             PreparedStatement statement = conn.prepareStatement("UPDATE cf_messages SET message_group_id = ?, " +
                     "message_content = ?, message_status = ?, message_timestamp = ?, message_author_id = ? " +
                     "WHERE message_id = ?;");
-            statement.setInt(1, message.getGroup_id());
+            statement.setInt(1, message.getGroupId());
             statement.setString(2, message.getContent());
             statement.setBoolean(3, message.isStatus());
             statement.setTime(4, message.getTime());
-            statement.setInt(5, message.getAuthor_id());
+            statement.setInt(5, message.getAuthorId());
             statement.setInt(6, message.getId());
             statement.executeUpdate();
         }

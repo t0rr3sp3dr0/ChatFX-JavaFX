@@ -8,22 +8,22 @@ public class User {
     private String username;
     private String password;
     private String address;
-    private int port_chat;
-    private int port_file;
-    private int port_rtt;
+    private int portChat;
+    private int portFile;
+    private int portRtt;
     private boolean status;
 
     public User() {
     }
 
-    public User(int id, String username, String password, String address, int port_chat, int port_file, int port_rtt, boolean status) {
+    public User(int id, String username, String password, String address, int portChat, int portFile, int portRtt, boolean status) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.address = address;
-        this.port_chat = port_chat;
-        this.port_file = port_file;
-        this.port_rtt = port_rtt;
+        this.portChat = portChat;
+        this.portFile = portFile;
+        this.portRtt = portRtt;
         this.status = status;
     }
 
@@ -59,28 +59,28 @@ public class User {
         this.address = address;
     }
 
-    public int getPort_chat() {
-        return port_chat;
+    public int getPortChat() {
+        return portChat;
     }
 
-    public void setPort_chat(int port_chat) {
-        this.port_chat = port_chat;
+    public void setPortChat(int portChat) {
+        this.portChat = portChat;
     }
 
-    public int getPort_file() {
-        return port_file;
+    public int getPortFile() {
+        return portFile;
     }
 
-    public void setPort_file(int port_file) {
-        this.port_file = port_file;
+    public void setPortFile(int portFile) {
+        this.portFile = portFile;
     }
 
-    public int getPort_rtt() {
-        return port_rtt;
+    public int getPortRtt() {
+        return portRtt;
     }
 
-    public void setPort_rtt(int port_rtt) {
-        this.port_rtt = port_rtt;
+    public void setPortRtt(int portRtt) {
+        this.portRtt = portRtt;
     }
 
     public boolean getStatus() {

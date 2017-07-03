@@ -6,13 +6,13 @@ package systems.singularity.chatfx.models;
 public class Member {
 
     private int id;
-    private int group_id;
-    private int user_id;
+    private int groupId;
+    private int userId;
 
-    public Member(int id, int group_id, int user_id) {
+    public Member(int id, int groupId, int userId) {
         this.id = id;
-        this.group_id = group_id;
-        this.user_id = user_id;
+        this.groupId = groupId;
+        this.userId = userId;
     }
 
     public Member() {
@@ -26,19 +26,19 @@ public class Member {
         this.id = id;
     }
 
-    public int getGroup_id() {
-        return group_id;
+    public int getGroupId() {
+        return groupId;
     }
 
-    public void setGroup_id(int group_id) {
-        this.group_id = group_id;
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
     }
 
-    public int getUser_id() {
-        return user_id;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 }

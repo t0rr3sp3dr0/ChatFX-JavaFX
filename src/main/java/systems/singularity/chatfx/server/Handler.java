@@ -40,15 +40,15 @@ public class Handler extends Thread implements Protocol.Receiver {
 
                         switch (pragma[1]) {
                             case "chat":
-                                user.setPort_chat(port);
+                                user.setPortChat(port);
                                 break;
 
                             case "file":
-                                user.setPort_file(port);
+                                user.setPortFile(port);
                                 break;
 
                             case "rtt":
-                                user.setPort_rtt(port);
+                                user.setPortRtt(port);
                                 break;
 
                             default:
@@ -69,15 +69,15 @@ public class Handler extends Thread implements Protocol.Receiver {
                         if (user.getPassword().equals(basic[1])) {
                             switch (pragma[1]) {
                                 case "chat":
-                                    user.setPort_chat(port);
+                                    user.setPortChat(port);
                                     break;
 
                                 case "file":
-                                    user.setPort_file(port);
+                                    user.setPortFile(port);
                                     break;
 
                                 case "rtt":
-                                    user.setPort_rtt(port);
+                                    user.setPortRtt(port);
                                     break;
 
                                 default:
