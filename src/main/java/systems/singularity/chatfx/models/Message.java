@@ -8,19 +8,19 @@ import java.sql.Time;
 public class Message {
 
     private int id;
-    private int group_id;
+    private int groupId;
     private String content;
     private boolean status;
     private Time time;
-    private int author_id;
+    private int authorId;
 
-    public Message(int id, int group_id, String content, boolean status, Time time, int author_id) {
+    public Message(int id, int groupId, String content, boolean status, Time time, int authorId) {
         this.id = id;
-        this.group_id = group_id;
+        this.groupId = groupId;
         this.content = content;
         this.status = status;
         this.time = time;
-        this.author_id = author_id;
+        this.authorId = authorId;
     }
 
     public Message() {
@@ -34,12 +34,12 @@ public class Message {
         this.id = id;
     }
 
-    public int getGroup_id() {
-        return group_id;
+    public int getGroupId() {
+        return groupId;
     }
 
-    public void setGroup_id(int group_id) {
-        this.group_id = group_id;
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
     }
 
     public String getContent() {
@@ -66,11 +66,11 @@ public class Message {
         this.time = time;
     }
 
-    public int getAuthor_id() {
-        return author_id;
+    public int getAuthorId() {
+        return authorId;
     }
 
-    public void setAuthor_id(int author_id) {
-        this.author_id = author_id;
+    public void setAuthorId(int authorId) {
+        this.authorId = authorId;
     }
 }

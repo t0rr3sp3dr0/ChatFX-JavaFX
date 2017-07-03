@@ -9,7 +9,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import systems.singularity.chatfx.server.Handler;
-import systems.singularity.chatfx.util.RDT;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -19,19 +18,19 @@ import java.util.ResourceBundle;
  */
 public class OpenServerController implements Initializable {
     @FXML
-    private Button bt_open;
+    private Button btOpen;
 
     @FXML
-    private TextField tf_port;
+    private TextField tfPort;
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        bt_open.setOnAction(e -> {
+        btOpen.setOnAction(e -> {
             try {
 
-                new Handler(Integer.parseInt(tf_port.getText())).start();
+                new Handler(Integer.parseInt(tfPort.getText())).start();
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/server.fxml"));
                 final Parent root = fxmlLoader.load();
 

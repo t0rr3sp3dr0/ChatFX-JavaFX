@@ -19,8 +19,8 @@ public class MemberRepository implements Repository<Member> {
         Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_members WHERE (member_group_id = ? " +
                 "AND member_user_id = ?);");
-        statement.setInt(1, member.getGroup_id());
-        statement.setInt(2, member.getUser_id());
+        statement.setInt(1, member.getGroupId());
+        statement.setInt(2, member.getUserId());
         ResultSet rs = statement.executeQuery();
         return rs.next();
     }
@@ -30,8 +30,8 @@ public class MemberRepository implements Repository<Member> {
         Connection conn = Database.getConnection();
         if (!exists(member)) {
             PreparedStatement statement = conn.prepareStatement("INSERT INTO cf_members (member_group_id, member_user_id) VALUES (?, ?);");
-            statement.setInt(1, member.getGroup_id());
-            statement.setInt(2, member.getUser_id());
+            statement.setInt(1, member.getGroupId());
+            statement.setInt(2, member.getUserId());
             statement.executeUpdate();
         }
     }
@@ -41,8 +41,8 @@ public class MemberRepository implements Repository<Member> {
         Connection conn = Database.getConnection();
         if (exists(member)) {
             PreparedStatement statement = conn.prepareStatement("UPDATE cf_members SET member_group_id = ?, member_user_id = ? WHERE member_id = ?;");
-            statement.setInt(1, member.getGroup_id());
-            statement.setInt(2, member.getUser_id());
+            statement.setInt(1, member.getGroupId());
+            statement.setInt(2, member.getUserId());
             statement.setInt(3, member.getId());
             statement.executeUpdate();
         }

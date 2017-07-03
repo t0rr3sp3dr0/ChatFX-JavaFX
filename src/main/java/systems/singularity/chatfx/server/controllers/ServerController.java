@@ -20,25 +20,25 @@ import java.util.ResourceBundle;
 public class ServerController implements Initializable {
 
     @FXML
-    private TableView<User> tv_users;
+    private TableView<User> tvUsers;
 
     @FXML
-    private TableColumn<User, String> tc_username;
+    private TableColumn<User, String> tcUsername;
 
     @FXML
-    private TableColumn<User, Short> tc_rtt;
+    private TableColumn<User, Short> tcRtt;
 
     @FXML
-    private TableColumn<User, Short> tc_file;
+    private TableColumn<User, Short> tcFile;
 
     @FXML
-    private TableColumn<User, Short> tc_chat;
+    private TableColumn<User, Short> tcChat;
 
     @FXML
-    private TableColumn<User, Short> tc_ip;
+    private TableColumn<User, Short> tcIp;
 
     @FXML
-    private TableColumn<User, Boolean> tc_status;
+    private TableColumn<User, Boolean> tcStatus;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -57,16 +57,16 @@ public class ServerController implements Initializable {
 
     private void updateTable() {
         try {
-            tv_users.setItems(FXCollections.observableArrayList(UserRepository.getInstance().getAll()));
+            tvUsers.setItems(FXCollections.observableArrayList(UserRepository.getInstance().getAll()));
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        tc_username.setCellValueFactory(new PropertyValueFactory<>("username"));
-        tc_ip.setCellValueFactory(new PropertyValueFactory<>("address"));
-        tc_chat.setCellValueFactory(new PropertyValueFactory<>("port_chat"));
-        tc_file.setCellValueFactory(new PropertyValueFactory<>("port_file"));
-        tc_rtt.setCellValueFactory(new PropertyValueFactory<>("port_rtt"));
-        tc_status.setCellValueFactory(new PropertyValueFactory<>("status"));
+        tcUsername.setCellValueFactory(new PropertyValueFactory<>("username"));
+        tcIp.setCellValueFactory(new PropertyValueFactory<>("address"));
+        tcChat.setCellValueFactory(new PropertyValueFactory<>("portChat"));
+        tcFile.setCellValueFactory(new PropertyValueFactory<>("portFile"));
+        tcRtt.setCellValueFactory(new PropertyValueFactory<>("portRtt"));
+        tcStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
     }
 }

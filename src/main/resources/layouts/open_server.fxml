@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.*?>
-
 <VBox maxHeight="74.0" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="74.0" prefWidth="285.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systems.singularity.chatfx.server.controllers.OpenServerController">
     <children>
         <HBox minWidth="256.0" prefHeight="0.0" prefWidth="0.0">
@@ -14,7 +14,7 @@
                         <Insets right="2.0" />
                     </HBox.margin>
                 </Label>
-                <TextField fx:id="tf_port" promptText="2020" HBox.hgrow="ALWAYS">
+                <TextField fx:id="tfPort" promptText="2020" HBox.hgrow="ALWAYS">
                     <HBox.margin>
                         <Insets left="2.0" />
                     </HBox.margin>
@@ -31,7 +31,8 @@
                         <Insets right="2.0" />
                     </HBox.margin>
                 </Label>
-                <Button fx:id="bt_open" maxWidth="Infinity" mnemonicParsing="false" text="Open Server" HBox.hgrow="ALWAYS">
+                <Button fx:id="btOpen" maxWidth="Infinity" mnemonicParsing="false" text="Open Server"
+                        HBox.hgrow="ALWAYS">
                     <HBox.margin>
                         <Insets left="2.0" />
                     </HBox.margin>

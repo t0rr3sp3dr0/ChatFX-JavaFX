@@ -30,60 +30,60 @@ import java.util.ResourceBundle;
 public class MainController implements Initializable {
 
     @FXML
-    private Button bt_send;
+    private Button btSend;
 
     @FXML
-    private Button bt_file;
+    private Button btFile;
 
     @FXML
-    private Button bt_showFolder;
+    private Button btShowFolder;
 
     @FXML
-    private Button bt_clear;
+    private Button btClear;
 
     @FXML
-    private ListView<?> lv_users;
+    private ListView<?> lvUsers;
 
     @FXML
-    private TextArea ta_chat;
+    private TextArea taChat;
 
     @FXML
     private ProgressBar progress;
 
     @FXML
-    private TabPane tp_chats;
+    private TabPane tpChats;
 
     @FXML
-    private ListView<?> lv_files;
+    private ListView<?> lvFiles;
 
     @FXML
-    private Label lb_filename;
+    private Label lbFilename;
 
     @FXML
-    private Label lb_rtt;
+    private Label lbRtt;
 
     @FXML
-    private Label lb_time;
+    private Label lbTime;
 
     @FXML
-    private Label lb_progress;
+    private Label lbProgress;
 
     @FXML
-    private TextField tf_message;
+    private TextField tfMessage;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        bt_send.setOnAction(e -> {
+        btSend.setOnAction(e -> {
             //Enviar a mensagem
             sendMessage();
         });
 
-        bt_file.setOnAction(e -> {
+        btFile.setOnAction(e -> {
             //enviar o arquivo
             sendFile();
         });
 
-        bt_showFolder.setOnAction(e -> {
+        btShowFolder.setOnAction(e -> {
             try {
                 Desktop.getDesktop().open(new File(Constants.PERSISTENT_DIRECTORY));
             } catch (IOException e1) {
@@ -91,7 +91,7 @@ public class MainController implements Initializable {
             }
         });
 
-        bt_clear.setOnAction(e -> {
+        btClear.setOnAction(e -> {
             //limpar o histórico
             clearChat();
         });
@@ -125,14 +125,14 @@ public class MainController implements Initializable {
     private void sendFile() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        final File file = fileChooser.showOpenDialog(bt_file.getScene().getWindow());
+        final File file = fileChooser.showOpenDialog(btFile.getScene().getWindow());
         if (file != null) {
-            lb_filename.setText(file.getName());
+            lbFilename.setText(file.getName());
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Send file");
             alert.setHeaderText("Are you sure?");
-            Button OKButton = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
-            OKButton.setText("Yes");
+            Button OkButton = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
+            OkButton.setText("Yes");
             Button CancelButton = (Button) alert.getDialogPane().lookupButton(ButtonType.CANCEL);
             CancelButton.setText("No");
 
@@ -145,8 +145,8 @@ public class MainController implements Initializable {
                         double remainingTime = (file.length() - bytesSent) / speed;
                         Platform.runLater(() -> {
                                     progress.setProgress(p);
-                                    lb_progress.setText(String.valueOf(p));
-                                    lb_time.setText(String.valueOf(remainingTime));
+                            lbProgress.setText(String.valueOf(p));
+                            lbTime.setText(String.valueOf(remainingTime));
                                 }
                         );
                     }).start();
@@ -156,7 +156,7 @@ public class MainController implements Initializable {
                     e.printStackTrace();
                 }
             } else {
-                lb_filename.setText("");
+                lbFilename.setText("");
             }
         }
     }
