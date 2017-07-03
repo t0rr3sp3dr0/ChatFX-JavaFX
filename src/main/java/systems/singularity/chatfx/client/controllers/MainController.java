@@ -1,5 +1,6 @@
 package systems.singularity.chatfx.client.controllers;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -9,11 +10,17 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import systems.singularity.chatfx.util.Constants;
+import systems.singularity.chatfx.util.Protocol;
+import systems.singularity.chatfx.util.RDT;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.URL;
+import java.net.UnknownHostException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -53,6 +60,15 @@ public class MainController implements Initializable {
     private Label lb_filename;
 
     @FXML
+    private Label lb_rtt;
+
+    @FXML
+    private Label lb_time;
+
+    @FXML
+    private Label lb_progress;
+
+    @FXML
     private TextField tf_message;
 
     @Override
@@ -81,15 +97,43 @@ public class MainController implements Initializable {
         });
 
 
+        try {
+            RDT.Receiver receiver = RDT.getReceiver(2020);
+
+            receiver.setOnReceiveListener(null, (address, bytes) -> {
+            //System.out.println("\t" + address.toString());
+
+            Map<String, String> headers = Protocol.extractHeaders(bytes);
+            final long contentLength = Long.parseLong(headers.get("Content-Length"));
+
+            Protocol.Downloader downloader = Protocol.getDownloader(headers);
+            downloader.setCallback((bytesReceived, elapsedTime, sequence) -> {
+                if (bytesReceived == contentLength)
+                    System.out.println("FINISHED");
+                else
+                    System.out.println((elapsedTime / 1e9) + "s");
+            });
+            downloader.add(Protocol.extractData(bytes));
+        });
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
     }
 
     private void sendMessage() {
+//        try {
+//
+//        } catch (SocketException e) {
+//            e.printStackTrace();
+//        } catch (UnknownHostException e) {
+//            e.printStackTrace();
+//        }
     }
 
     private void sendFile() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        File file = fileChooser.showOpenDialog(bt_file.getScene().getWindow());
+        final File file = fileChooser.showOpenDialog(bt_file.getScene().getWindow());
         if (file != null) {
             lb_filename.setText(file.getName());
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -102,10 +146,25 @@ public class MainController implements Initializable {
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                //enviar o arquivo
+                try {
+                    new Protocol.Uploader(RDT.getSender(InetAddress.getByName("192.168.43.78"), 2020), "", file, (double bytesSent, long elapsedTime, long sequence) -> {
+                        double speed = bytesSent / (elapsedTime * 1e9);
+                        double p = bytesSent / file.length();
+                        double remainingTime = (file.length() - bytesSent) / speed;
+                        Platform.runLater(() -> {
+                                    progress.setProgress(p);
+                                    lb_progress.setText(String.valueOf(p));
+                                    lb_time.setText(String.valueOf(remainingTime));
+                                }
+                        );
+                    }).start();
+                } catch (SocketException e) {
+                    e.printStackTrace();
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                }
             } else {
                 lb_filename.setText("");
-                file = null;
             }
         }
     }
