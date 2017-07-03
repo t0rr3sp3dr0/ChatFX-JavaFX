@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
+
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="430.0" minWidth="720.0" prefHeight="430.0" prefWidth="720.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systems.singularity.chatfx.client.controllers.MainController">
     <children>
         <MenuBar>
@@ -28,11 +31,8 @@
         </MenuBar>
         <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="720.0" prefHeight="400.0" prefWidth="600.0">
             <children>
-                <ListView fx:id="lvUsers" maxWidth="200.0" minHeight="400.0" minWidth="200.0" prefHeight="200.0"
-                          prefWidth="200.0"/>
-                <TabPane fx:id="tpChats" maxHeight="Infinity" maxWidth="Infinity" minHeight="-Infinity"
-                         minWidth="-Infinity" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE"
-                         HBox.hgrow="ALWAYS">
+                <ListView fx:id="lvUsers" maxWidth="200.0" minHeight="400.0" minWidth="200.0" prefHeight="200.0" prefWidth="200.0" />
+                <TabPane fx:id="tpChats" maxHeight="Infinity" maxWidth="Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" HBox.hgrow="ALWAYS">
                     <tabs>
                         <Tab text="Untitled Tab 1">
                             <content>
@@ -40,8 +40,7 @@
                                     <children>
                                         <ToolBar prefHeight="40.0" prefWidth="200.0">
                                             <items>
-                                                <Button fx:id="btClear" alignment="CENTER" mnemonicParsing="false"
-                                                        textAlignment="CENTER">
+                                                <Button fx:id="btClear" alignment="CENTER" mnemonicParsing="false" textAlignment="CENTER">
                                                     <font>
                                                         <Font name="System Bold" size="13.0" />
                                                     </font>
@@ -53,8 +52,7 @@
                                                         </ImageView>
                                                     </graphic>
                                                 </Button>
-                                                <Button fx:id="btShowFolder" alignment="CENTER" mnemonicParsing="false"
-                                                        textAlignment="CENTER">
+                                                <Button fx:id="btShowFolder" alignment="CENTER" mnemonicParsing="false" textAlignment="CENTER">
                                                     <font>
                                                         <Font name="System Bold" size="13.0" />
                                                     </font>
@@ -72,8 +70,7 @@
                                             <children>
                                                 <VBox minHeight="300.0" minWidth="296.0" prefHeight="300.0" prefWidth="296.0" HBox.hgrow="ALWAYS">
                                                     <children>
-                                                        <TextArea fx:id="taChat" prefHeight="200.0" prefWidth="200.0"
-                                                                  VBox.vgrow="ALWAYS">
+                                                        <TextArea fx:id="taChat" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                                                             <VBox.margin>
                                                                 <Insets bottom="4.0" />
                                                             </VBox.margin>
@@ -85,10 +82,7 @@
                                                                         <Insets right="4.0" />
                                                                     </HBox.margin>
                                                                 </TextField>
-                                                                <Button fx:id="btSend" alignment="CENTER"
-                                                                        maxHeight="30.0" maxWidth="30.0"
-                                                                        mnemonicParsing="false" prefHeight="30.0"
-                                                                        prefWidth="30.0" textAlignment="CENTER">
+                                                                <Button fx:id="btSend" alignment="CENTER" maxHeight="30.0" maxWidth="30.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" textAlignment="CENTER">
                                                                     <font>
                                                                         <Font name="System Bold" size="13.0" />
                                                                     </font>
@@ -115,8 +109,7 @@
                                                 </VBox>
                                                 <VBox maxWidth="200.0" minHeight="300.0" minWidth="200.0" prefHeight="300.0" prefWidth="200.0">
                                                     <children>
-                                                        <ListView fx:id="lvFiles" prefHeight="200.0" prefWidth="200.0"
-                                                                  VBox.vgrow="ALWAYS">
+                                                        <ListView fx:id="lvFiles" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                                                             <VBox.margin>
                                                                 <Insets bottom="4.0" />
                                                             </VBox.margin>
@@ -132,11 +125,7 @@
                                                                         </HBox>
                                                                         <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
                                                                             <children>
-                                                                                <Label fx:id="lbProgress"
-                                                                                       alignment="CENTER"
-                                                                                       maxWidth="Infinity" text="50%"
-                                                                                       textAlignment="CENTER"
-                                                                                       HBox.hgrow="ALWAYS"/>
+                                                                                <Label fx:id="lbProgress" alignment="CENTER" maxWidth="Infinity" text="50%" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                                                                             </children>
                                                                         </HBox>
                                                                     </children>
@@ -150,10 +139,7 @@
                                                                         </HBox>
                                                                         <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
                                                                             <children>
-                                                                                <Label fx:id="lbTime" alignment="CENTER"
-                                                                                       maxWidth="Infinity" text="1s"
-                                                                                       textAlignment="CENTER"
-                                                                                       HBox.hgrow="ALWAYS"/>
+                                                                                <Label fx:id="lbTime" alignment="CENTER" maxWidth="Infinity" text="1s" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                                                                             </children>
                                                                         </HBox>
                                                                     </children>
@@ -167,10 +153,7 @@
                                                                         </HBox>
                                                                         <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
                                                                             <children>
-                                                                                <Label fx:id="lbRtt" alignment="CENTER"
-                                                                                       maxWidth="Infinity" text="0.5ms"
-                                                                                       textAlignment="CENTER"
-                                                                                       HBox.hgrow="ALWAYS"/>
+                                                                                <Label fx:id="lbRtt" alignment="CENTER" maxWidth="Infinity" text="0.5ms" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                                                                             </children>
                                                                         </HBox>
                                                                     </children>
@@ -187,23 +170,11 @@
                                                         </ProgressBar>
                                                         <HBox maxHeight="27.0" minHeight="27.0" prefHeight="27.0" prefWidth="200.0">
                                                             <children>
-                                                                <Button fx:id="btFile" alignment="CENTER"
-                                                                        contentDisplay="CENTER" maxHeight="31.0"
-                                                                        maxWidth="200.0" minWidth="-Infinity"
-                                                                        mnemonicParsing="false" prefHeight="31.0"
-                                                                        prefWidth="200.0" textAlignment="CENTER"
-                                                                        HBox.hgrow="ALWAYS">
+                                                                <Button fx:id="btFile" alignment="CENTER" contentDisplay="CENTER" maxHeight="31.0" maxWidth="200.0" minWidth="-Infinity" mnemonicParsing="false" prefHeight="31.0" prefWidth="200.0" textAlignment="CENTER" HBox.hgrow="ALWAYS">
                                                                     <graphic>
                                                                         <HBox maxHeight="31.0" maxWidth="200.0" prefHeight="31.0" prefWidth="200.0">
                                                                             <children>
-                                                                                <Label fx:id="lbFilename"
-                                                                                       alignment="CENTER"
-                                                                                       contentDisplay="CENTER"
-                                                                                       maxHeight="31.0" maxWidth="180.0"
-                                                                                       prefHeight="31.0"
-                                                                                       prefWidth="180.0"
-                                                                                       text="choose file"
-                                                                                       textAlignment="CENTER"/>
+                                                                                <Label fx:id="lbFilename" alignment="CENTER" contentDisplay="CENTER" maxHeight="31.0" maxWidth="180.0" prefHeight="31.0" prefWidth="180.0" text="choose file" textAlignment="CENTER" />
                                                                                 <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                                                                     <image>
                                                                                         <Image url="@../icons/ic_attach_file.png" />
