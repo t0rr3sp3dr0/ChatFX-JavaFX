@@ -407,10 +407,18 @@ public final class RDT {
         }
 
         public static final class Echo extends Thread {
-            private final int port;
+            private final DatagramSocket datagramSocket;
 
-            public Echo(int port) {
-                this.port = port;
+            public Echo(int port) throws SocketException {
+                this.datagramSocket = new DatagramSocket(port);
+            }
+
+            public Echo(Receiver receiver) {
+                this.datagramSocket = receiver.socket;
+            }
+
+            public Echo(Sender sender) {
+                this.datagramSocket = sender.socket;
             }
 
             @Override
@@ -418,7 +426,6 @@ public final class RDT {
                 super.run();
 
                 try {
-                    DatagramSocket datagramSocket = new DatagramSocket(this.port);
                     byte[] probeData = new byte[1];
 
                     //noinspection InfiniteLoopStatement
