@@ -1,23 +1,61 @@
 package systems.singularity.chatfx.client;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 import systems.singularity.chatfx.util.RDT;
 
+import java.net.InetAddress;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by pedro on 7/3/17.
  */
 public class Singleton extends HashMap<String, Object> {
     private static Singleton ourInstance = new Singleton();
-
-    public RDT.Receiver chatReceiver;
-    public RDT.Receiver fileReceiver;
-    public RDT.Receiver rttReceiver;
+    private final Map<InetAddress, RDT.Receiver.OnReceiveListener> chatOnReceiveListeners = new HashMap<>();
+    private final Map<InetAddress, RDT.Receiver.OnReceiveListener> fileOnReceiveListeners = new HashMap<>();
+    private RDT.Receiver chatReceiver = null;
+    private RDT.Receiver fileReceiver = null;
 
     private Singleton() {
     }
 
     public static Singleton getInstance() {
         return ourInstance;
+    }
+
+    public void setChatReceiver(@NotNull RDT.Receiver chatReceiver) {
+        for (InetAddress key : this.chatOnReceiveListeners.keySet())
+            chatReceiver.setOnReceiveListener(key, this.chatOnReceiveListeners.get(key));
+
+        if (this.chatReceiver != null)
+            this.chatReceiver.clearOnReceiveListeners();
+
+        this.chatReceiver = chatReceiver;
+    }
+
+    public void setFileReceiver(@NotNull RDT.Receiver fileReceiver) {
+        for (InetAddress key : this.fileOnReceiveListeners.keySet())
+            fileReceiver.setOnReceiveListener(key, this.fileOnReceiveListeners.get(key));
+
+        if (this.fileReceiver != null)
+            this.fileReceiver.clearOnReceiveListeners();
+
+        this.fileReceiver = chatReceiver;
+    }
+
+    public void setChatOnReceiveListener(@Nullable InetAddress address, @Nullable RDT.Receiver.OnReceiveListener onReceiveListener) {
+        this.chatOnReceiveListeners.put(address, onReceiveListener);
+
+        if (this.chatReceiver != null)
+            this.chatReceiver.setOnReceiveListener(address, onReceiveListener);
+    }
+
+    public void setFileOnReceiveListener(@Nullable InetAddress address, @Nullable RDT.Receiver.OnReceiveListener onReceiveListener) {
+        this.fileOnReceiveListeners.put(address, onReceiveListener);
+
+        if (this.fileReceiver != null)
+            this.fileReceiver.setOnReceiveListener(address, onReceiveListener);
     }
 }

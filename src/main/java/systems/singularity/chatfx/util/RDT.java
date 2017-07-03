@@ -388,6 +388,10 @@ public final class RDT {
             }
         }
 
+        public void clearOnReceiveListeners() {
+            this.onReceiveListeners.clear();
+        }
+
         public void setOnReceiveListener(@Nullable InetAddress address, @Nullable OnReceiveListener onReceiveListener) {
             this.onReceiveListeners.put(address, onReceiveListener);
         }
