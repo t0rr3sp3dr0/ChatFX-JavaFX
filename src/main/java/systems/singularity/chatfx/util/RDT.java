@@ -28,6 +28,9 @@ public final class RDT {
 
     @NotNull
     public static Sender getSender(@NotNull InetAddress address, @NotNull Integer port) throws SocketException, UnknownHostException {
+        assert port > 0;
+        System.out.println("\t\t\t\tgetSender(InetAddress, Integer)\t" + port);
+
         Pair<InetAddress, Integer> key = new Pair<>(address, port);
         synchronized (RDT.senders) {
             Sender sender = senders.get(key);
@@ -42,6 +45,9 @@ public final class RDT {
 
     @NotNull
     public static Receiver getReceiver(@NotNull Integer port) throws SocketException {
+        assert port > 0;
+        System.out.println("\t\t\t\tgetReceiver(Integer)\t" + port);
+
         synchronized (RDT.receivers) {
             Receiver receiver = receivers.get(port);
             if (receiver == null) {
@@ -55,12 +61,15 @@ public final class RDT {
 
     @NotNull
     public static Receiver getReceiver(@NotNull Sender sender) throws SocketException {
+        assert sender.socket.getPort() > 0;
+        System.out.println("\t\t\t\tgetReceiver(Sender)\t" + sender.socket.getLocalPort());
+
         synchronized (RDT.receivers) {
-            Receiver receiver = receivers.get(sender.socket.getPort());
+            Receiver receiver = receivers.get(sender.socket.getLocalPort());
             if (receiver == null) {
                 receiver = new Receiver(sender);
                 receiver.start();
-                receivers.put(sender.socket.getPort(), receiver);
+                receivers.put(sender.socket.getLocalPort(), receiver);
             }
             return receiver;
         }
@@ -129,7 +138,8 @@ public final class RDT {
             this.probe.setOnTimeoutChanged(objects -> Sender.this.timer.setTimeout((Integer) objects[0]));
             this.probe.start();
 
-            RDT.getReceiver(Sender.this);
+            System.out.printf("DEBUG: Sender\t\tADDRESS\t%s\tPORT\t%s\tCONNECTION\t%s\n", this.address, this.port, this.connection);
+            System.out.printf("RDT.getReceiver\t%s\tPORT\t%s\n", RDT.getReceiver(Sender.this), this.socket.getLocalPort());
         }
 
         public void sendMessage(byte[] message) throws InterruptedException {
@@ -142,7 +152,7 @@ public final class RDT {
         }
 
         public void sendACK(Integer seq, Integer port) throws IOException {
-            System.out.printf("DEBUG: sendACK\t\tADDRESS\t%s\tPORT\t%s\tCONNECTION\t%s\n", this.address, this.port, this.connection);
+            System.out.printf("DEBUG: sendACK\t\tADDRESS\t%s\tPORT\t%s\tCONNECTION\t%sSEQ\t%s\n", this.address, this.port, this.connection, seq);
 
             byte[] payload = new byte[8 + Constants.MTU];
             payload[0] = (byte) 0b10000000;
@@ -300,7 +310,8 @@ public final class RDT {
 
             this.socket.setSoTimeout(0);
 
-            assert port > 0;
+            assert this.port > 0;
+            System.out.println("\t\t\t\tReceiver(int)\t" + port);
         }
 
         private Receiver(Sender sender) {
@@ -310,6 +321,7 @@ public final class RDT {
             this.socket = sender.socket;
 
             assert this.port > 0;
+            System.out.println("\t\t\t\tReceiver(sender)\t" + port);
         }
 
         @Override
