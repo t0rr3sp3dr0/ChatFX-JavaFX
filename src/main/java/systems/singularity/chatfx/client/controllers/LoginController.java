@@ -7,13 +7,19 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import systems.singularity.chatfx.client.Singleton;
 import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.server.db.UserRepository;
+import systems.singularity.chatfx.util.Protocol;
+import systems.singularity.chatfx.util.RDT;
+import systems.singularity.chatfx.util.java.Utilities;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class LoginController implements Initializable {
 
@@ -26,44 +32,85 @@ public class LoginController implements Initializable {
     @FXML
     private PasswordField tf_pass;
 
+    @FXML
+    private TextField tf_ip;
+
+    @FXML
+    private TextField tf_port;
+    private boolean[] logged = new boolean[3];
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
             bt_login.setOnAction(e -> {
 
                 if (!tf_user.getText().isEmpty() && !tf_pass.getText().isEmpty() && tf_pass.getText().length() >= 8) {
-                    /*try {
+                    try {
                         //ajustar para o RDT
-                        Map<String, String> map = new HashMap<>();
-                        map.put("Authorization", "Basic");
-                        map.put("Pragma", "login");
-                        new Protocol.Sender(sender).sendMessage(map, "Vai tomar no cu, pasg!");
-
-
-
-                        User user = UserRepository.getInstance().get(new User(0, tf_user.getText(), "", "", (short) 0, (short) 0, (short) 0, false));
                         String password = Utilities.MD5(tf_pass.getText());
-                        if (user != null) {
-                            if (user.getPassword().equals(password))
-                                login(user);
-                            else {
-                                Alert alert = new Alert(Alert.AlertType.WARNING);
-                                alert.setTitle("Error");
-                                alert.setHeaderText("Invalid password!");
-                                Button exitButton = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
-                                exitButton.setText("OK");
-                                alert.show();
+                        int port = Integer.parseInt(tf_port.getText());
+                        Map<String, String> map = new HashMap<>();
+                        map.put("Authorization", "Basic" + new String(Base64.getEncoder().encode((tf_user + ":" + password).getBytes())));
+                        map.put("Pragma", "login;chat");
+                        RDT.Sender sender = RDT.getSender(InetAddress.getByName(tf_ip.getText()), port);
+                        Protocol.Sender.sendMessage(sender, map, "Vai tomar no cu, pasg!");
+
+                        RDT.getReceiver(sender).setOnReceiveListener(InetAddress.getByName(tf_ip.getText()), (Protocol.Receiver) (address, port1, headers, message) -> {
+                            String[] basic = new String(Base64.getDecoder().decode(headers.get("Authorization").split(" ")[1])).split(":");
+                            String[] pragma = headers.get("Pragma").split(";");
+
+                            if (pragma[0].equals("login") && !pragma[1].equals("401")) {
+                                try {
+                                    Singleton.getInstance().setChatReceiver(RDT.getReceiver(sender));
+                                    this.logged[0] = true;
+                                    login();
+                                } catch (SocketException e1) {
+                                    e1.printStackTrace();
+                                }
                             }
-                        } else {
-                            user = new User(0, tf_user.getText(), password, "address", (short) 0, (short) 0, (short) 0, true);
-                            UserRepository.getInstance().insert(user);
-                            login(user);
-                        }
-                    } catch (SQLException | NoSuchAlgorithmException e1) {
+
+                        });
+
+                        map = new HashMap<>();
+                        map.put("Authorization", "Basic" + new String(Base64.getEncoder().encode((tf_user + ":" + password).getBytes())));
+                        map.put("Pragma", "login;file");
+                        Protocol.Sender.sendMessage(sender, map, "Vai tomar no cu, pasg!");
+
+                        RDT.getReceiver(sender).setOnReceiveListener(InetAddress.getByName(tf_ip.getText()), (Protocol.Receiver) (address, port1, headers, message) -> {
+                            String[] basic = new String(Base64.getDecoder().decode(headers.get("Authorization").split(" ")[1])).split(":");
+                            String[] pragma = headers.get("Pragma").split(";");
+
+                            if (pragma[0].equals("login") && !pragma[1].equals("401")) {
+                                try {
+                                    Singleton.getInstance().setFileReceiver(RDT.getReceiver(sender));
+                                    this.logged[1] = true;
+                                    login();
+                                } catch (SocketException e1) {
+                                    e1.printStackTrace();
+                                }
+                            }
+
+                        });
+
+                        map = new HashMap<>();
+                        map.put("Authorization", "Basic" + new String(Base64.getEncoder().encode((tf_user + ":" + password).getBytes())));
+                        map.put("Pragma", "login;rtt");
+                        Protocol.Sender.sendMessage(sender, map, "Vai tomar no cu, pasg!");
+
+                        RDT.getReceiver(sender).setOnReceiveListener(InetAddress.getByName(tf_ip.getText()), (Protocol.Receiver) (address, port1, headers, message) -> {
+                            String[] basic = new String(Base64.getDecoder().decode(headers.get("Authorization").split(" ")[1])).split(":");
+                            String[] pragma = headers.get("Pragma").split(";");
+
+                            if (pragma[0].equals("login") && !pragma[1].equals("401")) {
+                                new RDT.RTT.Echo(sender).start();
+                                this.logged[2] = true;
+                                login();
+                            }
+                        });
+                    } catch (Exception e1) {
                         e1.printStackTrace();
                     }
-                    */
-                    login(new User());
+
 
                 } else {
                     Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -86,29 +133,23 @@ public class LoginController implements Initializable {
         }
     }
 
-    private void login(User user) {
-        //ir para a tela principal
-        try {
-            user.setStatus(true);
-            UserRepository.getInstance().update(user);
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/main.fxml"));
-            final Parent root = fxmlLoader.load();
+    private void login() {
+        if (this.logged[0] && this.logged[1] && this.logged[2]) {
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/main.fxml"));
+                final Parent root = fxmlLoader.load();
 
-            Stage stage = new Stage();
-            stage.setTitle("Welcome, " + tf_user.getText());
-            stage.setScene(new Scene(root, 720, 430));
-            stage.show();
+                Stage stage = new Stage();
+                stage.setScene(new Scene(root, 720, 430));
+                stage.show();
 
-            stage.setOnCloseRequest(e -> {
-                user.setStatus(false);
-                try {
-                    UserRepository.getInstance().update(user);
-                } catch (SQLException e1) {
-                    e1.printStackTrace();
-                }
-            });
-        } catch (IOException | SQLException e1) {
-            e1.printStackTrace();
+                stage.setOnCloseRequest(e -> {
+
+                });
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
+
     }
 }

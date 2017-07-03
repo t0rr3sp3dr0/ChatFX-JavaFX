@@ -1,57 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="109.0" maxWidth="285.0" minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="109.0" prefWidth="285.0" xmlns="http://javafx.com/javafx/8"
-      fx:controller="systems.singularity.chatfx.client.controllers.LoginController">
+
+<VBox maxHeight="183.0" maxWidth="285.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="183.0" prefWidth="285.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systems.singularity.chatfx.client.controllers.LoginController">
     <children>
+      <HBox maxHeight="31.0" minWidth="256.0" prefHeight="31.0" prefWidth="200.0">
+         <children>
+            <Label alignment="CENTER" maxHeight="31.0" maxWidth="67.0" prefHeight="31.0" prefWidth="67.0" text="ip server">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Label>
+            <TextField fx:id="tf_ip" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0" promptText="192.168.0.1" />
+         </children>
+         <VBox.margin>
+            <Insets bottom="2.0" left="4.0" right="4.0" top="4.0" />
+         </VBox.margin>
+      </HBox>
+      <HBox maxHeight="31.0" minWidth="256.0" prefHeight="31.0" prefWidth="200.0">
+         <children>
+            <Label alignment="CENTER" maxHeight="31.0" maxWidth="67.0" prefHeight="31.0" prefWidth="67.0" text="ip port">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Label>
+            <TextField fx:id="tf_port" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0" promptText="65535">
+               <HBox.margin>
+                  <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
+               </HBox.margin>
+            </TextField>
+         </children>
+         <VBox.margin>
+            <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
+         </VBox.margin>
+      </HBox>
         <HBox maxHeight="31.0" minWidth="256.0" prefHeight="31.0" prefWidth="200.0">
             <children>
                 <Label maxHeight="31.0" maxWidth="67.0" prefHeight="31.0" prefWidth="67.0" text="username">
                     <HBox.margin>
-                        <Insets/>
+                        <Insets />
                     </HBox.margin>
                 </Label>
-                <TextField fx:id="tf_user" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0"
-                           promptText="user"/>
+                <TextField fx:id="tf_user" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0" promptText="user" />
             </children>
             <VBox.margin>
-                <Insets bottom="2.0" left="4.0" right="4.0" top="4.0"/>
+                <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
             </VBox.margin>
         </HBox>
         <HBox maxHeight="31.0" minWidth="256.0" prefHeight="31.0" prefWidth="200.0">
             <children>
-                <Label maxHeight="31.0" maxWidth="67.0" prefHeight="31.0" prefWidth="67.0" text="password"
-                       textAlignment="RIGHT">
+                <Label maxHeight="31.0" maxWidth="67.0" prefHeight="31.0" prefWidth="67.0" text="password" textAlignment="RIGHT">
                     <HBox.margin>
-                        <Insets/>
+                        <Insets />
                     </HBox.margin>
                 </Label>
-                <PasswordField fx:id="tf_pass" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0"
-                               promptText="password"/>
+                <PasswordField fx:id="tf_pass" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0" promptText="password" />
             </children>
             <VBox.margin>
-                <Insets bottom="2.0" left="4.0" right="4.0" top="2.0"/>
+                <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
             </VBox.margin>
         </HBox>
         <HBox maxHeight="31.0" minWidth="256.0" prefHeight="31.0" prefWidth="200.0">
             <children>
                 <Label maxHeight="31.0" maxWidth="67.0" prefHeight="31.0" prefWidth="67.0" textAlignment="RIGHT">
                     <HBox.margin>
-                        <Insets/>
+                        <Insets />
                     </HBox.margin>
                 </Label>
-                <Button fx:id="bt_login" maxHeight="31.0" maxWidth="209.0" mnemonicParsing="false" prefHeight="31.0"
-                        prefWidth="209.0" text="login">
+                <Button fx:id="bt_login" maxHeight="31.0" maxWidth="209.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="209.0" text="login">
                     <HBox.margin>
-                        <Insets/>
+                        <Insets />
                     </HBox.margin>
                 </Button>
             </children>
             <VBox.margin>
-                <Insets bottom="4.0" left="4.0" right="4.0" top="2.0"/>
+                <Insets bottom="4.0" left="4.0" right="4.0" top="2.0" />
             </VBox.margin>
         </HBox>
     </children>
