@@ -31,7 +31,7 @@ public final class Protocol {
         // Avoid class instantiation
     }
 
-    @Nullable
+    @NotNull
     public static byte[] extractData(byte[] bytes) {
         char c = '\0';
         for (int i = 0; i < bytes.length; i++)
@@ -40,7 +40,7 @@ public final class Protocol {
             else
                 c = (char) bytes[i];
 
-        return null;
+        return new byte[0];
     }
 
     @NotNull
@@ -82,7 +82,6 @@ public final class Protocol {
     public interface Receiver extends RDT.Receiver.OnReceiveListener {
         @Override
         default void onReceive(InetAddress address, int port, byte[] bytes) {
-            //noinspection ConstantConditions
             onReceive(address, port, Protocol.extractHeaders(bytes), new String(Protocol.extractData(bytes)));
         }
 
