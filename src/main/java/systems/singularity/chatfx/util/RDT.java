@@ -122,11 +122,13 @@ public final class RDT {
             this.address = address;
             this.port = port;
 
-            this.probe = new RTT.Probe(address, 4321);
+            this.probe = new RTT.Probe(address, 49150);
             this.probe.setOnTimeoutChanged(objects -> Sender.this.timer.setTimeout((Integer) objects[0]));
             this.probe.start();
 
             this.socket.setSoTimeout(0);
+
+            RDT.getReceiver(this);
         }
 
         public void sendMessage(byte[] message) throws InterruptedException {
@@ -475,7 +477,7 @@ public final class RDT {
                     while (true)
                         try {
                             DatagramPacket packet = new DatagramPacket(bytes, bytes.length, this.address, this.port);
-                            socket.setSoTimeout(this.timeout);
+                            socket.setSoTimeout(250);
 
                             this.sample = System.nanoTime();
                             socket.send(packet);
@@ -492,7 +494,6 @@ public final class RDT {
                                 this.onTimeoutChanged.onEvent(timeout);
                             this.timeout = timeout;
                         } catch (IOException e) {
-                            System.out.println(e.getMessage());
                             if (this.onRTTFailed != null)
                                 this.onRTTFailed.onEvent();
                         } finally {
