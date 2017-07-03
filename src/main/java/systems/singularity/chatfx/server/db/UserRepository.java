@@ -1,8 +1,7 @@
 package systems.singularity.chatfx.server.db;
 
 import systems.singularity.chatfx.interfaces.Repository;
-import systems.singularity.chatfx.structs.User;
-import systems.singularity.chatfx.util.Constants;
+import systems.singularity.chatfx.models.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,7 +17,7 @@ import java.util.List;
 public class UserRepository implements Repository<User> {
     @Override
     public void insert(User user) throws SQLException {
-        Connection conn = Database.getConnection(Constants.chatFX + "ChatFXServer.db");
+        Connection conn = Database.getConnection();
         if (!exists(user)) {
             PreparedStatement statement = conn.prepareStatement("INSERT INTO cf_users (user_username, user_password, user_address, user_portChat, user_portFile, user_portRtt, user_status) VALUES (?, ?, ?, ?, ?, ?, ?);");
             statement.setString(1, user.getUsername());
@@ -34,7 +33,7 @@ public class UserRepository implements Repository<User> {
 
     @Override
     public void update(User user) throws SQLException {
-        Connection conn = Database.getConnection(Constants.chatFX + "ChatFXServer.db");
+        Connection conn = Database.getConnection();
         if (exists(user)) {
             PreparedStatement statement = conn.prepareStatement("UPDATE cf_users SET user_username = ?, user_password = ?, user_address = ?, user_portChat = ?, user_portFile = ?, user_portRtt = ?, user_status = ? WHERE user_id = ?;");
             statement.setString(1, user.getUsername());
@@ -52,7 +51,7 @@ public class UserRepository implements Repository<User> {
 
     @Override
     public boolean exists(User user) throws SQLException {
-        Connection conn = Database.getConnection(Constants.chatFX + "ChatFXServer.db");
+        Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_users WHERE user_username = ?;");
         statement.setString(1, user.getUsername());
         ResultSet rs = statement.executeQuery();
@@ -61,7 +60,7 @@ public class UserRepository implements Repository<User> {
 
     @Override
     public void remove(User user) throws SQLException {
-        Connection conn = Database.getConnection(Constants.chatFX + "ChatFXServer.db");
+        Connection conn = Database.getConnection();
         if (exists(user)) {
             PreparedStatement statement = conn.prepareStatement("DELETE FROM cf_users WHERE user_id = ?;");
             statement.setInt(1, user.getId());
@@ -71,7 +70,7 @@ public class UserRepository implements Repository<User> {
 
     @Override
     public List<User> getAll() throws SQLException {
-        Connection conn = Database.getConnection(Constants.chatFX + "ChatFXServer.db");
+        Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_users;");
         ResultSet rs = statement.executeQuery();
         ArrayList<User> users = new ArrayList<>();
@@ -91,7 +90,7 @@ public class UserRepository implements Repository<User> {
 
     @Override
     public User get(User user) throws SQLException {
-        Connection conn = Database.getConnection(Constants.chatFX + "ChatFXServer.db");
+        Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_users WHERE user_username = ?;");
         statement.setString(1, user.getUsername());
         ResultSet rs = statement.executeQuery();

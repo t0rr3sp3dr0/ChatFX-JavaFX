@@ -5,7 +5,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import systems.singularity.chatfx.server.db.Database;
 import systems.singularity.chatfx.util.Constants;
 
 import java.io.File;
@@ -22,13 +21,9 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        File file = new File(Constants.chatFX);
+        File file = new File(Constants.PERSISTENT_DIRECTORY);
         if (!file.exists())
             file.mkdir();
-
-        //Server Database
-        Database.createDatabase(Constants.chatFX + "ChatFXServer.db");
-        Database.createTable(Constants.chatFX + "ChatFXServer.db");
 
         Parent root = FXMLLoader.load(getClass().getResource("/layouts/open_server.fxml"));
         primaryStage.setTitle("Open Server");

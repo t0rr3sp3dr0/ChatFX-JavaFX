@@ -69,7 +69,7 @@ public class MainController implements Initializable {
 
         bt_showFolder.setOnAction(e -> {
             try {
-                Desktop.getDesktop().open(new File(Constants.chatFX));
+                Desktop.getDesktop().open(new File(Constants.PERSISTENT_DIRECTORY));
             } catch (IOException e1) {
                 e1.printStackTrace();
             }

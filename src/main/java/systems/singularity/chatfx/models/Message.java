@@ -1,4 +1,4 @@
-package systems.singularity.chatfx.client.structs;
+package systems.singularity.chatfx.models;
 
 import java.sql.Time;
 

@@ -1,83 +1,52 @@
 package systems.singularity.chatfx.client.db;
 
-import systems.singularity.chatfx.util.ConnectionFactory;
+import systems.singularity.chatfx.util.Constants;
 
-import java.sql.*;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Created by caesa on 01/07/2017.
  */
 public class Database {
-    private static Database ourInstance;
+    private static Connection connection;
 
     static {
+        //noinspection Duplicates
         try {
             Class.forName("org.sqlite.JDBC");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+
+            Database.initializeDatabase();
+            Database.initializeTables();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private Connection connection;
+    private Database() {
+        // Avoid class instantiation
+    }
 
-    private Database(String path) {
-        try {
-            this.connection = ConnectionFactory.createConnection(path);
-        } catch (SQLException e) {
-            e.printStackTrace();
+    private static void initializeDatabase() throws SQLException {
+        try (Connection connection = DriverManager.getConnection(String.format("jdbc:sqlite:%s", Paths.get(Constants.PERSISTENT_DIRECTORY, "client.db").toString()))) {
+            Database.connection = connection;
         }
     }
 
-    public static void createDatabase(String path) {
-        String url = "jdbc:sqlite:" + path;
-        try (Connection connection = DriverManager.getConnection(url)) {
-            if (connection != null) {
-                DatabaseMetaData metaData = connection.getMetaData();
-                ourInstance = new Database(url);
-                //conexão criada
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    private static void initializeTables() throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.execute("CREATE TABLE IF NOT EXISTS cf_messages (message_id INTEGER PRIMARY KEY, message_group_id INTEGER NULL, message_content VARCHAR, message_status BOOLEAN, message_timestamp DATETIME, message_author_id INTEGER NOT NULL);");
+        statement.execute("CREATE TABLE IF NOT EXISTS cf_groups (group_id INTEGER PRIMARY KEY, group_name VARCHAR(25));");
+        statement.execute("CREATE TABLE IF NOT EXISTS cf_members (member_id INTEGER PRIMARY KEY, member_group_id INTEGER NOT NULL, member_user_id INTEGER NOT NULL);");
     }
 
-    public static void createTable(String path) {
-        String url = "jdbc:sqlite:" + path;
+    public static Connection getConnection() throws SQLException {
+        if (connection.isClosed())
+            Database.initializeDatabase();
 
-        String sql = "CREATE TABLE IF NOT EXISTS cf_messages (message_id INTEGER PRIMARY KEY, message_group_id INTEGER NULL, message_content VARCHAR, message_status BOOLEAN, message_timestamp DATETIME, message_author_id INTEGER NOT NULL);";
-        try (Connection connection = DriverManager.getConnection(url)) {
-            Statement sttm = connection.createStatement();
-            sttm.execute(sql);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        sql = "CREATE TABLE IF NOT EXISTS cf_groups (group_id INTEGER PRIMARY KEY, group_name VARCHAR(25));";
-        try (Connection connection = DriverManager.getConnection(url)) {
-            Statement sttm = connection.createStatement();
-            sttm.execute(sql);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        sql = "CREATE TABLE IF NOT EXISTS cf_members (member_id INTEGER PRIMARY KEY, member_group_id INTEGER NOT NULL, member_user_id INTEGER NOT NULL);";
-        try (Connection connection = DriverManager.getConnection(url)) {
-            Statement sttm = connection.createStatement();
-            sttm.execute(sql);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        return connection;
     }
-
-    public static Connection getConnection(String path) {
-        try {
-            if (ourInstance.connection == null || !ourInstance.connection.isValid(4))
-                ourInstance.connection = ConnectionFactory.createConnection("jdbc:sqlite:" + path);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return ourInstance.connection;
-    }
-
-
 }

@@ -1,19 +1,18 @@
 package systems.singularity.chatfx.server.controllers;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.server.db.UserRepository;
-import systems.singularity.chatfx.structs.User;
 
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by caesa on 01/07/2017.
@@ -43,20 +42,17 @@ public class ServerController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
-
-        updateTable();
-
-        int delay = 2000;   // delay de 2 seg.
-        int interval = 1000;  // intervalo de 1 seg.
-        Timer timer = new Timer();
-
-        timer.scheduleAtFixedRate(new TimerTask() {
-            public void run() {
-                updateTable();
+        new Thread(() -> {
+            //noinspection InfiniteLoopStatement
+            while (true) {
+                Platform.runLater(ServerController.this::updateTable);
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-        }, delay, interval);
-
+        }).start();
     }
 
     private void updateTable() {

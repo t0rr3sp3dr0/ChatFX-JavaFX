@@ -1,7 +1,7 @@
 package systems.singularity.chatfx.client.db;
 
-import systems.singularity.chatfx.client.structs.Member;
 import systems.singularity.chatfx.interfaces.Repository;
+import systems.singularity.chatfx.models.Member;
 
 import java.sql.SQLException;
 import java.util.List;
