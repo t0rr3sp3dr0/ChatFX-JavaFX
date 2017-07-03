@@ -100,7 +100,7 @@ public final class RDT {
         public Integer fin = -1;
         public Integer repeatedCount = 0;
 
-        public Connection() throws UnknownHostException {
+        public Connection() {
             this.packets = new PriorityQueue<>();
             this.window = new ResizableBlockingQueue<>(4);
         }
@@ -110,7 +110,7 @@ public final class RDT {
         private final InetAddress address;
         private final int port;
 
-        private final DatagramSocket socket = new DatagramSocket();
+        private final DatagramSocket socket;
         private final BlockingQueue<byte[]> queue = new ArrayBlockingQueue<>(Short.MAX_VALUE);
         private final RDT.Connection connection = new Connection();
         private final Timer timer = new Timer();
@@ -122,16 +122,19 @@ public final class RDT {
             this.address = address;
             this.port = port;
 
+            this.socket = new DatagramSocket();
+            this.socket.setSoTimeout(0);
+
             this.probe = new RTT.Probe(address, 49150);
             this.probe.setOnTimeoutChanged(objects -> Sender.this.timer.setTimeout((Integer) objects[0]));
             this.probe.start();
-
-            this.socket.setSoTimeout(0);
 
             RDT.getReceiver(Sender.this);
         }
 
         public void sendMessage(byte[] message) throws InterruptedException {
+            System.out.printf("DEBUG: sendMessage\t\tADDRESS\t%s\tPORT\t%s\tCONNECTION\t%s\n", this.address, this.port, this.connection);
+
             this.queue.put(message);
 
             //noinspection StatementWithEmptyBody
@@ -139,6 +142,8 @@ public final class RDT {
         }
 
         public void sendACK(Integer seq, Integer port) throws IOException {
+            System.out.printf("DEBUG: sendACK\t\tADDRESS\t%s\tPORT\t%s\tCONNECTION\t%s\n", this.address, this.port, this.connection);
+
             byte[] payload = new byte[8 + Constants.MTU];
             payload[0] = (byte) 0b10000000;
             payload[4] = (byte) (seq >> 8);
@@ -294,6 +299,8 @@ public final class RDT {
             this.socket = new DatagramSocket(port);
 
             this.socket.setSoTimeout(0);
+
+            assert port > 0;
         }
 
         private Receiver(Sender sender) {
@@ -301,6 +308,8 @@ public final class RDT {
 
             this.port = sender.socket.getLocalPort();
             this.socket = sender.socket;
+
+            assert this.port > 0;
         }
 
         @Override
