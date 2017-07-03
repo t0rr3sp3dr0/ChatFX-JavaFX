@@ -107,7 +107,7 @@ public class MainController implements Initializable {
             final long contentLength = Long.parseLong(headers.get("Content-Length"));
 
             Protocol.Downloader downloader = Protocol.getDownloader(headers);
-            downloader.setCallback((bytesReceived, elapsedTime, sequence) -> {
+                downloader.setCallback((file, bytesReceived, elapsedTime) -> {
                 if (bytesReceived == contentLength)
                     System.out.println("FINISHED");
                 else
@@ -147,7 +147,7 @@ public class MainController implements Initializable {
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 try {
-                    new Protocol.Uploader(RDT.getSender(InetAddress.getByName("192.168.43.78"), 2020), "", file, (double bytesSent, long elapsedTime, long sequence) -> {
+                    new Protocol.Uploader(RDT.getSender(InetAddress.getByName("192.168.43.78"), 2020), "", file, ($, bytesSent, elapsedTime) -> {
                         double speed = bytesSent / (elapsedTime * 1e9);
                         double p = bytesSent / file.length();
                         double remainingTime = (file.length() - bytesSent) / speed;

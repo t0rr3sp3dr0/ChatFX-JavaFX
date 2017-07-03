@@ -34,7 +34,7 @@ public class Main {
 //            downloader.add(Protocol.extractData(bytes));
 //        });
 
-        new Protocol.Uploader(sender, "", new File("/Users/pedro/Downloads/go.src.tar.gz"), (bytesSent, elapsedTime, sequence) -> {
+        new Protocol.Uploader(sender, "", new File("/Users/pedro/Downloads/go.src.tar.gz"), (file, bytesSent, elapsedTime) -> {
             System.out.println(bytesSent / (elapsedTime / 1e9) + "Bps");
         }).start();
 

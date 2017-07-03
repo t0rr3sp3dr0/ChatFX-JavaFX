@@ -342,6 +342,7 @@ public final class RDT {
                                 Packet finPacket = connection.packets.poll();
                                 connection.seq = finPacket.seq;
                                 RDT.getSender(packet.getAddress(), port).sendACK(finPacket.seq);
+                                System.err.printf("%s\t%s\t%s\n", len, ((len - 1) % Constants.MTU) + 1, (connection.seq - (connection.fin + 1)) * Constants.MTU);
                                 System.arraycopy(finPacket.bytes, 0, bytes, (connection.seq - (connection.fin + 1)) * Constants.MTU, ((len - 1) % Constants.MTU) + 1);
                                 connection.fin = connection.seq;
 

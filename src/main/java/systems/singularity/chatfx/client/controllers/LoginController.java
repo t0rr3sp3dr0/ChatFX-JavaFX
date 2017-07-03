@@ -9,11 +9,9 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.server.db.UserRepository;
-import systems.singularity.chatfx.util.java.Utilities;
 
 import java.io.IOException;
 import java.net.URL;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
@@ -34,7 +32,7 @@ public class LoginController implements Initializable {
             bt_login.setOnAction(e -> {
 
                 if (!tf_user.getText().isEmpty() && !tf_pass.getText().isEmpty() && tf_pass.getText().length() >= 8) {
-                    try {
+                    /*try {
                         //ajustar para o RDT
                         User user = new UserRepository().get(new User(0, tf_user.getText(), "", "", (short) 0, (short) 0, (short) 0, false));
                         String password = Utilities.MD5(tf_pass.getText());
@@ -57,6 +55,8 @@ public class LoginController implements Initializable {
                     } catch (SQLException | NoSuchAlgorithmException e1) {
                         e1.printStackTrace();
                     }
+                    */
+                    login(new User());
 
                 } else {
                     Alert alert = new Alert(Alert.AlertType.WARNING);

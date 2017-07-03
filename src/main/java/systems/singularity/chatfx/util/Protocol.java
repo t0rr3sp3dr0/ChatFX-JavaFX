@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,7 +70,7 @@ public final class Protocol {
         synchronized (Protocol.downloaders) {
             Downloader downloader = Protocol.downloaders.get(headers.get("Message-ID"));
             if (downloader == null) {
-                downloader = new Downloader(headers, new File("C:\\Users\\caesa\\Desktop\\" + headers.get("Content-Disposition").split("\"")[1]));
+                downloader = new Downloader(headers, new File(Paths.get(Constants.DOWNLOAD_DIRECTORY, headers.get("Content-Disposition").split("\"")[1]).toString()));
                 downloader.start();
                 Protocol.downloaders.put(headers.get("Message-ID"), downloader);
             }
@@ -102,7 +103,6 @@ public final class Protocol {
 
             try (FileInputStream fileInputStream = new FileInputStream(this.file)) {
                 long writtenSize = 0;
-                int count = 0;
                 int size;
                 long startTime = System.nanoTime();
                 while (true) {
@@ -118,10 +118,9 @@ public final class Protocol {
                     sender.sendMessage(bytes);
                     long elapsedTime = System.nanoTime() - startTime;
                     writtenSize += size;
-                    count++;
 
                     if (callback != null)
-                        callback.onCallback(writtenSize, elapsedTime, count);
+                        callback.onCallback(this.file, writtenSize, elapsedTime);
                 }
 
                 if (writtenSize != this.file.length())
@@ -134,7 +133,7 @@ public final class Protocol {
         }
 
         public interface Callback {
-            void onCallback(double bytesSent, long elapsedTime, long sequence);
+            void onCallback(File file, double bytesSent, long elapsedTime);
         }
     }
 
@@ -178,7 +177,7 @@ public final class Protocol {
                     count++;
 
                     if (callback != null)
-                        callback.onCallback(readSize, elapsedTime, count);
+                        callback.onCallback(this.file, readSize, elapsedTime);
                 }
 
                 if (readSize != file.length())
@@ -199,7 +198,15 @@ public final class Protocol {
         }
 
         public interface Callback {
-            void onCallback(double bytesReceived, long elapsedTime, long sequence);
+            void onCallback(File file, double bytesReceived, long elapsedTime);
+        }
+    }
+
+    public static final class Sender implements Runnable {
+
+        @Override
+        public void run() {
+
         }
     }
 }

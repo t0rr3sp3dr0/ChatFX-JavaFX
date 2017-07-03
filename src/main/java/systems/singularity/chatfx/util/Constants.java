@@ -12,6 +12,7 @@ public final class Constants {
     public static final double SENDER_LOSS_PROBABILITY = 0;
     public static final double RECEIVER_LOSS_PROBABILITY = 0;
     public static final String PERSISTENT_DIRECTORY = Paths.get(Utilities.defaultDirectory(), "ChatFX").toString();
+    public static final String DOWNLOAD_DIRECTORY = Paths.get(System.getProperty("user.home"), "Downloads").toString();
 
     private Constants() {
         // Avoid class instantiation
