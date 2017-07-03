@@ -1,6 +1,9 @@
 package systems.singularity.chatfx.client.controllers;
 
+import com.google.gson.Gson;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -9,6 +12,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
+import systems.singularity.chatfx.client.Singleton;
+import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.util.Constants;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
@@ -20,9 +25,8 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.List;
 
 /**
  * Created by caesa on 01/07/2017.
@@ -42,7 +46,7 @@ public class MainController implements Initializable {
     private Button btClear;
 
     @FXML
-    private ListView<?> lvUsers;
+    private ListView<User> lvUsers;
 
     @FXML
     private TextArea taChat;
@@ -73,6 +77,49 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        try {
+            Map<String, String> map = new HashMap<>();
+            map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode(("blá:blá").getBytes())));
+            map.put("Pragma", "get;users");
+            final RDT.Sender sender = RDT.getSender(LoginController.getInetAddress(), LoginController.getPort());
+            Protocol.Sender.sendMessage(sender, map, "Manda esses user aí, seu porra!");
+
+            RDT.getReceiver(sender).setOnReceiveListener(LoginController.getInetAddress(), (Protocol.Receiver) (address, port1, headers, message) -> {
+                String[] pragma = headers.get("Pragma").split(";");
+                Gson json = new Gson();
+                List<User> users = Arrays.asList(json.fromJson(pragma[1], User[].class));
+
+
+                lvUsers.setItems(FXCollections.observableArrayList(users));
+                lvUsers.setCellFactory(param -> new ListCell<User>(){
+                    @Override
+                    protected void updateItem(User item, boolean empty) {
+                        setText(item.getUsername());
+                    }
+                });
+            });
+
+            RDT.Receiver receiver = RDT.getReceiver(2020);
+
+            receiver.setOnReceiveListener(null, (address, port, bytes) -> {
+                //System.out.println("\t" + address.toString());
+
+                Map<String, String> headers = Protocol.extractHeaders(bytes);
+                final long contentLength = Long.parseLong(headers.get("Content-Length"));
+
+                Protocol.Downloader downloader = Protocol.getDownloader(headers);
+                downloader.setCallback((file, bytesReceived, elapsedTime) -> {
+                    if (bytesReceived == contentLength)
+                        System.out.println("FINISHED");
+                    else
+                        System.out.println((elapsedTime / 1e9) + "s");
+                });
+                downloader.add(Protocol.extractData(bytes));
+            });
+        } catch (SocketException | InterruptedException | UnknownHostException e) {
+            e.printStackTrace();
+        }
+
         btSend.setOnAction(e -> {
             //Enviar a mensagem
             sendMessage();
@@ -96,27 +143,7 @@ public class MainController implements Initializable {
             clearChat();
         });
 
-        try {
-            RDT.Receiver receiver = RDT.getReceiver(2020);
 
-            receiver.setOnReceiveListener(null, (address, port, bytes) -> {
-            //System.out.println("\t" + address.toString());
-
-            Map<String, String> headers = Protocol.extractHeaders(bytes);
-            final long contentLength = Long.parseLong(headers.get("Content-Length"));
-
-            Protocol.Downloader downloader = Protocol.getDownloader(headers);
-                downloader.setCallback((file, bytesReceived, elapsedTime) -> {
-                if (bytesReceived == contentLength)
-                    System.out.println("FINISHED");
-                else
-                    System.out.println((elapsedTime / 1e9) + "s");
-            });
-            downloader.add(Protocol.extractData(bytes));
-        });
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
     }
 
     private void sendMessage() {
@@ -145,8 +172,8 @@ public class MainController implements Initializable {
                         double remainingTime = (file.length() - bytesSent) / speed;
                         Platform.runLater(() -> {
                                     progress.setProgress(p);
-                            lbProgress.setText(String.valueOf(p));
-                            lbTime.setText(String.valueOf(remainingTime));
+                                    lbProgress.setText(String.valueOf(p));
+                                    lbTime.setText(String.valueOf(remainingTime));
                                 }
                         );
                     }).start();

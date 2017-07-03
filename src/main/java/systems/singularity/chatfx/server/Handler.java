@@ -1,5 +1,6 @@
 package systems.singularity.chatfx.server;
 
+import com.google.gson.Gson;
 import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.server.db.UserRepository;
 import systems.singularity.chatfx.util.Protocol;
@@ -9,9 +10,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by pedro on 7/2/17.
@@ -113,6 +112,27 @@ public class Handler extends Thread implements Protocol.Receiver {
 
                         break;
 
+                    case "get":
+                        switch (pragma[1]) {
+                            case "users":
+
+                                List<User> users = UserRepository.getInstance().getAll();
+                                Gson gson = new Gson();
+                                String json = gson.toJson(users);
+                                Map<String, String> map = new HashMap<>();
+                                map.put("Pragma", "OK;" + json);
+
+                                try {
+                                    Protocol.Sender.sendMessage(RDT.getSender(address, port), map, "");
+                                } catch (InterruptedException | SocketException | UnknownHostException e) {
+                                    e.printStackTrace();
+                                }
+                                break;
+
+                            default:
+                                break;
+                        }
+                        break;
                     default:
                         break;
                 }

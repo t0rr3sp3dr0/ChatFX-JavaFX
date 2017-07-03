@@ -39,6 +39,16 @@ public class LoginController implements Initializable {
     @FXML
     private TextField tf_port;
     private boolean[] logged = new boolean[3];
+    private static InetAddress inetAddress;
+    private static int port;
+
+    public static InetAddress getInetAddress() {
+        return inetAddress;
+    }
+
+    public static int getPort() {
+        return port;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -47,16 +57,17 @@ public class LoginController implements Initializable {
 
                 if (!tf_user.getText().isEmpty() && !tf_pass.getText().isEmpty() && tf_pass.getText().length() >= 8) {
                     try {
+                        inetAddress = InetAddress.getByName(tf_ip.getText());
+                        port = Integer.parseInt(tf_port.getText());
                         //ajustar para o RDT
                         String password = Utilities.MD5(tf_pass.getText());
-                        int port = Integer.parseInt(tf_port.getText());
                         Map<String, String> map = new HashMap<>();
                         map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
                         map.put("Pragma", "login;chat");
-                        final RDT.Sender sender = RDT.getSender(InetAddress.getByName(tf_ip.getText()), port);
+                        final RDT.Sender sender = RDT.getSender(inetAddress, port);
                         Protocol.Sender.sendMessage(sender, map, "Vai tomar no cu, pasg!");
 
-                        RDT.getReceiver(sender).setOnReceiveListener(InetAddress.getByName(tf_ip.getText()), (Protocol.Receiver) (address, port1, headers, message) -> {
+                        RDT.getReceiver(sender).setOnReceiveListener(inetAddress, (Protocol.Receiver) (address, port1, headers, message) -> {
                             String[] pragma = headers.get("Pragma").split(";");
                             if (pragma[0].equals("login") && !pragma[1].equals("401")) {
                                 try {
@@ -75,7 +86,7 @@ public class LoginController implements Initializable {
                         map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
                         map.put("Pragma", "login;file");
                         Protocol.Sender.sendMessage(sender, map, "Vai tomar no cu, file!");
-                        RDT.getReceiver(sender).setOnReceiveListener(InetAddress.getByName(tf_ip.getText()), (Protocol.Receiver) (address, port1, headers, message) -> {
+                        RDT.getReceiver(sender).setOnReceiveListener(inetAddress, (Protocol.Receiver) (address, port1, headers, message) -> {
                             String[] pragma = headers.get("Pragma").split(";");
 
                             if (pragma[0].equals("login") && !pragma[1].equals("401")) {
@@ -95,7 +106,7 @@ public class LoginController implements Initializable {
                         map.put("Pragma", "login;rtt");
                         Protocol.Sender.sendMessage(sender, map, "Vai tomar no cu, rtt!");
 
-                        RDT.getReceiver(sender).setOnReceiveListener(InetAddress.getByName(tf_ip.getText()), (Protocol.Receiver) (address, port1, headers, message) -> {
+                        RDT.getReceiver(sender).setOnReceiveListener(inetAddress, (Protocol.Receiver) (address, port1, headers, message) -> {
                             String[] pragma = headers.get("Pragma").split(";");
 
                             if (pragma[0].equals("login") && !pragma[1].equals("401")) {
