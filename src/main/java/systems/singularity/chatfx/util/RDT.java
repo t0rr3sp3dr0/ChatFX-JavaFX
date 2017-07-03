@@ -346,7 +346,7 @@ public final class RDT {
 
                             if (seq <= connection.fin || seq < connection.seq || connection.packets.contains(pkt)) {
                                 System.out.printf("\nUnexpected SEQ(%d)\t%d(%d)\n%b\t%b\t%b\n\n", seq, connection.hashCode(), connection.seq, seq <= connection.fin, seq < connection.seq, connection.packets.contains(pkt));
-                                RDT.getSender(packet.getAddress(), port).sendACK(connection.seq);
+                                RDT.getSender(packet.getAddress(), packet.getPort()).sendACK(connection.seq);
                                 continue;
                             }
 
@@ -363,7 +363,7 @@ public final class RDT {
 
                                 Packet finPacket = connection.packets.poll();
                                 connection.seq = finPacket.seq;
-                                RDT.getSender(packet.getAddress(), port).sendACK(finPacket.seq);
+                                RDT.getSender(packet.getAddress(), packet.getPort()).sendACK(finPacket.seq);
                                 System.err.printf("%s\t%s\t%s\n", len, ((len - 1) % Constants.MTU) + 1, (connection.seq - (connection.fin + 1)) * Constants.MTU);
                                 System.arraycopy(finPacket.bytes, 0, bytes, (connection.seq - (connection.fin + 1)) * Constants.MTU, ((len - 1) % Constants.MTU) + 1);
                                 connection.fin = connection.seq;
