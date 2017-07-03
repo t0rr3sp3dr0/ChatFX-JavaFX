@@ -80,6 +80,7 @@ public final class Protocol {
     }
 
     public interface Receiver extends RDT.Receiver.OnReceiveListener {
+        @Override
         default void onReceive(InetAddress address, byte[] bytes) {
             //noinspection ConstantConditions
             onReceive(address, Protocol.extractHeaders(bytes), new String(Protocol.extractData(bytes)));

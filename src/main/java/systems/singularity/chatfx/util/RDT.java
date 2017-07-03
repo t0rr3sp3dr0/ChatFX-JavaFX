@@ -113,7 +113,7 @@ public final class RDT {
             this.probe.setOnTimeoutChanged(objects -> Sender.this.timer.setTimeout((Integer) objects[0]));
             this.probe.start();
 
-            this.socket.setSoTimeout(60);
+            this.socket.setSoTimeout(0);
         }
 
         public void sendMessage(byte[] message) throws InterruptedException {
@@ -282,7 +282,7 @@ public final class RDT {
             this.port = port;
             this.socket = new DatagramSocket(port);
 
-            this.socket.setSoTimeout(60);
+            this.socket.setSoTimeout(0);
         }
 
         private Receiver(Sender sender) {
@@ -300,7 +300,7 @@ public final class RDT {
                 try {
                     byte[] payload = new byte[8 + Constants.MTU];
                     DatagramPacket packet = new DatagramPacket(payload, payload.length);
-                    socket.receive(packet);
+                    this.socket.receive(packet);
 
                     final Boolean ack = ((payload[0] >> 7) & 0b1) != 0;
                     final Boolean fin = ((payload[0] >> 6) & 0b1) != 0;

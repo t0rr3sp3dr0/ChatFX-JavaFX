@@ -3,7 +3,6 @@ package systems.singularity.chatfx.tests;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
 
-import java.io.File;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -41,9 +40,9 @@ public class Main {
 //            downloader.add(Protocol.extractData(bytes));
 //        });
 
-        new Protocol.Uploader(sender, "", new File("/Users/pedro/Downloads/go.src.tar.gz"), (file, bytesSent, elapsedTime) -> {
-            System.out.println(bytesSent / (elapsedTime / 1e9) + "Bps");
-        }).start();
+//        new Protocol.Uploader(sender, "", new File("/Users/pedro/Downloads/go.src.tar.gz"), (file, bytesSent, elapsedTime) -> {
+//            System.out.println(bytesSent / (elapsedTime / 1e9) + "Bps");
+//        }).start();
 
 //        try {
 //            final FileOutputStream fileOutputStream = new FileOutputStream(new File("/home/CIN/phts/Desktop/" + receiver.hashCode()));
