@@ -34,6 +34,13 @@ public class LoginController implements Initializable {
                 if (!tf_user.getText().isEmpty() && !tf_pass.getText().isEmpty() && tf_pass.getText().length() >= 8) {
                     /*try {
                         //ajustar para o RDT
+                        Map<String, String> map = new HashMap<>();
+                        map.put("Authorization", "Basic");
+                        map.put("Pragma", "login");
+                        new Protocol.Sender(sender).sendMessage(map, "Vai tomar no cu, pasg!");
+
+
+
                         User user = new UserRepository().get(new User(0, tf_user.getText(), "", "", (short) 0, (short) 0, (short) 0, false));
                         String password = Utilities.MD5(tf_pass.getText());
                         if (user != null) {

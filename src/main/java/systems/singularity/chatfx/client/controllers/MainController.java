@@ -96,7 +96,6 @@ public class MainController implements Initializable {
             clearChat();
         });
 
-
         try {
             RDT.Receiver receiver = RDT.getReceiver(2020);
 
@@ -121,13 +120,6 @@ public class MainController implements Initializable {
     }
 
     private void sendMessage() {
-//        try {
-//
-//        } catch (SocketException e) {
-//            e.printStackTrace();
-//        } catch (UnknownHostException e) {
-//            e.printStackTrace();
-//        }
     }
 
     private void sendFile() {

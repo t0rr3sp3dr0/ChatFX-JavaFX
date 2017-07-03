@@ -6,6 +6,8 @@ import systems.singularity.chatfx.util.RDT;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by pedro on 6/10/17.
