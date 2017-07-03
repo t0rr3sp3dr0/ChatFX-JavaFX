@@ -282,7 +282,14 @@ public final class RDT {
             this.port = port;
             this.socket = new DatagramSocket(port);
 
-            this.socket.setSoTimeout(0);
+            this.socket.setSoTimeout(60);
+        }
+
+        private Receiver(Sender sender) {
+            super();
+
+            this.port = sender.socket.getPort();
+            this.socket = sender.socket;
         }
 
         @Override

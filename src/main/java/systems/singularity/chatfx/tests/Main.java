@@ -18,6 +18,13 @@ public class Main {
         RDT.Receiver receiver = RDT.getReceiver(1234);
         RDT.Sender sender = RDT.getSender(InetAddress.getByName("192.168.43.43"), 1234);
 
+        receiver.setOnReceiveListener(null, (Protocol.Receiver) (address, headers, message) -> {
+            System.out.println(address);
+            System.out.println(headers.keySet());
+            System.out.println(headers.values());
+            System.out.println(message);
+        });
+
 //        receiver.setOnReceiveListener(null, (address, bytes) -> {
 //            System.out.println("\t" + address.toString());
 //

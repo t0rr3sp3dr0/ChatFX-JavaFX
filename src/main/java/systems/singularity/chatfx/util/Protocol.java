@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -76,6 +77,15 @@ public final class Protocol {
             }
             return downloader;
         }
+    }
+
+    public interface Receiver extends RDT.Receiver.OnReceiveListener {
+        default void onReceive(InetAddress address, byte[] bytes) {
+            //noinspection ConstantConditions
+            onReceive(address, Protocol.extractHeaders(bytes), new String(Protocol.extractData(bytes)));
+        }
+
+        void onReceive(InetAddress address, Map<String, String> headers, String message);
     }
 
     /**
@@ -202,11 +212,21 @@ public final class Protocol {
         }
     }
 
-    public static final class Sender implements Runnable {
+    public static final class Sender {
+        private final RDT.Sender sender;
 
-        @Override
-        public void run() {
+        public Sender(@NotNull RDT.Sender sender) {
+            this.sender = sender;
+        }
 
+        public void sendMessage(Map<String, String> headers, String message) throws InterruptedException {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (String key : headers.keySet())
+                stringBuilder.append(key).append(": ").append(headers.get(key)).append('\n');
+            stringBuilder.append('\n');
+            stringBuilder.append(message);
+
+            sender.sendMessage(stringBuilder.toString().getBytes());
         }
     }
 }
