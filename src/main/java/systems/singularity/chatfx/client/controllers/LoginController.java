@@ -41,7 +41,7 @@ public class LoginController implements Initializable {
 
 
 
-                        User user = new UserRepository().get(new User(0, tf_user.getText(), "", "", (short) 0, (short) 0, (short) 0, false));
+                        User user = UserRepository.getInstance().get(new User(0, tf_user.getText(), "", "", (short) 0, (short) 0, (short) 0, false));
                         String password = Utilities.MD5(tf_pass.getText());
                         if (user != null) {
                             if (user.getPassword().equals(password))
@@ -56,7 +56,7 @@ public class LoginController implements Initializable {
                             }
                         } else {
                             user = new User(0, tf_user.getText(), password, "address", (short) 0, (short) 0, (short) 0, true);
-                            new UserRepository().insert(user);
+                            UserRepository.getInstance().insert(user);
                             login(user);
                         }
                     } catch (SQLException | NoSuchAlgorithmException e1) {
@@ -90,7 +90,7 @@ public class LoginController implements Initializable {
         //ir para a tela principal
         try {
             user.setStatus(true);
-            new UserRepository().update(user);
+            UserRepository.getInstance().update(user);
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/main.fxml"));
             final Parent root = fxmlLoader.load();
 
@@ -102,7 +102,7 @@ public class LoginController implements Initializable {
             stage.setOnCloseRequest(e -> {
                 user.setStatus(false);
                 try {
-                    new UserRepository().update(user);
+                    UserRepository.getInstance().update(user);
                 } catch (SQLException e1) {
                     e1.printStackTrace();
                 }

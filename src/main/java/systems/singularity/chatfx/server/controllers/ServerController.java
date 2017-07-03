@@ -57,7 +57,7 @@ public class ServerController implements Initializable {
 
     private void updateTable() {
         try {
-            tv_users.setItems(FXCollections.observableArrayList(new UserRepository().getAll()));
+            tv_users.setItems(FXCollections.observableArrayList(UserRepository.getInstance().getAll()));
         } catch (SQLException e) {
             e.printStackTrace();
         }
