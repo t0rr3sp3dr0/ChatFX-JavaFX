@@ -23,8 +23,6 @@ public class Handler extends Thread implements Protocol.Receiver {
 
     @Override
     public void onReceive(InetAddress address, int port, Map<String, String> headers, String message) {
-        System.out.printf("\t\t\t\t%s\t%s\t%s\t%s\n", address, port, headers, message);
-
         String[] basic = new String(Base64.getDecoder().decode(headers.get("Authorization").split(" ")[1])).split(":");
         String[] pragma = headers.get("Pragma").split(";");
 
@@ -42,6 +40,7 @@ public class Handler extends Thread implements Protocol.Receiver {
                             user.setUsername(basic[0]);
                             user.setPassword(basic[1]);
 
+                            //noinspection Duplicates
                             switch (pragma[1]) {
                                 case "chat":
                                     user.setPortChat(port);
@@ -72,13 +71,15 @@ public class Handler extends Thread implements Protocol.Receiver {
                         } else {
                             if (user.getPassword().equals(basic[1])) {
                                 user.setAddress(address.getHostAddress());
+
+                                //noinspection Duplicates
                                 switch (pragma[1]) {
                                     case "chat":
-                                        user.setPortFile(port);
+                                        user.setPortChat(port);
                                         break;
 
                                     case "file":
-                                        user.setPortChat(port);
+                                        user.setPortFile(port);
                                         break;
 
                                     case "rtt":

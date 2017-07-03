@@ -132,8 +132,6 @@ public final class RDT {
         }
 
         public void sendMessage(byte[] message) throws InterruptedException {
-            System.out.printf("\t\t\t\t%s\t%s\n", this.address, this.port);
-
             this.queue.put(message);
 
             //noinspection StatementWithEmptyBody
@@ -148,7 +146,6 @@ public final class RDT {
             payload[6] = (byte) (port >> 8);
             payload[7] = port.byteValue();
 
-            System.out.println(port);
             DatagramPacket packet = new DatagramPacket(payload, payload.length, this.address, this.port);
             socket.send(packet);
         }
@@ -197,8 +194,6 @@ public final class RDT {
                         else
                             System.arraycopy(message, i * Constants.MTU, payload, 8, ((message.length - 1) % Constants.MTU) + 1);
 
-                        System.err.printf("\t\t%d\t%d\t%d\t%d\n", message.length, message[message.length - 1], payload.length, payload[payload.length - 1]);
-
                         if (!RDT.dispose(Constants.SENDER_LOSS_PROBABILITY)) {
                             DatagramPacket packet = new DatagramPacket(payload, payload.length, this.address, this.port);
                             socket.send(packet);
@@ -222,8 +217,6 @@ public final class RDT {
         }
 
         public void onACK(final int seq) {
-            System.out.printf("\t\t\t\t%s\t%s\n", this.address, this.port);
-
             if (!this.connection.window.contains(seq)) {
                 System.err.printf("Repeated\tACK(%d)\n", seq);
                 if (this.connection.repeatedCount == 3) {
@@ -296,7 +289,7 @@ public final class RDT {
 
         private Receiver(int port) throws SocketException {
             super();
-            System.out.println("\t\t" + port);
+
             this.port = port;
             this.socket = new DatagramSocket(port);
 
@@ -334,8 +327,7 @@ public final class RDT {
                     if (ack) {
                         RDT.getSender(packet.getAddress(), port).onACK(seq);
 
-                        System.out.println(packet.getPort());
-                        System.out.println(port);
+                        System.out.printf("DEBUG: onACK\t\tADDRESS\t%s\tPORT\t%s\n", packet.getAddress(), port);
                     } else {
                         Connection connection;
                         synchronized (this.connections) {
@@ -345,6 +337,8 @@ public final class RDT {
                                 this.connections.put(packet.getAddress(), connection);
                             }
                         }
+
+                        System.out.printf("DEBUG: onReceive\t\tADDRESS\t%s\tPORT\t%s\tCONNECTION\t%s\n", packet.getAddress(), port, connection);
 
                         //noinspection SynchronizationOnLocalVariableOrMethodParameter
                         synchronized (connection) {
@@ -370,7 +364,6 @@ public final class RDT {
                                 Packet finPacket = connection.packets.poll();
                                 connection.seq = finPacket.seq;
                                 RDT.getSender(packet.getAddress(), packet.getPort()).sendACK(finPacket.seq, this.port);
-                                System.err.printf("%s\t%s\t%s\n", len, ((len - 1) % Constants.MTU) + 1, (connection.seq - (connection.fin + 1)) * Constants.MTU);
                                 System.arraycopy(finPacket.bytes, 0, bytes, (connection.seq - (connection.fin + 1)) * Constants.MTU, ((len - 1) % Constants.MTU) + 1);
                                 connection.fin = connection.seq;
 
