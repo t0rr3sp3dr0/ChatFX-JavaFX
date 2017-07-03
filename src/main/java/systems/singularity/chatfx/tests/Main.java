@@ -3,6 +3,7 @@ package systems.singularity.chatfx.tests;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -14,15 +15,15 @@ public class Main {
     public static void main(String[] args) throws SocketException, UnknownHostException, InterruptedException {
         new RDT.RTT.Echo(4321).start();
 
-        RDT.Receiver receiver = RDT.getReceiver(1234);
+//        RDT.Receiver receiver = RDT.getReceiver(1234);
         RDT.Sender sender = RDT.getSender(InetAddress.getByName("192.168.43.43"), 1234);
 
-        receiver.setOnReceiveListener(null, (Protocol.Receiver) (address, port, headers, message) -> {
-            System.out.println(address);
-            System.out.println(headers.keySet());
-            System.out.println(headers.values());
-            System.out.println(message);
-        });
+//        receiver.setOnReceiveListener(null, (Protocol.Receiver) (address, port, headers, message) -> {
+//            System.out.println(address);
+//            System.out.println(headers.keySet());
+//            System.out.println(headers.values());
+//            System.out.println(message);
+//        });
 
 //        receiver.setOnReceiveListener(null, (address, bytes) -> {
 //            System.out.println("\t" + address.toString());
@@ -40,9 +41,9 @@ public class Main {
 //            downloader.add(Protocol.extractData(bytes));
 //        });
 
-//        new Protocol.Uploader(sender, "", new File("/Users/pedro/Downloads/go.src.tar.gz"), (file, bytesSent, elapsedTime) -> {
-//            System.out.println(bytesSent / (elapsedTime / 1e9) + "Bps");
-//        }).start();
+        new Protocol.Uploader(sender, "", new File("/Users/pedro/Downloads/ubuntu-16.04.2-desktop-amd64.iso"), (file, bytesSent, elapsedTime) -> {
+            System.out.println(bytesSent / (elapsedTime / 1e9) + "Bps");
+        }).start();
 
 //        try {
 //            final FileOutputStream fileOutputStream = new FileOutputStream(new File("/home/CIN/phts/Desktop/" + receiver.hashCode()));
