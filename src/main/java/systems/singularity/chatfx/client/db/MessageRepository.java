@@ -26,7 +26,7 @@ public class MessageRepository implements Repository<Message> {
 
     @Override
     public void insert(Message message) throws SQLException {
-        Connection conn = systems.singularity.chatfx.server.db.Database.getConnection();
+        Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement("INSERT INTO cf_messages (" +
                 "message_group_id, message_content, message_status, message_timestamp, message_author_id) " +
                 "VALUES (?, ?, ?, ?, ?);");
@@ -40,7 +40,7 @@ public class MessageRepository implements Repository<Message> {
 
     @Override
     public void update(Message message) throws SQLException {
-        Connection conn = systems.singularity.chatfx.server.db.Database.getConnection();
+        Connection conn = Database.getConnection();
         if (exists(message)) {
             PreparedStatement statement = conn.prepareStatement("UPDATE cf_messages SET message_group_id = ?, " +
                     "message_content = ?, message_status = ?, message_timestamp = ?, message_author_id = ? " +
