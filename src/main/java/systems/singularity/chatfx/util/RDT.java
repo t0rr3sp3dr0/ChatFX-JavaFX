@@ -128,7 +128,7 @@ public final class RDT {
 
             this.socket.setSoTimeout(0);
 
-            RDT.getReceiver(this);
+            RDT.getReceiver(Sender.this);
         }
 
         public void sendMessage(byte[] message) throws InterruptedException {
@@ -148,6 +148,7 @@ public final class RDT {
             payload[6] = (byte) (port >> 8);
             payload[7] = port.byteValue();
 
+            System.out.println(port);
             DatagramPacket packet = new DatagramPacket(payload, payload.length, this.address, this.port);
             socket.send(packet);
         }
@@ -295,7 +296,7 @@ public final class RDT {
 
         private Receiver(int port) throws SocketException {
             super();
-
+            System.out.println("\t\t" + port);
             this.port = port;
             this.socket = new DatagramSocket(port);
 

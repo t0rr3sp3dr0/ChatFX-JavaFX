@@ -24,7 +24,7 @@ public class Main extends Application {
 
         Parent root = FXMLLoader.load(getClass().getResource("/layouts/login.fxml"));
         primaryStage.setTitle("Login");
-        primaryStage.setScene(new Scene(root, 285, 109));
+        primaryStage.setScene(new Scene(root, 285, 183));
         primaryStage.show();
     }
 }

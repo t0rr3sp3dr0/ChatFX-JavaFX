@@ -1,5 +1,6 @@
 package systems.singularity.chatfx.client.controllers;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -50,15 +51,13 @@ public class LoginController implements Initializable {
                         String password = Utilities.MD5(tf_pass.getText());
                         int port = Integer.parseInt(tf_port.getText());
                         Map<String, String> map = new HashMap<>();
-                        map.put("Authorization", "Basic" + new String(Base64.getEncoder().encode((tf_user + ":" + password).getBytes())));
+                        map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
                         map.put("Pragma", "login;chat");
-                        RDT.Sender sender = RDT.getSender(InetAddress.getByName(tf_ip.getText()), port);
+                        final RDT.Sender sender = RDT.getSender(InetAddress.getByName(tf_ip.getText()), port);
                         Protocol.Sender.sendMessage(sender, map, "Vai tomar no cu, pasg!");
 
                         RDT.getReceiver(sender).setOnReceiveListener(InetAddress.getByName(tf_ip.getText()), (Protocol.Receiver) (address, port1, headers, message) -> {
-                            String[] basic = new String(Base64.getDecoder().decode(headers.get("Authorization").split(" ")[1])).split(":");
                             String[] pragma = headers.get("Pragma").split(";");
-
                             if (pragma[0].equals("login") && !pragma[1].equals("401")) {
                                 try {
                                     Singleton.getInstance().setChatReceiver(RDT.getReceiver(sender));
@@ -71,13 +70,12 @@ public class LoginController implements Initializable {
 
                         });
 
+                        Thread.sleep(2000);
                         map = new HashMap<>();
-                        map.put("Authorization", "Basic" + new String(Base64.getEncoder().encode((tf_user + ":" + password).getBytes())));
+                        map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
                         map.put("Pragma", "login;file");
-                        Protocol.Sender.sendMessage(sender, map, "Vai tomar no cu, pasg!");
-
+                        Protocol.Sender.sendMessage(sender, map, "Vai tomar no cu, file!");
                         RDT.getReceiver(sender).setOnReceiveListener(InetAddress.getByName(tf_ip.getText()), (Protocol.Receiver) (address, port1, headers, message) -> {
-                            String[] basic = new String(Base64.getDecoder().decode(headers.get("Authorization").split(" ")[1])).split(":");
                             String[] pragma = headers.get("Pragma").split(";");
 
                             if (pragma[0].equals("login") && !pragma[1].equals("401")) {
@@ -89,16 +87,15 @@ public class LoginController implements Initializable {
                                     e1.printStackTrace();
                                 }
                             }
-
                         });
 
+                        Thread.sleep(2000);
                         map = new HashMap<>();
-                        map.put("Authorization", "Basic" + new String(Base64.getEncoder().encode((tf_user + ":" + password).getBytes())));
+                        map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
                         map.put("Pragma", "login;rtt");
-                        Protocol.Sender.sendMessage(sender, map, "Vai tomar no cu, pasg!");
+                        Protocol.Sender.sendMessage(sender, map, "Vai tomar no cu, rtt!");
 
                         RDT.getReceiver(sender).setOnReceiveListener(InetAddress.getByName(tf_ip.getText()), (Protocol.Receiver) (address, port1, headers, message) -> {
-                            String[] basic = new String(Base64.getDecoder().decode(headers.get("Authorization").split(" ")[1])).split(":");
                             String[] pragma = headers.get("Pragma").split(";");
 
                             if (pragma[0].equals("login") && !pragma[1].equals("401")) {
@@ -110,7 +107,6 @@ public class LoginController implements Initializable {
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
-
 
                 } else {
                     Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -139,13 +135,16 @@ public class LoginController implements Initializable {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/main.fxml"));
                 final Parent root = fxmlLoader.load();
 
-                Stage stage = new Stage();
-                stage.setScene(new Scene(root, 720, 430));
-                stage.show();
+                Platform.runLater(() -> {
+                    Stage stage = new Stage();
+                    stage.setScene(new Scene(root, 720, 430));
+                    stage.show();
 
-                stage.setOnCloseRequest(e -> {
+                    stage.setOnCloseRequest(e -> {
 
+                    });
                 });
+
             } catch (IOException e1) {
                 e1.printStackTrace();
             }

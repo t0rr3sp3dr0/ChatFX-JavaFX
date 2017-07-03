@@ -14,7 +14,7 @@
                   <Insets />
                </HBox.margin>
             </Label>
-            <TextField fx:id="tf_ip" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0" promptText="192.168.0.1" />
+            <TextField fx:id="tf_ip" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0" text="192.168.43.78" promptText="192.168.0.1" />
          </children>
          <VBox.margin>
             <Insets bottom="2.0" left="4.0" right="4.0" top="4.0" />
@@ -27,7 +27,7 @@
                   <Insets />
                </HBox.margin>
             </Label>
-            <TextField fx:id="tf_port" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0" promptText="65535">
+            <TextField fx:id="tf_port" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0" text="9876" promptText="65535">
                <HBox.margin>
                   <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
                </HBox.margin>
@@ -44,7 +44,7 @@
                         <Insets />
                     </HBox.margin>
                 </Label>
-                <TextField fx:id="tf_user" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0" promptText="user" />
+                <TextField fx:id="tf_user" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" text="edjan" prefWidth="209.0" promptText="user" />
             </children>
             <VBox.margin>
                 <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
@@ -57,7 +57,7 @@
                         <Insets />
                     </HBox.margin>
                 </Label>
-                <PasswordField fx:id="tf_pass" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0" promptText="password" />
+                <PasswordField fx:id="tf_pass" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0" text="12345678" promptText="password" />
             </children>
             <VBox.margin>
                 <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
