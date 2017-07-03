@@ -38,6 +38,7 @@ public class Handler extends Thread implements Protocol.Receiver {
 
                         if (user == null) {
                             user = new User();
+                            user.setAddress(address.getHostAddress());
                             user.setUsername(basic[0]);
                             user.setPassword(basic[1]);
 
@@ -70,6 +71,7 @@ public class Handler extends Thread implements Protocol.Receiver {
                             }
                         } else {
                             if (user.getPassword().equals(basic[1])) {
+                                user.setAddress(address.getHostAddress());
                                 switch (pragma[1]) {
                                     case "chat":
                                         user.setPortFile(port);

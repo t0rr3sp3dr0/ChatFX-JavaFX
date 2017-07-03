@@ -132,6 +132,8 @@ public final class RDT {
         }
 
         public void sendMessage(byte[] message) throws InterruptedException {
+            System.out.printf("\t\t\t\t%s\t%s\n", this.address, this.port);
+
             this.queue.put(message);
 
             //noinspection StatementWithEmptyBody
@@ -219,6 +221,8 @@ public final class RDT {
         }
 
         public void onACK(final int seq) {
+            System.out.printf("\t\t\t\t%s\t%s\n", this.address, this.port);
+
             if (!this.connection.window.contains(seq)) {
                 System.err.printf("Repeated\tACK(%d)\n", seq);
                 if (this.connection.repeatedCount == 3) {
@@ -301,7 +305,7 @@ public final class RDT {
         private Receiver(Sender sender) {
             super();
 
-            this.port = sender.socket.getPort();
+            this.port = sender.socket.getLocalPort();
             this.socket = sender.socket;
         }
 
@@ -326,9 +330,12 @@ public final class RDT {
                         continue;
                     }
 
-                    if (ack)
+                    if (ack) {
                         RDT.getSender(packet.getAddress(), port).onACK(seq);
-                    else {
+
+                        System.out.println(packet.getPort());
+                        System.out.println(port);
+                    } else {
                         Connection connection;
                         synchronized (this.connections) {
                             connection = this.connections.get(packet.getAddress());
