@@ -15,6 +15,16 @@ import java.util.List;
  * Created by caesa on 02/07/2017.
  */
 public class UserRepository implements Repository<User> {
+
+    @Override
+    public boolean exists(User user) throws SQLException {
+        Connection conn = Database.getConnection();
+        PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_users WHERE user_username = ?;");
+        statement.setString(1, user.getUsername());
+        ResultSet rs = statement.executeQuery();
+        return rs.next();
+    }
+
     @Override
     public void insert(User user) throws SQLException {
         Connection conn = Database.getConnection();
@@ -47,15 +57,6 @@ public class UserRepository implements Repository<User> {
             statement.executeUpdate();
         }
 
-    }
-
-    @Override
-    public boolean exists(User user) throws SQLException {
-        Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_users WHERE user_username = ?;");
-        statement.setString(1, user.getUsername());
-        ResultSet rs = statement.executeQuery();
-        return rs.next();
     }
 
     @Override
