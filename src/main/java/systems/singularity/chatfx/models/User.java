@@ -8,15 +8,15 @@ public class User {
     private String username;
     private String password;
     private String address;
-    private short port_chat;
-    private short port_file;
-    private short port_rtt;
+    private int port_chat;
+    private int port_file;
+    private int port_rtt;
     private boolean status;
 
     public User() {
     }
 
-    public User(int id, String username, String password, String address, short port_chat, short port_file, short port_rtt, boolean status) {
+    public User(int id, String username, String password, String address, int port_chat, int port_file, int port_rtt, boolean status) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -59,27 +59,27 @@ public class User {
         this.address = address;
     }
 
-    public short getPort_chat() {
+    public int getPort_chat() {
         return port_chat;
     }
 
-    public void setPort_chat(short port_chat) {
+    public void setPort_chat(int port_chat) {
         this.port_chat = port_chat;
     }
 
-    public short getPort_file() {
+    public int getPort_file() {
         return port_file;
     }
 
-    public void setPort_file(short port_file) {
+    public void setPort_file(int port_file) {
         this.port_file = port_file;
     }
 
-    public short getPort_rtt() {
+    public int getPort_rtt() {
         return port_rtt;
     }
 
-    public void setPort_rtt(short port_rtt) {
+    public void setPort_rtt(int port_rtt) {
         this.port_rtt = port_rtt;
     }
 

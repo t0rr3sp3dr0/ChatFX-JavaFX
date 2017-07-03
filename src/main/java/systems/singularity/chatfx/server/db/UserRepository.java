@@ -23,9 +23,9 @@ public class UserRepository implements Repository<User> {
             statement.setString(1, user.getUsername());
             statement.setString(2, user.getPassword());
             statement.setString(3, user.getAddress());
-            statement.setShort(4, user.getPort_chat());
-            statement.setShort(5, user.getPort_file());
-            statement.setShort(6, user.getPort_rtt());
+            statement.setInt(4, user.getPort_chat());
+            statement.setInt(5, user.getPort_file());
+            statement.setInt(6, user.getPort_rtt());
             statement.setBoolean(7, user.getStatus());
             statement.executeUpdate();
         }
@@ -39,9 +39,9 @@ public class UserRepository implements Repository<User> {
             statement.setString(1, user.getUsername());
             statement.setString(2, user.getPassword());
             statement.setString(3, user.getAddress());
-            statement.setShort(4, user.getPort_chat());
-            statement.setShort(5, user.getPort_file());
-            statement.setShort(6, user.getPort_rtt());
+            statement.setInt(4, user.getPort_chat());
+            statement.setInt(5, user.getPort_file());
+            statement.setInt(6, user.getPort_rtt());
             statement.setBoolean(7, user.getStatus());
             statement.setInt(8, user.getId());
             statement.executeUpdate();
@@ -80,9 +80,9 @@ public class UserRepository implements Repository<User> {
                     rs.getString("user_username"),
                     rs.getString("user_password"),
                     rs.getString("user_address"),
-                    rs.getShort("user_portChat"),
-                    rs.getShort("user_portFile"),
-                    rs.getShort("user_portRtt"),
+                    rs.getInt("user_portChat"),
+                    rs.getInt("user_portFile"),
+                    rs.getInt("user_portRtt"),
                     rs.getBoolean("user_status")
             ));
         return users;
@@ -101,9 +101,9 @@ public class UserRepository implements Repository<User> {
                     rs.getString(2),
                     rs.getString(3),
                     rs.getString(4),
-                    rs.getShort(5),
-                    rs.getShort(6),
-                    rs.getShort(7),
+                    rs.getInt(5),
+                    rs.getInt(6),
+                    rs.getInt(7),
                     rs.getBoolean(8));
         return user;
     }
