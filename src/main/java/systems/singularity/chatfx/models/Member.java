@@ -1,16 +1,18 @@
 package systems.singularity.chatfx.models;
 
 /**
- * Created by caesa on 02/07/2017.
+ * Created by lvrma on 03/07/2017.
  */
 public class Member {
 
     private int id;
-    private String name;
+    private int group_id;
+    private int user_id;
 
-    public Member(int id, String name) {
+    public Member(int id, int group_id, int user_id) {
         this.id = id;
-        this.name = name;
+        this.group_id = group_id;
+        this.user_id = user_id;
     }
 
     public Member() {
@@ -24,11 +26,19 @@ public class Member {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public int getGroup_id() {
+        return group_id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setGroup_id(int group_id) {
+        this.group_id = group_id;
+    }
+
+    public int getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(int user_id) {
+        this.user_id = user_id;
     }
 }
