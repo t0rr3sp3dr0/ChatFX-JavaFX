@@ -53,6 +53,19 @@ public final class RDT {
         }
     }
 
+    @NotNull
+    public static Receiver getReceiver(@NotNull Sender sender) throws SocketException {
+        synchronized (RDT.receivers) {
+            Receiver receiver = receivers.get(sender.socket.getPort());
+            if (receiver == null) {
+                receiver = new Receiver(sender);
+                receiver.start();
+                receivers.put(sender.socket.getPort(), receiver);
+            }
+            return receiver;
+        }
+    }
+
     public static boolean dispose(double probability) {
         return Math.random() <= probability;
     }
