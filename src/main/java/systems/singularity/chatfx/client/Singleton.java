@@ -25,6 +25,10 @@ public class Singleton extends HashMap<String, Object> {
         return ourInstance;
     }
 
+    public RDT.Receiver getChatReceiver() {
+        return chatReceiver;
+    }
+
     public void setChatReceiver(@NotNull RDT.Receiver chatReceiver) {
         for (InetAddress key : this.chatOnReceiveListeners.keySet())
             chatReceiver.setOnReceiveListener(key, this.chatOnReceiveListeners.get(key));
@@ -33,6 +37,10 @@ public class Singleton extends HashMap<String, Object> {
             this.chatReceiver.clearOnReceiveListeners();
 
         this.chatReceiver = chatReceiver;
+    }
+
+    public RDT.Receiver getFileReceiver() {
+        return fileReceiver;
     }
 
     public void setFileReceiver(@NotNull RDT.Receiver fileReceiver) {
