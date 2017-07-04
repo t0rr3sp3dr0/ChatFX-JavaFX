@@ -76,7 +76,7 @@ public class LoginController implements Initializable {
                             }
 
                         });
-
+                        Thread.sleep(1000);
                         map = new HashMap<>();
                         map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
                         map.put("Pragma", "login;file");
@@ -94,7 +94,7 @@ public class LoginController implements Initializable {
                                 }
                             }
                         });
-
+                        Thread.sleep(1000);
                         map = new HashMap<>();
                         map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
                         map.put("Pragma", "login;rtt");

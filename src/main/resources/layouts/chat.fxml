@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<VBox xmlns:fx="http://javafx.com/fxml" xmlns="http://javafx.com/javafx" prefHeight="400.0" prefWidth="600.0">
+    <children>
+        <ToolBar prefHeight="40.0" prefWidth="200.0">
+            <items>
+                <Button fx:id="btClear" alignment="CENTER" mnemonicParsing="false" textAlignment="CENTER">
+                    <font>
+                        <Font name="System Bold" size="13.0"/>
+                    </font>
+                    <graphic>
+                        <ImageView fitHeight="17.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@/icons/ic_delete.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button fx:id="btShowFolder" alignment="CENTER" mnemonicParsing="false" textAlignment="CENTER">
+                    <font>
+                        <Font name="System Bold" size="13.0"/>
+                    </font>
+                    <graphic>
+                        <ImageView fitHeight="17.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@/icons/ic_folder.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+            </items>
+        </ToolBar>
+        <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+            <children>
+                <VBox minHeight="300.0" minWidth="296.0" prefHeight="300.0" prefWidth="296.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <TextArea fx:id="taChat" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                            <VBox.margin>
+                                <Insets bottom="4.0"/>
+                            </VBox.margin>
+                        </TextArea>
+                        <HBox maxHeight="27.0" minHeight="27.0" prefHeight="27.0" prefWidth="200.0">
+                            <children>
+                                <TextField fx:id="tfMessage" HBox.hgrow="ALWAYS">
+                                    <HBox.margin>
+                                        <Insets right="4.0"/>
+                                    </HBox.margin>
+                                </TextField>
+                                <Button fx:id="btSend" alignment="CENTER" maxHeight="30.0" maxWidth="30.0"
+                                        mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0"
+                                        textAlignment="CENTER">
+                                    <font>
+                                        <Font name="System Bold" size="13.0"/>
+                                    </font>
+                                    <graphic>
+                                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
+                                                   preserveRatio="true">
+                                            <image>
+                                                <Image url="@/icons/ic_send.png"/>
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                    <HBox.margin>
+                                        <Insets left="4.0"/>
+                                    </HBox.margin>
+                                </Button>
+                            </children>
+                            <VBox.margin>
+                                <Insets top="4.0"/>
+                            </VBox.margin>
+                        </HBox>
+                    </children>
+                    <HBox.margin>
+                        <Insets bottom="8.0" left="8.0" right="4.0" top="8.0"/>
+                    </HBox.margin>
+                </VBox>
+                <VBox maxWidth="200.0" minHeight="300.0" minWidth="200.0" prefHeight="300.0" prefWidth="200.0">
+                    <children>
+                        <ListView fx:id="lvFiles" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                            <VBox.margin>
+                                <Insets bottom="4.0"/>
+                            </VBox.margin>
+                        </ListView>
+                        <HBox maxHeight="34.0" prefHeight="100.0" prefWidth="200.0">
+                            <children>
+                                <VBox prefHeight="200.0" prefWidth="100.0">
+                                    <children>
+                                        <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Label alignment="CENTER" maxWidth="Infinity" text="Progress"
+                                                       textAlignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                            </children>
+                                        </HBox>
+                                        <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Label fx:id="lbProgress" alignment="CENTER" maxWidth="Infinity"
+                                                       text="50%" textAlignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+                                <VBox prefHeight="200.0" prefWidth="100.0">
+                                    <children>
+                                        <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Label alignment="CENTER" maxWidth="Infinity" text="ETA"
+                                                       textAlignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                            </children>
+                                        </HBox>
+                                        <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Label fx:id="lbTime" alignment="CENTER" maxWidth="Infinity" text="1s"
+                                                       textAlignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+                                <VBox prefHeight="200.0" prefWidth="100.0">
+                                    <children>
+                                        <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Label alignment="CENTER" maxWidth="Infinity" text="RTT"
+                                                       textAlignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                            </children>
+                                        </HBox>
+                                        <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                                            <children>
+                                                <Label fx:id="lbRtt" alignment="CENTER" maxWidth="Infinity" text="0.5ms"
+                                                       textAlignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+                            </children>
+                            <VBox.margin>
+                                <Insets bottom="4.0" top="4.0"/>
+                            </VBox.margin>
+                        </HBox>
+                        <ProgressBar fx:id="progress" prefWidth="200.0" progress="0.0">
+                            <VBox.margin>
+                                <Insets bottom="4.0" top="4.0"/>
+                            </VBox.margin>
+                        </ProgressBar>
+                        <HBox maxHeight="27.0" minHeight="27.0" prefHeight="27.0" prefWidth="200.0">
+                            <children>
+                                <Button fx:id="btFile" alignment="CENTER" contentDisplay="CENTER" maxHeight="31.0"
+                                        maxWidth="200.0" minWidth="-Infinity" mnemonicParsing="false" prefHeight="31.0"
+                                        prefWidth="200.0" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+                                    <graphic>
+                                        <HBox maxHeight="31.0" maxWidth="200.0" prefHeight="31.0" prefWidth="200.0">
+                                            <children>
+                                                <Label fx:id="lbFilename" alignment="CENTER" contentDisplay="CENTER"
+                                                       maxHeight="31.0" maxWidth="180.0" prefHeight="31.0"
+                                                       prefWidth="180.0" text="choose file" textAlignment="CENTER"/>
+                                                <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true"
+                                                           preserveRatio="true">
+                                                    <image>
+                                                        <Image url="@/icons/ic_attach_file.png"/>
+                                                    </image>
+                                                </ImageView>
+                                            </children>
+                                        </HBox>
+                                    </graphic>
+                                </Button>
+                            </children>
+                            <VBox.margin>
+                                <Insets top="4.0"/>
+                            </VBox.margin>
+                        </HBox>
+                    </children>
+                    <HBox.margin>
+                        <Insets bottom="8.0" left="4.0" right="8.0" top="8.0"/>
+                    </HBox.margin>
+                </VBox>
+            </children>
+        </HBox>
+    </children>
+</VBox>
