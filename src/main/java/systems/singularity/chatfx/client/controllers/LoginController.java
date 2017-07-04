@@ -15,7 +15,6 @@ import systems.singularity.chatfx.util.java.Utilities;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.URL;
 import java.util.Base64;
 import java.util.HashMap;
@@ -60,57 +59,69 @@ public class LoginController implements Initializable {
                         Map<String, String> map = new HashMap<>();
                         map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
                         map.put("Pragma", "login;chat");
-                        final RDT.Sender sender = RDT.getSender(inetAddress, port);
-                        Protocol.Sender.sendMessage(sender, map, "Vai tomar no cu, pasg!");
 
-                        RDT.getReceiver(sender).setOnReceiveListener(inetAddress, (Protocol.Receiver) (address, port1, headers, message) -> {
+                        RDT.Sender chatSender = RDT.newSender(inetAddress, port);
+
+                        Singleton.getInstance().setChatReceiver(RDT.getReceiver(chatSender));
+                        Singleton.getInstance().setChatOnReceiveListener(inetAddress, (Protocol.Receiver) (address, port1, headers, message) -> {
                             String[] pragma = headers.get("Pragma").split(";");
                             if (pragma[0].equals("login") && !pragma[1].equals("401")) {
-                                try {
-                                    Singleton.getInstance().setChatReceiver(RDT.getReceiver(sender));
-                                    this.logged[0] = true;
-                                    login();
-                                } catch (SocketException e1) {
-                                    e1.printStackTrace();
-                                }
+                                this.logged[0] = true;
+                                login();
                             }
-
                         });
-                        Thread.sleep(1000);
+
+                        for (int i = 0; i < 10; i++)
+                            System.out.println();
+
+                        Protocol.Sender.sendMessage(chatSender, map, "Vai tomar no cu, pasg!");
+
+
+                        Thread.sleep(8000);
+
+
+                        RDT.Sender fileSender = RDT.newSender(inetAddress, port);
+
                         map = new HashMap<>();
                         map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
                         map.put("Pragma", "login;file");
-                        Protocol.Sender.sendMessage(sender, map, "Vai tomar no cu, file!");
-                        RDT.getReceiver(sender).setOnReceiveListener(inetAddress, (Protocol.Receiver) (address, port1, headers, message) -> {
-                            String[] pragma = headers.get("Pragma").split(";");
 
+                        Singleton.getInstance().setFileReceiver(RDT.getReceiver(fileSender));
+                        Singleton.getInstance().setFileOnReceiveListener(inetAddress, (Protocol.Receiver) (address, port1, headers, message) -> {
+                            String[] pragma = headers.get("Pragma").split(";");
                             if (pragma[0].equals("login") && !pragma[1].equals("401")) {
-                                try {
-                                    Singleton.getInstance().setFileReceiver(RDT.getReceiver(sender));
-                                    this.logged[1] = true;
-                                    login();
-                                } catch (SocketException e1) {
-                                    e1.printStackTrace();
-                                }
+                                this.logged[1] = true;
+                                login();
                             }
                         });
-                        Thread.sleep(1000);
+
+                        Protocol.Sender.sendMessage(fileSender, map, "Vai tomar no cu, file!");
+
+
+                        Thread.sleep(8000);
+
+
+                        RDT.Sender rttSender = RDT.newSender(inetAddress, port);
+
                         map = new HashMap<>();
                         map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
                         map.put("Pragma", "login;rtt");
-                        Protocol.Sender.sendMessage(sender, map, "Vai tomar no cu, rtt!");
 
-                        RDT.getReceiver(sender).setOnReceiveListener(inetAddress, (Protocol.Receiver) (address, port1, headers, message) -> {
+                        RDT.Receiver rdtReceiver = RDT.getReceiver(rttSender);
+                        rdtReceiver.setOnReceiveListener(inetAddress, (Protocol.Receiver) (address, port1, headers, message) -> {
                             String[] pragma = headers.get("Pragma").split(";");
-
                             if (pragma[0].equals("login") && !pragma[1].equals("401")) {
-                                new RDT.RTT.Echo(sender).start();
+                                new RDT.RTT.Echo(rdtReceiver).start();
+
                                 this.logged[2] = true;
                                 login();
                             }
                         });
 
-                        Thread.sleep(1000);
+                        Protocol.Sender.sendMessage(rttSender, map, "Vai tomar no cu, rtt!");
+
+
+                        Thread.sleep(2000);
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
@@ -138,6 +149,8 @@ public class LoginController implements Initializable {
 
     private void login() {
         if (this.logged[0] && this.logged[1] && this.logged[2]) {
+            this.logged = new boolean[3];
+
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/main.fxml"));
                 final Parent root = fxmlLoader.load();
@@ -151,7 +164,6 @@ public class LoginController implements Initializable {
 
                     });
                 });
-
             } catch (IOException e1) {
                 e1.printStackTrace();
             }

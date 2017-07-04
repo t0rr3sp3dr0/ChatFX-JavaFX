@@ -44,6 +44,22 @@ public final class RDT {
     }
 
     @NotNull
+    public static Sender newSender(@NotNull InetAddress address, @NotNull Integer port) throws SocketException, UnknownHostException {
+        assert port > 0;
+        System.out.println("\t\t\t\tnewSender(InetAddress, Integer)\t" + port);
+
+        Pair<InetAddress, Integer> key = new Pair<>(address, port);
+        synchronized (RDT.senders) {
+            Sender sender = new Sender(key.first, key.second);
+            sender.start();
+
+            senders.put(key, sender);
+
+            return sender;
+        }
+    }
+
+    @NotNull
     public static Receiver getReceiver(@NotNull Integer port) throws SocketException {
         assert port > 0;
         System.out.println("\t\t\t\tgetReceiver(Integer)\t" + port);
@@ -300,7 +316,7 @@ public final class RDT {
         private final int port;
         private final DatagramSocket socket;
         private final Map<InetAddress, OnReceiveListener> onReceiveListeners = new HashMap<>();
-        private final Map<InetAddress, Connection> connections = new HashMap<>();
+        private final Map<Pair<InetAddress, Integer>, Connection> connections = new HashMap<>();
 
         private Receiver(int port) throws SocketException {
             super();
@@ -352,11 +368,7 @@ public final class RDT {
                     } else {
                         Connection connection;
                         synchronized (this.connections) {
-                            connection = this.connections.get(packet.getAddress());
-                            if (connection == null) {
-                                connection = new Connection();
-                                this.connections.put(packet.getAddress(), connection);
-                            }
+                            connection = this.connections.computeIfAbsent(new Pair<>(packet.getAddress(), packet.getPort()), k -> new Connection());
                         }
 
                         System.out.printf("DEBUG: onReceive\t\tADDRESS\t%s\tPORT\t%s\tCONNECTION\t%s\n", packet.getAddress(), port, connection);
