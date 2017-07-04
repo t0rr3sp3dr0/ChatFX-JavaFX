@@ -63,24 +63,26 @@ public class MainController implements Initializable {
 
         tableColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
 
-        try {
-            Map<String, String> map = new HashMap<>();
-            map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode(("blá:blá").getBytes())));
-            map.put("Pragma", "get;users");
-            final RDT.Sender sender = RDT.getSender(LoginController.getInetAddress(), LoginController.getPort());
-            Protocol.Sender.sendMessage(sender, map, "Manda esses user aí, seu porra!");
+        new Thread(() -> {
+            try {
+                while (true) {
+                    Thread.sleep(3000);
+                    Map<String, String> map = new HashMap<>();
+                    map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode(("blá:blá").getBytes())));
+                    map.put("Pragma", "get;users");
+                    final RDT.Sender sender = RDT.getSender(LoginController.getInetAddress(), LoginController.getPort());
+                    Protocol.Sender.sendMessage(sender, map, "Manda esses user aí, seu porra!");
 
-            RDT.getReceiver(sender).setOnReceiveListener(LoginController.getInetAddress(), (Protocol.Receiver) (address, port1, headers, message) -> {
-                String[] pragma = headers.get("Pragma").split(";");
-                List<User> users = Arrays.stream(new Gson().fromJson(message, User[].class)).filter(User::getStatus).collect(Collectors.toList());
+                    RDT.getReceiver(sender).setOnReceiveListener(LoginController.getInetAddress(), (Protocol.Receiver) (address, port1, headers, message) -> {
+                        List<User> users = Arrays.stream(new Gson().fromJson(message, User[].class)).filter(User::getStatus).collect(Collectors.toList());
 
-                Platform.runLater(() -> tableView.setItems(FXCollections.observableArrayList(users)));
-            });
-
-
-        } catch (SocketException | InterruptedException | UnknownHostException e) {
-            e.printStackTrace();
-        }
+                        Platform.runLater(() -> tableView.setItems(FXCollections.observableArrayList(users)));
+                    });
+                }
+            } catch (SocketException | InterruptedException | UnknownHostException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     private void newTab(User user) {

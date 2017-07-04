@@ -69,14 +69,6 @@ public class ChatController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
-            Singleton.getInstance().setChatOnReceiveListener(InetAddress.getByName(user.getAddress()), (Protocol.Receiver) (address, port, headers, message) -> {
-                String[] pragma = headers.get("Pragma").split(";");
-                Gson json = new Gson();
-                Message message1 = new Gson().fromJson(pragma[1], Message.class);
-                message1.setAuthorId(user.getId());
-
-            });
-
             Networking.receiveFile(user, (progress, speed, remainingTime) -> {
                 if (progress == 1)
                     System.out.println("FINISHED");
@@ -131,24 +123,24 @@ public class ChatController implements Initializable {
                 chooseFileButton.setDisable(false);
         });
 
-        sendButton.setOnAction(event -> {
-            try {
-                Message message = new Message();
-                message.setContent(textField.getText());
-                message.setTime(new Time(new Date().getTime()));
-                message.setStatus("Sent");
-                new MessageRepository().insert(message);
-                String json = new Gson().toJson(message);
-
-                RDT.getSender(InetAddress.getByName(user.getAddress()), user.getPortChat()).sendMessage(json.getBytes());
-
-                Platform.runLater(() ->
-                        textArea.appendText("\t\t\t" + textField.getText() + "\n")
-                );
-
-            } catch (SocketException | InterruptedException | UnknownHostException | SQLException e) {
-                e.printStackTrace();
-            }
-        });
+//        sendButton.setOnAction(event -> {
+//            try {
+//                Message message = new Message();
+//                message.setContent(textField.getText());
+//                message.setTime(new Time(new Date().getTime()));
+//                message.setStatus("Sent");
+//                new MessageRepository().insert(message);
+//                String json = new Gson().toJson(message);
+//
+//                RDT.getSender(InetAddress.getByName(user.getAddress()), user.getPortChat()).sendMessage(json.getBytes());
+//
+//                Platform.runLater(() ->
+//                        textArea.appendText("\t\t\t" + textField.getText() + "\n")
+//                );
+//
+//            } catch (SocketException | InterruptedException | UnknownHostException | SQLException e) {
+//                e.printStackTrace();
+//            }
+//        });
     }
 }

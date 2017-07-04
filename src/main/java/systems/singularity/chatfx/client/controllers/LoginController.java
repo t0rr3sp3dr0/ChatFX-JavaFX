@@ -109,6 +109,8 @@ public class LoginController implements Initializable {
                                 login();
                             }
                         });
+
+                        Thread.sleep(1000);
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
