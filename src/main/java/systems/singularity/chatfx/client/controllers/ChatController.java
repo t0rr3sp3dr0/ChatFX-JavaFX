@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
+import systems.singularity.chatfx.client.Singleton;
 import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
@@ -67,9 +68,10 @@ public class ChatController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+
+
         try {
-            RDT.Receiver receiver = RDT.getReceiver(user.getPortFile());
-            receiver.setOnReceiveListener(null, (address, port, bytes) -> {
+            Singleton.getInstance().setFileOnReceiveListener(InetAddress.getByName(user.getAddress()), (address, port, bytes) -> {
                 //System.out.println("\t" + address.toString());
 
                 Map<String, String> headers = Protocol.extractHeaders(bytes);
@@ -85,7 +87,7 @@ public class ChatController implements Initializable {
                 downloader.add(Protocol.extractData(bytes));
             });
 
-        } catch (SocketException e) {
+        } catch (UnknownHostException e) {
             e.printStackTrace();
         }
 
