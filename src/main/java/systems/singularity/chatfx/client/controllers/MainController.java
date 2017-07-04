@@ -72,8 +72,7 @@ public class MainController implements Initializable {
 
             RDT.getReceiver(sender).setOnReceiveListener(LoginController.getInetAddress(), (Protocol.Receiver) (address, port1, headers, message) -> {
                 String[] pragma = headers.get("Pragma").split(";");
-                Gson json = new Gson();
-                List<User> users = Arrays.stream(json.fromJson(message, User[].class)).filter(User::getStatus).collect(Collectors.toList());
+                List<User> users = Arrays.stream(new Gson().fromJson(message, User[].class)).filter(User::getStatus).collect(Collectors.toList());
 
                 Platform.runLater(() -> tableView.setItems(FXCollections.observableArrayList(users)));
             });
@@ -82,14 +81,6 @@ public class MainController implements Initializable {
         } catch (SocketException | InterruptedException | UnknownHostException e) {
             e.printStackTrace();
         }
-    }
-
-    private void sendMessage() {
-    }
-
-
-
-    private void clearChat() {
     }
 
     private void newTab(User user) {

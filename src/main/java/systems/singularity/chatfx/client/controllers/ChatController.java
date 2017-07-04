@@ -1,5 +1,6 @@
 package systems.singularity.chatfx.client.controllers;
 
+import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -8,6 +9,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import systems.singularity.chatfx.client.Networking;
 import systems.singularity.chatfx.client.Singleton;
+import systems.singularity.chatfx.client.db.MessageRepository;
+import systems.singularity.chatfx.models.Message;
 import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
@@ -17,6 +20,9 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.sql.SQLException;
+import java.sql.Time;
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -63,6 +69,14 @@ public class ChatController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
+            Singleton.getInstance().setChatOnReceiveListener(InetAddress.getByName(user.getAddress()), (Protocol.Receiver) (address, port, headers, message) -> {
+                String[] pragma = headers.get("Pragma").split(";");
+                Gson json = new Gson();
+                Message message1 = new Gson().fromJson(pragma[1], Message.class);
+                message1.setAuthorId(user.getId());
+
+            });
+
             Networking.receiveFile(user, (progress, speed, remainingTime) -> {
                 if (progress == 1)
                     System.out.println("FINISHED");
@@ -115,6 +129,26 @@ public class ChatController implements Initializable {
                     }
             } else
                 chooseFileButton.setDisable(false);
+        });
+
+        sendButton.setOnAction(event -> {
+            try {
+                Message message = new Message();
+                message.setContent(textField.getText());
+                message.setTime(new Time(new Date().getTime()));
+                message.setStatus("Sent");
+                new MessageRepository().insert(message);
+                String json = new Gson().toJson(message);
+
+                RDT.getSender(InetAddress.getByName(user.getAddress()), user.getPortChat()).sendMessage(json.getBytes());
+
+                Platform.runLater(() ->
+                        textArea.appendText("\t\t\t" + textField.getText() + "\n")
+                );
+
+            } catch (SocketException | InterruptedException | UnknownHostException | SQLException e) {
+                e.printStackTrace();
+            }
         });
     }
 }

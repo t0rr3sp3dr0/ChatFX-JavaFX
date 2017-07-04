@@ -32,7 +32,7 @@ public class MessageRepository implements Repository<Message> {
                 "VALUES (?, ?, ?, ?, ?);");
         statement.setInt(1, message.getGroupId());
         statement.setString(2, message.getContent());
-        statement.setBoolean(3, message.isStatus());
+        statement.setString(3, message.getStatus());
         statement.setTime(4, message.getTime());
         statement.setInt(5, message.getAuthorId());
         statement.executeUpdate();
@@ -47,7 +47,7 @@ public class MessageRepository implements Repository<Message> {
                     "WHERE message_id = ?;");
             statement.setInt(1, message.getGroupId());
             statement.setString(2, message.getContent());
-            statement.setBoolean(3, message.isStatus());
+            statement.setString(3, message.getStatus());
             statement.setTime(4, message.getTime());
             statement.setInt(5, message.getAuthorId());
             statement.setInt(6, message.getId());
@@ -76,7 +76,7 @@ public class MessageRepository implements Repository<Message> {
                     rs.getInt("message_id"),
                     rs.getInt("message_group_id"),
                     rs.getString("message_content"),
-                    rs.getBoolean("message_status"),
+                    rs.getString("message_status"),
                     rs.getTime("message_timestamp"),
                     rs.getInt("message_author_id")
             ));
@@ -95,7 +95,7 @@ public class MessageRepository implements Repository<Message> {
                     rs.getInt("message_id"),
                     rs.getInt("message_group_id"),
                     rs.getString("message_content"),
-                    rs.getBoolean("message_status"),
+                    rs.getString("message_status"),
                     rs.getTime("message_timestamp"),
                     rs.getInt("message_author_id"));
         return message;

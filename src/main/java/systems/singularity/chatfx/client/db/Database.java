@@ -38,7 +38,7 @@ public class Database {
 
     private static void initializeTables() throws SQLException {
         Statement statement = connection.createStatement();
-        statement.execute("CREATE TABLE IF NOT EXISTS cf_messages (message_id INTEGER PRIMARY KEY, message_group_id INTEGER NULL, message_content VARCHAR, message_status BOOLEAN, message_timestamp DATETIME, message_author_id INTEGER NOT NULL);");
+        statement.execute("CREATE TABLE IF NOT EXISTS cf_messages (message_id INTEGER PRIMARY KEY, message_group_id INTEGER NULL, message_content VARCHAR, message_status VARCHAR(8), message_timestamp DATETIME, message_author_id INTEGER NOT NULL);");
         statement.execute("CREATE TABLE IF NOT EXISTS cf_groups (group_id INTEGER PRIMARY KEY, group_name VARCHAR(25));");
         statement.execute("CREATE TABLE IF NOT EXISTS cf_members (member_id INTEGER PRIMARY KEY, member_group_id INTEGER NOT NULL, member_user_id INTEGER NOT NULL);");
     }

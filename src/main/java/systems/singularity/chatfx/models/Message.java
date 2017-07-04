@@ -10,11 +10,11 @@ public class Message {
     private int id;
     private int groupId;
     private String content;
-    private boolean status;
+    private String status;
     private Time time;
     private int authorId;
 
-    public Message(int id, int groupId, String content, boolean status, Time time, int authorId) {
+    public Message(int id, int groupId, String content, String status, Time time, int authorId) {
         this.id = id;
         this.groupId = groupId;
         this.content = content;
@@ -50,11 +50,11 @@ public class Message {
         this.content = content;
     }
 
-    public boolean isStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(boolean status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
