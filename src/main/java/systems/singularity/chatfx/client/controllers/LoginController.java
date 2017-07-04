@@ -66,18 +66,17 @@ public class LoginController implements Initializable {
                         Singleton.getInstance().setChatOnReceiveListener(inetAddress, (Protocol.Receiver) (address, port1, headers, message) -> {
                             String[] pragma = headers.get("Pragma").split(";");
                             if (pragma[0].equals("login") && !pragma[1].equals("401")) {
+                                System.out.println("\n\nLOGIN: CHAT\n\n");
+
                                 this.logged[0] = true;
                                 login();
                             }
                         });
 
-                        for (int i = 0; i < 10; i++)
-                            System.out.println();
-
                         Protocol.Sender.sendMessage(chatSender, map, "Vai tomar no cu, pasg!");
 
 
-                        Thread.sleep(8000);
+//                        Thread.sleep(1000);
 
 
                         RDT.Sender fileSender = RDT.newSender(inetAddress, port);
@@ -90,6 +89,8 @@ public class LoginController implements Initializable {
                         Singleton.getInstance().setFileOnReceiveListener(inetAddress, (Protocol.Receiver) (address, port1, headers, message) -> {
                             String[] pragma = headers.get("Pragma").split(";");
                             if (pragma[0].equals("login") && !pragma[1].equals("401")) {
+                                System.out.println("\n\nLOGIN: FILE\n\n");
+
                                 this.logged[1] = true;
                                 login();
                             }
@@ -98,7 +99,7 @@ public class LoginController implements Initializable {
                         Protocol.Sender.sendMessage(fileSender, map, "Vai tomar no cu, file!");
 
 
-                        Thread.sleep(8000);
+//                        Thread.sleep(1000);
 
 
                         RDT.Sender rttSender = RDT.newSender(inetAddress, port);
@@ -107,11 +108,13 @@ public class LoginController implements Initializable {
                         map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
                         map.put("Pragma", "login;rtt");
 
-                        RDT.Receiver rdtReceiver = RDT.getReceiver(rttSender);
-                        rdtReceiver.setOnReceiveListener(inetAddress, (Protocol.Receiver) (address, port1, headers, message) -> {
+                        RDT.Receiver rttReceiver = RDT.getReceiver(rttSender);
+                        rttReceiver.setOnReceiveListener(inetAddress, (Protocol.Receiver) (address, port1, headers, message) -> {
                             String[] pragma = headers.get("Pragma").split(";");
                             if (pragma[0].equals("login") && !pragma[1].equals("401")) {
-                                new RDT.RTT.Echo(rdtReceiver).start();
+                                System.out.println("\n\nLOGIN: RTT\n\n");
+
+                                new RDT.RTT.Echo(rttSender).start();
 
                                 this.logged[2] = true;
                                 login();
@@ -119,9 +122,6 @@ public class LoginController implements Initializable {
                         });
 
                         Protocol.Sender.sendMessage(rttSender, map, "Vai tomar no cu, rtt!");
-
-
-                        Thread.sleep(2000);
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }

@@ -50,7 +50,7 @@ public class Singleton extends HashMap<String, Object> {
         if (this.fileReceiver != null)
             this.fileReceiver.clearOnReceiveListeners();
 
-        this.fileReceiver = chatReceiver;
+        this.fileReceiver = fileReceiver;
     }
 
     public void setChatOnReceiveListener(@Nullable InetAddress address, @Nullable RDT.Receiver.OnReceiveListener onReceiveListener) {

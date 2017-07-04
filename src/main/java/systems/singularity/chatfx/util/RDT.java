@@ -378,7 +378,7 @@ public final class RDT {
                             Packet pkt = new Packet(seq, Arrays.copyOfRange(payload, 8, 8 + Constants.MTU));
 
                             if (seq <= connection.fin || seq < connection.seq || connection.packets.contains(pkt)) {
-                                System.out.printf("\nUnexpected SEQ(%d)\t%d(%d)\n%b\t%b\t%b\n\n", seq, connection.hashCode(), connection.seq, seq <= connection.fin, seq < connection.seq, connection.packets.contains(pkt));
+                                System.out.printf("\n\n\n\nUnexpected SEQ(%d)\t%d(%d)\n%b\t%b\t%b\n\n\n\n", seq, connection.hashCode(), connection.seq, seq <= connection.fin, seq < connection.seq, connection.packets.contains(pkt));
                                 RDT.getSender(packet.getAddress(), packet.getPort()).sendACK(connection.seq, this.port);
                                 continue;
                             }
