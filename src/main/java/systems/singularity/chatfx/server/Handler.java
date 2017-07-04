@@ -10,7 +10,10 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by pedro on 7/2/17.
@@ -120,10 +123,10 @@ public class Handler extends Thread implements Protocol.Receiver {
                                 Gson gson = new Gson();
                                 String json = gson.toJson(users);
                                 Map<String, String> map = new HashMap<>();
-                                map.put("Pragma", "OK;" + json);
+                                map.put("Pragma", "OK");
 
                                 try {
-                                    Protocol.Sender.sendMessage(RDT.getSender(address, port), map, "");
+                                    Protocol.Sender.sendMessage(RDT.getSender(address, port), map, json);
                                 } catch (InterruptedException | SocketException | UnknownHostException e) {
                                     e.printStackTrace();
                                 }

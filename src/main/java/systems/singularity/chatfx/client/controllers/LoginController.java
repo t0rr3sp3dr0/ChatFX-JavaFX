@@ -9,8 +9,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import systems.singularity.chatfx.client.Singleton;
-import systems.singularity.chatfx.models.User;
-import systems.singularity.chatfx.server.db.UserRepository;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
 import systems.singularity.chatfx.util.java.Utilities;
@@ -19,28 +17,26 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.URL;
-import java.sql.SQLException;
-import java.util.*;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
 
+    private static InetAddress inetAddress;
+    private static int port;
     @FXML
     private Button bt_login;
-
     @FXML
     private TextField tf_user;
-
     @FXML
     private PasswordField tf_pass;
-
     @FXML
     private TextField tf_ip;
-
     @FXML
     private TextField tf_port;
     private boolean[] logged = new boolean[3];
-    private static InetAddress inetAddress;
-    private static int port;
 
     public static InetAddress getInetAddress() {
         return inetAddress;
@@ -81,7 +77,6 @@ public class LoginController implements Initializable {
 
                         });
 
-                        Thread.sleep(2000);
                         map = new HashMap<>();
                         map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
                         map.put("Pragma", "login;file");
@@ -100,7 +95,6 @@ public class LoginController implements Initializable {
                             }
                         });
 
-                        Thread.sleep(2000);
                         map = new HashMap<>();
                         map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
                         map.put("Pragma", "login;rtt");

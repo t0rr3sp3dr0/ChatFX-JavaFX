@@ -3,7 +3,6 @@ package systems.singularity.chatfx.client.controllers;
 import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -12,7 +11,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
-import systems.singularity.chatfx.client.Singleton;
 import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.util.Constants;
 import systems.singularity.chatfx.util.Protocol;
@@ -27,6 +25,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by caesa on 01/07/2017.
@@ -87,14 +86,13 @@ public class MainController implements Initializable {
             RDT.getReceiver(sender).setOnReceiveListener(LoginController.getInetAddress(), (Protocol.Receiver) (address, port1, headers, message) -> {
                 String[] pragma = headers.get("Pragma").split(";");
                 Gson json = new Gson();
-                List<User> users = Arrays.asList(json.fromJson(pragma[1], User[].class));
-
+                List<User> users = Arrays.stream(json.fromJson(message, User[].class)).filter(User::getStatus).collect(Collectors.toList());
 
                 lvUsers.setItems(FXCollections.observableArrayList(users));
                 lvUsers.setCellFactory(param -> new ListCell<User>(){
-                    @Override
                     protected void updateItem(User item, boolean empty) {
-                        setText(item.getUsername());
+                        if (!empty && item.getStatus())
+                            setText(item.getUsername());
                     }
                 });
             });

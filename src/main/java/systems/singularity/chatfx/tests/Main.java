@@ -1,22 +1,28 @@
 package systems.singularity.chatfx.tests;
 
-import systems.singularity.chatfx.util.Protocol;
-import systems.singularity.chatfx.util.RDT;
+import com.google.gson.Gson;
 
-import java.io.File;
-import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by pedro on 6/10/17.
  */
 public class Main {
     public static void main(String[] args) throws SocketException, UnknownHostException, InterruptedException {
-        new RDT.RTT.Echo(4321).start();
+//        new RDT.RTT.Echo(4321).start();
+
+        List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
+        String json = new Gson().toJson(list);
+        System.out.println(json);
+        int[] ints = new Gson().fromJson(json, int[].class);
+        for (int i : ints)
+            System.out.println(i);
 
 //        RDT.Receiver receiver = RDT.getReceiver(1234);
-        RDT.Sender sender = RDT.getSender(InetAddress.getByName("192.168.43.43"), 1234);
+//        RDT.Sender sender = RDT.getSender(InetAddress.getByName("192.168.43.43"), 1234);
 
 //        receiver.setOnReceiveListener(null, (Protocol.Receiver) (address, port, headers, message) -> {
 //            System.out.println(address);
@@ -41,9 +47,9 @@ public class Main {
 //            downloader.add(Protocol.extractData(bytes));
 //        });
 
-        new Protocol.Uploader(sender, "", new File("/Users/pedro/Downloads/ubuntu-16.04.2-desktop-amd64.iso"), (file, bytesSent, elapsedTime) -> {
-            System.out.println(bytesSent / (elapsedTime / 1e9) + "Bps");
-        }).start();
+//        new Protocol.Uploader(sender, "", new File("/Users/pedro/Downloads/ubuntu-16.04.2-desktop-amd64.iso"), (file, bytesSent, elapsedTime) -> {
+//            System.out.println(bytesSent / (elapsedTime / 1e9) + "Bps");
+//        }).start();
 
 //        try {
 //            final FileOutputStream fileOutputStream = new FileOutputStream(new File("/home/CIN/phts/Desktop/" + receiver.hashCode()));
