@@ -4,7 +4,9 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import systems.singularity.chatfx.client.Networking;
 import systems.singularity.chatfx.client.Singleton;
 import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.util.Protocol;
@@ -25,122 +27,94 @@ import java.util.ResourceBundle;
 public class ChatController implements Initializable {
     private final User user;
 
+    @FXML
+    private ResourceBundle resources;
+    @FXML
+    private URL location;
+    @FXML
+    private Button clearChatButton;
+    @FXML
+    private ListView<File> listView;
+    @FXML
+    private Label speedLabel;
+    @FXML
+    private VBox root;
+    @FXML
+    private ProgressBar progressBar;
+    @FXML
+    private Button chooseFileButton;
+    @FXML
+    private Button openDownloadsButton;
+    @FXML
+    private Label progressLabel;
+    @FXML
+    private Label etaLabel;
+    @FXML
+    private TextArea textArea;
+    @FXML
+    private TextField textField;
+    @FXML
+    private Button sendButton;
+
     public ChatController(User user) {
         this.user = user;
     }
 
-    @FXML
-    private Button btFile;
-
-    @FXML
-    private Label lbFilename;
-
-    @FXML
-    private Label lbRtt;
-
-    @FXML
-    private Button btShowFolder;
-
-    @FXML
-    private ListView<?> lvFiles;
-
-    @FXML
-    private TextField tfMessage;
-
-    @FXML
-    private ProgressBar progress;
-
-    @FXML
-    private Label lbTime;
-
-    @FXML
-    private Button btClear;
-
-    @FXML
-    private TextArea taChat;
-
-    @FXML
-    private Button btSend;
-
-    @FXML
-    private Label lbProgress;
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
-
-
         try {
-            Singleton.getInstance().setFileOnReceiveListener(InetAddress.getByName(user.getAddress()), (address, port, bytes) -> {
-                //System.out.println("\t" + address.toString());
-
-                Map<String, String> headers = Protocol.extractHeaders(bytes);
-                final long contentLength = Long.parseLong(headers.get("Content-Length"));
-
-                Protocol.Downloader downloader = Protocol.getDownloader(headers);
-                downloader.setCallback((file, bytesReceived, elapsedTime) -> {
-                    if (bytesReceived == contentLength)
-                        System.out.println("FINISHED");
-                    else
-                        System.out.println((elapsedTime / 1e9) + "s");
-                });
-                downloader.add(Protocol.extractData(bytes));
+            Networking.receiveFile(user, (progress, speed, remainingTime) -> {
+                if (progress == 1)
+                    System.out.println("FINISHED");
+                else
+                    System.out.println(remainingTime + "s");
             });
-
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
 
-        btClear.setOnAction(event -> {
+        chooseFileButton.setOnAction(event -> {
+            chooseFileButton.setDisable(true);
 
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+            final File file = fileChooser.showOpenDialog(this.root.getScene().getWindow());
+            if (file != null) {
+                Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+                confirm.setHeaderText(String.format("Do you want to send \"%s\"?", file.getName()));
+                ((Button) confirm.getDialogPane().lookupButton(ButtonType.OK)).setText("Yes");
+                ((Button) confirm.getDialogPane().lookupButton(ButtonType.CANCEL)).setText("No");
+
+                Optional<ButtonType> result = confirm.showAndWait();
+                if (result.isPresent() && result.get() == ButtonType.OK)
+                    try {
+                        Networking.sendFile(file, user, "", ((progress, speed, remainingTime) -> {
+                            if (progress == 1)
+                                Platform.runLater(() -> {
+                                    chooseFileButton.setDisable(false);
+
+                                    Alert info = new Alert(Alert.AlertType.INFORMATION);
+                                    info.setHeaderText("Upload Finished Successfully!");
+                                    info.show();
+
+                                    progressBar.setProgress(0);
+                                    progressLabel.setText(null);
+                                    etaLabel.setText(null);
+                                    speedLabel.setText(null);
+                                });
+                            else
+                                Platform.runLater(() -> {
+                                    progressBar.setProgress(progress);
+                                    progressLabel.setText(String.format("%.2f%", progress * 100));
+                                    etaLabel.setText(String.format("%.0fs", remainingTime));
+                                    speedLabel.setText(String.format("%.2f MB/s", speed / (1024 * 1024)));
+                                });
+                        }));
+                    } catch (SocketException | UnknownHostException e) {
+                        e.printStackTrace();
+                    }
+            } else
+                chooseFileButton.setDisable(false);
         });
-
-        btSend.setOnAction(event -> {
-
-        });
-
-        btFile.setOnAction(event -> {
-            sendFile();
-        });
-
-    }
-
-    private void sendFile() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        final File file = fileChooser.showOpenDialog(btFile.getScene().getWindow());
-        if (file != null) {
-            lbFilename.setText(file.getName());
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Send file");
-            alert.setHeaderText("Are you sure?");
-            Button OkButton = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
-            OkButton.setText("Yes");
-            Button CancelButton = (Button) alert.getDialogPane().lookupButton(ButtonType.CANCEL);
-            CancelButton.setText("No");
-
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                try {
-                    new Protocol.Uploader(RDT.getSender(InetAddress.getByName(user.getAddress()), user.getPortFile()), "", file, ($, bytesSent, elapsedTime) -> {
-                        double speed = bytesSent / (elapsedTime * 1e9);
-                        double p = bytesSent / file.length();
-                        double remainingTime = (file.length() - bytesSent) / speed;
-                        Platform.runLater(() -> {
-                                    progress.setProgress(p);
-                                    lbProgress.setText(String.valueOf(p));
-                                    lbTime.setText(String.valueOf(remainingTime));
-                                }
-                        );
-                    }).start();
-                } catch (SocketException e) {
-                    e.printStackTrace();
-                } catch (UnknownHostException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                lbFilename.setText("");
-            }
-        }
     }
 }
