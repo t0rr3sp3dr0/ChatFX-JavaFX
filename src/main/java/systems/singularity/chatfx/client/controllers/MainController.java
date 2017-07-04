@@ -78,23 +78,7 @@ public class MainController implements Initializable {
                 Platform.runLater(() -> tableView.setItems(FXCollections.observableArrayList(users)));
             });
 
-            RDT.Receiver receiver = RDT.getReceiver(2020);
 
-            receiver.setOnReceiveListener(null, (address, port, bytes) -> {
-                //System.out.println("\t" + address.toString());
-
-                Map<String, String> headers = Protocol.extractHeaders(bytes);
-                final long contentLength = Long.parseLong(headers.get("Content-Length"));
-
-                Protocol.Downloader downloader = Protocol.getDownloader(headers);
-                downloader.setCallback((file, bytesReceived, elapsedTime) -> {
-                    if (bytesReceived == contentLength)
-                        System.out.println("FINISHED");
-                    else
-                        System.out.println((elapsedTime / 1e9) + "s");
-                });
-                downloader.add(Protocol.extractData(bytes));
-            });
         } catch (SocketException | InterruptedException | UnknownHostException e) {
             e.printStackTrace();
         }
@@ -103,44 +87,7 @@ public class MainController implements Initializable {
     private void sendMessage() {
     }
 
-    private void sendFile() {
-//        FileChooser fileChooser = new FileChooser();
-//        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-//        final File file = fileChooser.showOpenDialog(btFile.getScene().getWindow());
-//        if (file != null) {
-//            lbFilename.setText(file.getName());
-//            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-//            alert.setTitle("Send file");
-//            alert.setHeaderText("Are you sure?");
-//            Button OkButton = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
-//            OkButton.setText("Yes");
-//            Button CancelButton = (Button) alert.getDialogPane().lookupButton(ButtonType.CANCEL);
-//            CancelButton.setText("No");
-//
-//            Optional<ButtonType> result = alert.showAndWait();
-//            if (result.isPresent() && result.get() == ButtonType.OK) {
-//                try {
-//                    new Protocol.Uploader(RDT.getSender(InetAddress.getByName("192.168.43.78"), 2020), "", file, ($, bytesSent, elapsedTime) -> {
-//                        double speed = bytesSent / (elapsedTime * 1e9);
-//                        double p = bytesSent / file.length();
-//                        double remainingTime = (file.length() - bytesSent) / speed;
-//                        Platform.runLater(() -> {
-//                                    progress.setProgress(p);
-//                                    lbProgress.setText(String.valueOf(p));
-//                                    lbTime.setText(String.valueOf(remainingTime));
-//                                }
-//                        );
-//                    }).start();
-//                } catch (SocketException e) {
-//                    e.printStackTrace();
-//                } catch (UnknownHostException e) {
-//                    e.printStackTrace();
-//                }
-//            } else {
-//                lbFilename.setText("");
-//            }
-//        }
-    }
+
 
     private void clearChat() {
     }
