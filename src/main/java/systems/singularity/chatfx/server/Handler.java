@@ -41,6 +41,7 @@ public class Handler extends Thread implements Protocol.Receiver {
                             user.setAddress(address.getHostAddress());
                             user.setUsername(basic[0]);
                             user.setPassword(basic[1]);
+                            user.setStatus(true);
 
                             //noinspection Duplicates
                             switch (pragma[1]) {
@@ -73,6 +74,7 @@ public class Handler extends Thread implements Protocol.Receiver {
                         } else {
                             if (user.getPassword().equals(basic[1])) {
                                 user.setAddress(address.getHostAddress());
+                                user.setStatus(true);
 
                                 //noinspection Duplicates
                                 switch (pragma[1]) {
