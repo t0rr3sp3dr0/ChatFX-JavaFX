@@ -82,11 +82,20 @@ public class ChatController implements Initializable {
         });
 
         try {
-            Networking.receiveMessage(this.user, message -> {
-                Platform.runLater(() -> textArea.setText(textArea.getText() + message.getContent() + '\n'));
+            Networking.receiveMessage(this.user, (headers, message) -> {
                 try {
-                    MessageRepository.getInstance().insert(message);
-                } catch (SQLException e) {
+                    if (headers.get("Pragma").equals("message")) {
+                        MessageRepository.getInstance().insert(message.status("sent"));
+                        Platform.runLater(() -> textArea.setText(textArea.getText() + message.getContent() + '\n'));
+                        Networking.sendACK(message, ChatController.this.user);
+                    } else if (headers.get("Pragma").equals("ack")) {
+                        MessageRepository.getInstance().update(MessageRepository.getInstance()
+                                .get(new Message().id(Integer.parseInt(headers.get("Message-ID")))).status("ack"));
+                    } else if (headers.get("Pragma").equals("seen")) {
+                        MessageRepository.getInstance().update(MessageRepository.getInstance()
+                                .get(new Message().id(Integer.parseInt(headers.get("Message-ID")))).status("seen"));
+                    }
+                } catch (SQLException | InterruptedException | SocketException | UnknownHostException e) {
                     e.printStackTrace();
                 }
             });

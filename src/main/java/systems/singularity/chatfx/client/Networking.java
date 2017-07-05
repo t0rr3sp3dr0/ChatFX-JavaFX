@@ -31,7 +31,7 @@ public final class Networking {
             final double remainingTime = (file.length() - bytesSent) / speed;
 
             if (callback != null)
-                callback.onCalback(progress, speed, remainingTime);
+                callback.onCallback(progress, speed, remainingTime);
         })).start();
     }
 
@@ -47,7 +47,7 @@ public final class Networking {
                 final double remainingTime = (contentLength - bytesReceived) / speed;
 
                 if (callback != null)
-                    callback.onCalback(progress, speed, remainingTime);
+                    callback.onCallback(progress, speed, remainingTime);
             }));
             downloader.add(Protocol.extractData(bytes));
         });
@@ -55,12 +55,28 @@ public final class Networking {
 
     public static void sendMessage(@NotNull final Message message, @NotNull final User user) throws UnknownHostException, SocketException, InterruptedException {
         Map<String, String> headers = new HashMap<>();
-        headers.put("Pragma", "sendMessage");
+        headers.put("Pragma", "message");
 
         Gson gson = new GsonBuilder().create();
         String json = gson.toJson(message);
 
         Protocol.Sender.sendMessage(RDT.getSender(InetAddress.getByName(user.getAddress()), user.getPortChat()), headers, json);
+    }
+
+    public static void sendACK(@NotNull final Message message, @NotNull final User user) throws UnknownHostException, SocketException, InterruptedException {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Pragma", "ack");
+        headers.put("Message-ID", String.valueOf(message.getId()));
+
+        Protocol.Sender.sendMessage(RDT.getSender(InetAddress.getByName(user.getAddress()), user.getPortChat()), headers, "");
+    }
+
+    public static void sendSeen(@NotNull final Message message, @NotNull final User user) throws UnknownHostException, SocketException, InterruptedException {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Pragma", "seen");
+        headers.put("Message-ID", String.valueOf(message.getId()));
+
+        Protocol.Sender.sendMessage(RDT.getSender(InetAddress.getByName(user.getAddress()), user.getPortChat()), headers, "");
     }
 
     public static void receiveMessage(@NotNull final User user, @Nullable final OnMessageListener onMessageListener) throws UnknownHostException {
@@ -72,15 +88,15 @@ public final class Networking {
             Message message = gson.fromJson(new String(data), Message.class);
 
             if (onMessageListener != null)
-                onMessageListener.onMessage(message);
+                onMessageListener.onMessage(headers, message);
         });
     }
 
     public interface TransferCallback {
-        void onCalback(double progress, double speed, double remainingTime);
+        void onCallback(double progress, double speed, double remainingTime);
     }
 
     public interface OnMessageListener {
-        void onMessage(Message message);
+        void onMessage(Map<String, String> headers, Message message);
     }
 }
