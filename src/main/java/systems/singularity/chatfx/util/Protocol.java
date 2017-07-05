@@ -172,7 +172,6 @@ public final class Protocol {
                 long contentLength = Long.parseLong(headers.get("Content-Length"));
 
                 long readSize = 0;
-                int count = 0;
                 long startTime = System.nanoTime();
                 while (readSize < contentLength) {
                     byte[] bytes = this.queue.remove();
@@ -184,7 +183,6 @@ public final class Protocol {
                     fileOutputStream.write(bytes, 0, size);
                     long elapsedTime = System.nanoTime() - startTime;
                     readSize += size;
-                    count++;
 
                     if (callback != null)
                         callback.onCallback(this.file, readSize, elapsedTime);

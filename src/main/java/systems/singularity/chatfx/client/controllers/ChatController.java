@@ -104,21 +104,20 @@ public class ChatController implements Initializable {
         }
 
         try {
-            Networking.receiveFile(this.user, (progress, speed, remainingTime) -> {
+            Networking.receiveFile(this.user, (file, progress, speed, remainingTime) -> Platform.runLater(() -> {
                 if (progress == 1)
-                    Platform.runLater(() -> ChatController.this.receiveFileDialog.hide());
-                else
-                    Platform.runLater(() -> {
-                        ChatController.this.receiveFileController.getProgressBar().setProgress(progress);
-                        ChatController.this.receiveFileController.getProgressLabel().setText(String.format("%.2f%%", progress * 100));
-                        ChatController.this.receiveFileController.getEtaLabel().setText(String.format("%.0fs", remainingTime));
-                        ChatController.this.receiveFileController.getSpeedLabel().setText(String.format("%.2f MB/s", speed / (1024 * 1024)));
+                    ChatController.this.receiveFileDialog.hide();
+                else {
+                    ChatController.this.receiveFileController.getProgressBar().setProgress(progress);
+                    ChatController.this.receiveFileController.getProgressLabel().setText(String.format("%.2f%%", progress * 100));
+                    ChatController.this.receiveFileController.getEtaLabel().setText(String.format("%.0fs", remainingTime));
+                    ChatController.this.receiveFileController.getSpeedLabel().setText(String.format("%.2f MB/s", speed / (1024 * 1024)));
 
-                        ChatController.this.receiveFileDialog.getDialogPane().setContent(ChatController.this.receiveFileNode);
-                        ChatController.this.receiveFileDialog.setHeaderText("Receiving File");
-                        ChatController.this.receiveFileDialog.show();
-                    });
-            });
+                    ChatController.this.receiveFileDialog.getDialogPane().setContent(ChatController.this.receiveFileNode);
+                    ChatController.this.receiveFileDialog.setHeaderText("Receiving File");
+                    ChatController.this.receiveFileDialog.show();
+                }
+            }));
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
@@ -132,14 +131,11 @@ public class ChatController implements Initializable {
                 if (content.length() > 0) {
                     new Thread(() -> {
                         Message message = new Message()
-                                .id((String.valueOf(content.hashCode()) +
-                                        String.valueOf(Singleton.getInstance().getUsername().hashCode()) +
-                                        String.valueOf(ChatController.this.user.getUsername().hashCode()) +
-                                        new DateTime().toString()).hashCode())
                                 .content(content.trim()).time(DateTime.now().toString())
                                 .authorId(Singleton.getInstance().getUser().getId());
+
                         try {
-                            Networking.sendMessage(message, ChatController.this.user);
+                            Networking.sendMessage(message.id(message.hashCode()), ChatController.this.user);
                         } catch (UnknownHostException | SocketException | InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -166,28 +162,25 @@ public class ChatController implements Initializable {
                 Optional<ButtonType> result = confirm.showAndWait();
                 if (result.isPresent() && result.get() == ButtonType.OK)
                     try {
-                        Networking.sendFile(file, user, "", ((progress, speed, remainingTime) -> {
-                            if (progress == 1)
-                                Platform.runLater(() -> {
-                                    chooseFileButton.setDisable(false);
+                        Networking.sendFile(file, user, "", (($, progress, speed, remainingTime) -> Platform.runLater(() -> {
+                            if (progress == 1) {
+                                chooseFileButton.setDisable(false);
 
-                                    Alert info = new Alert(Alert.AlertType.INFORMATION);
-                                    info.setHeaderText("Upload Finished Successfully!");
-                                    info.show();
+                                Alert info = new Alert(Alert.AlertType.INFORMATION);
+                                info.setHeaderText("Upload Finished Successfully!");
+                                info.show();
 
-                                    progressBar.setProgress(0);
-                                    progressLabel.setText(null);
-                                    etaLabel.setText(null);
-                                    speedLabel.setText(null);
-                                });
-                            else
-                                Platform.runLater(() -> {
-                                    progressBar.setProgress(progress);
-                                    progressLabel.setText(String.format("%.2f%%", progress * 100));
-                                    etaLabel.setText(String.format("%.0fs", remainingTime));
-                                    speedLabel.setText(String.format("%.2f MB/s", speed / (1024 * 1024)));
-                                });
-                        }));
+                                progressBar.setProgress(0);
+                                progressLabel.setText(null);
+                                etaLabel.setText(null);
+                                speedLabel.setText(null);
+                            } else {
+                                progressBar.setProgress(progress);
+                                progressLabel.setText(String.format("%.2f%%", progress * 100));
+                                etaLabel.setText(String.format("%.0fs", remainingTime));
+                                speedLabel.setText(String.format("%.2f MB/s", speed / (1024 * 1024)));
+                            }
+                        })));
                     } catch (SocketException | UnknownHostException e) {
                         e.printStackTrace();
                     }

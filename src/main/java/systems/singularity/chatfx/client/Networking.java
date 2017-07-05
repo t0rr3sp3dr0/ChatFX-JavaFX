@@ -31,7 +31,7 @@ public final class Networking {
             final double remainingTime = (file.length() - bytesSent) / speed;
 
             if (callback != null)
-                callback.onCallback(progress, speed, remainingTime);
+                callback.onCallback(file, progress, speed, remainingTime);
         })).start();
     }
 
@@ -47,7 +47,7 @@ public final class Networking {
                 final double remainingTime = (contentLength - bytesReceived) / speed;
 
                 if (callback != null)
-                    callback.onCallback(progress, speed, remainingTime);
+                    callback.onCallback(file, progress, speed, remainingTime);
             }));
             downloader.add(Protocol.extractData(bytes));
         });
@@ -93,7 +93,7 @@ public final class Networking {
     }
 
     public interface TransferCallback {
-        void onCallback(double progress, double speed, double remainingTime);
+        void onCallback(File file, double progress, double speed, double remainingTime);
     }
 
     public interface OnMessageListener {
