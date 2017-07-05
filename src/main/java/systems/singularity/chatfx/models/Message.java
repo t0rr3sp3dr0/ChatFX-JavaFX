@@ -14,7 +14,6 @@
 package systems.singularity.chatfx.models;
 
 import com.google.gson.annotations.SerializedName;
-import org.joda.time.DateTime;
 
 import java.util.Objects;
 
@@ -33,7 +32,7 @@ public class Message {
   private String status = null;
 
   @SerializedName("time")
-  private DateTime time = null;
+  private String time = null;
 
   @SerializedName("authorId")
   private Integer authorId = null;
@@ -95,7 +94,7 @@ public class Message {
     this.status = status;
   }
 
-  public Message time(DateTime time) {
+  public Message time(String time) {
     this.time = time;
     return this;
   }
@@ -105,11 +104,11 @@ public class Message {
    *
    * @return time
    **/
-  public DateTime getTime() {
+  public String getTime() {
     return time;
   }
 
-  public void setTime(DateTime time) {
+  public void setTime(String time) {
     this.time = time;
   }
 

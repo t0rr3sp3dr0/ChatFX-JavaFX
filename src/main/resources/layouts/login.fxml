@@ -3,8 +3,8 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="183.0" maxWidth="285.0" minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="183.0" prefWidth="285.0" xmlns="http://javafx.com/javafx/8"
+<VBox maxHeight="183.0" maxWidth="285.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="183.0" prefWidth="285.0"
+      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="systems.singularity.chatfx.client.controllers.LoginController">
     <children>
       <HBox maxHeight="31.0" minWidth="256.0" prefHeight="31.0" prefWidth="200.0">
@@ -15,7 +15,7 @@
                </HBox.margin>
             </Label>
              <TextField fx:id="tf_ip" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0"
-                        promptText="192.168.0.1" text="localhost"/>
+                        promptText="192.168.0.1" text="172.20.4.13"/>
          </children>
          <VBox.margin>
             <Insets bottom="2.0" left="4.0" right="4.0" top="4.0" />
@@ -47,7 +47,7 @@
                     </HBox.margin>
                 </Label>
                 <TextField fx:id="tf_user" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0"
-                           promptText="user" text="user"/>
+                           promptText="user" text="g1c14"/>
             </children>
             <VBox.margin>
                 <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />

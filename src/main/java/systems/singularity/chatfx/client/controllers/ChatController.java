@@ -2,15 +2,20 @@ package systems.singularity.chatfx.client.controllers;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import org.joda.time.DateTime;
 import systems.singularity.chatfx.client.Networking;
+import systems.singularity.chatfx.client.Singleton;
 import systems.singularity.chatfx.models.Message;
 import systems.singularity.chatfx.models.User;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -52,14 +57,36 @@ public class ChatController implements Initializable {
     @FXML
     private Button sendButton;
 
+    private Node receiveFileNode;
+    private Dialog receiveFileDialog;
+    private ReceiveFileController receiveFileController;
+
+
     public ChatController(User user) {
         this.user = user;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        Platform.runLater(() -> {
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/receive_file.fxml"));
+                ChatController.this.receiveFileController = fxmlLoader.getController();
+                ChatController.this.receiveFileNode = fxmlLoader.load();
+                ChatController.this.receiveFileDialog = new Dialog();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
         try {
-            Networking.receiveMessage(this.user, message -> Platform.runLater(() -> textArea.setText(textArea.getText() + message.getContent() + '\n')));
+            Networking.receiveMessage(this.user, message -> {
+                new Thread(() -> {
+                    for (int i = 0; i < 100; i++)
+                        System.out.println(message.toString());
+                }).run();
+                Platform.runLater(() -> textArea.setText(textArea.getText() + message.getContent() + '\n'));
+            });
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
@@ -67,9 +94,17 @@ public class ChatController implements Initializable {
         try {
             Networking.receiveFile(this.user, (progress, speed, remainingTime) -> {
                 if (progress == 1)
-                    System.out.println("FINISHED");
+                    Platform.runLater(() -> ChatController.this.receiveFileDialog.hide());
                 else
-                    System.out.println(remainingTime + "s");
+                    Platform.runLater(() -> {
+                        this.receiveFileController.getProgressBar().setProgress(progress);
+                        this.receiveFileController.getProgressLabel().setText(String.format("%.2f%%", progress * 100));
+                        this.receiveFileController.getEtaLabel().setText(String.format("%.0fs", remainingTime));
+                        this.receiveFileController.getSpeedLabel().setText(String.format("%.2f MB/s", speed / (1024 * 1024)));
+
+                        this.receiveFileDialog.setHeaderText("Receiving File");
+                        this.receiveFileDialog.show();
+                    });
             });
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -84,9 +119,11 @@ public class ChatController implements Initializable {
                 if (content.length() > 0) {
                     new Thread(() -> {
                         Message message = new Message()
-                                .id(content.hashCode())
-                                .content(content.trim());
-
+                                .id((String.valueOf(content.hashCode()) +
+                                        String.valueOf(Singleton.getInstance().getUsername().hashCode()) +
+                                        String.valueOf(ChatController.this.user.getUsername().hashCode()) +
+                                        new DateTime().toString()).hashCode())
+                                .content(content.trim()).time(DateTime.now().toString());
                         try {
                             Networking.sendMessage(message, ChatController.this.user);
                         } catch (UnknownHostException | SocketException | InterruptedException e) {

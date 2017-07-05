@@ -31,7 +31,7 @@ public class MessageRepository implements Repository<Message> {
         statement.setInt(1, message.getGroupId());
         statement.setString(2, message.getContent());
         statement.setString(3, message.getStatus());
-        statement.setTime(4, new Time(message.getTime().getMillis()));
+        statement.setTime(4, new Time(DateTime.parse(message.getTime()).getMillis()));
         statement.setInt(5, message.getAuthorId());
         statement.executeUpdate();
     }
@@ -46,7 +46,7 @@ public class MessageRepository implements Repository<Message> {
             statement.setInt(1, message.getGroupId());
             statement.setString(2, message.getContent());
             statement.setString(3, message.getStatus());
-            statement.setTime(4, new Time(message.getTime().getMillis()));
+            statement.setTime(4, new Time(DateTime.parse(message.getTime()).getMillis()));
             statement.setInt(5, message.getAuthorId());
             statement.setInt(6, message.getId());
             statement.executeUpdate();
@@ -76,7 +76,7 @@ public class MessageRepository implements Repository<Message> {
                             .groupId(rs.getInt("message_group_id"))
                             .content(rs.getString("message_content"))
                             .status(rs.getString("message_status"))
-                            .time(new DateTime(rs.getTime("message_timestamp")))
+                            .time(rs.getString("message_timestamp"))
                             .authorId(rs.getInt("message_author_id"))
             );
         return messages;
@@ -97,7 +97,7 @@ public class MessageRepository implements Repository<Message> {
                 .groupId(rs.getInt("message_group_id"))
                 .content(rs.getString("message_content"))
                 .status(rs.getString("message_status"))
-                .time(new DateTime(rs.getTime("message_timestamp")))
+                .time(rs.getString("message_timestamp"))
                 .authorId(rs.getInt("message_author_id"));
     }
 }
