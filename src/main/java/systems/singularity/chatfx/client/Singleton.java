@@ -2,6 +2,7 @@ package systems.singularity.chatfx.client;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
+import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.util.RDT;
 
 import java.net.InetAddress;
@@ -19,6 +20,7 @@ public class Singleton extends HashMap<String, Object> {
     private RDT.Receiver fileReceiver = null;
     private String token = null;
     private String username = null;
+    private User user = null;
 
     private Singleton() {
     }
@@ -83,5 +85,13 @@ public class Singleton extends HashMap<String, Object> {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

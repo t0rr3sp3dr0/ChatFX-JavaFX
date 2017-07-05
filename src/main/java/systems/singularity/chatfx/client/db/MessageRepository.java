@@ -3,7 +3,6 @@ package systems.singularity.chatfx.client.db;
 import org.joda.time.DateTime;
 import systems.singularity.chatfx.interfaces.Repository;
 import systems.singularity.chatfx.models.Message;
-import systems.singularity.chatfx.server.db.Database;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,6 +12,16 @@ import java.util.List;
  * Created by lvrma on 02/07/2017.
  */
 public class MessageRepository implements Repository<Message> {
+    private static MessageRepository ourInstance = new MessageRepository();
+
+    private MessageRepository() {
+        // Avoid class instantiation
+    }
+
+    public static MessageRepository getInstance() {
+        return MessageRepository.ourInstance;
+    }
+
     @Override
     public boolean exists(Message message) throws SQLException {
         Connection conn = Database.getConnection();
@@ -28,11 +37,11 @@ public class MessageRepository implements Repository<Message> {
         PreparedStatement statement = conn.prepareStatement("INSERT INTO cf_messages (" +
                 "message_group_id, message_content, message_status, message_timestamp, message_author_id) " +
                 "VALUES (?, ?, ?, ?, ?);");
-        statement.setInt(1, message.getGroupId());
+        statement.setObject(1, message.getGroupId());
         statement.setString(2, message.getContent());
         statement.setString(3, message.getStatus());
         statement.setTime(4, new Time(DateTime.parse(message.getTime()).getMillis()));
-        statement.setInt(5, message.getAuthorId());
+        statement.setObject(5, message.getAuthorId());
         statement.executeUpdate();
     }
 

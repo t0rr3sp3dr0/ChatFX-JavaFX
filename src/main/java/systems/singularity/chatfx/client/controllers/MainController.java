@@ -103,7 +103,14 @@ public class MainController implements Initializable {
                     Protocol.Sender.sendMessage(sender, map, "Manda esses user aí, seu porra!");
 
                     RDT.getReceiver(sender).setOnReceiveListener(LoginController.getInetAddress(), (Protocol.Receiver) (address, port1, headers, message) -> {
-                        List<User> users = Arrays.stream(new Gson().fromJson(message, User[].class)).filter(user -> user.getStatus() && !user.getUsername().equals(Singleton.getInstance().getUsername())).collect(Collectors.toList());
+                        List<User> users = Arrays.stream(new Gson().fromJson(message, User[].class)).filter(user -> {
+                            if (user.getUsername().equals(Singleton.getInstance().getUsername())) {
+                                Singleton.getInstance().setUser(user);
+                                return true;
+                            }
+
+                            return user.getStatus();
+                        }).collect(Collectors.toList());
 
                         Platform.runLater(() -> tableView.setItems(FXCollections.observableArrayList(users)));
                     });

@@ -11,6 +11,7 @@ import javafx.stage.FileChooser;
 import org.joda.time.DateTime;
 import systems.singularity.chatfx.client.Networking;
 import systems.singularity.chatfx.client.Singleton;
+import systems.singularity.chatfx.client.db.MessageRepository;
 import systems.singularity.chatfx.models.Message;
 import systems.singularity.chatfx.models.User;
 
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.sql.SQLException;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -81,11 +83,12 @@ public class ChatController implements Initializable {
 
         try {
             Networking.receiveMessage(this.user, message -> {
-                new Thread(() -> {
-                    for (int i = 0; i < 100; i++)
-                        System.out.println(message.toString());
-                }).run();
                 Platform.runLater(() -> textArea.setText(textArea.getText() + message.getContent() + '\n'));
+                try {
+                    MessageRepository.getInstance().insert(message);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             });
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -123,7 +126,8 @@ public class ChatController implements Initializable {
                                         String.valueOf(Singleton.getInstance().getUsername().hashCode()) +
                                         String.valueOf(ChatController.this.user.getUsername().hashCode()) +
                                         new DateTime().toString()).hashCode())
-                                .content(content.trim()).time(DateTime.now().toString());
+                                .content(content.trim()).time(DateTime.now().toString())
+                                .authorId(Singleton.getInstance().getUser().getId());
                         try {
                             Networking.sendMessage(message, ChatController.this.user);
                         } catch (UnknownHostException | SocketException | InterruptedException e) {

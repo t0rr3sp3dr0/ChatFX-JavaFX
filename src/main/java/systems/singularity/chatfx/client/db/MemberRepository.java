@@ -14,6 +14,16 @@ import java.util.List;
  * Created by lvrma on 03/07/2017.
  */
 public class MemberRepository implements Repository<Member> {
+    private static MemberRepository ourInstance = new MemberRepository();
+
+    private MemberRepository() {
+        // Avoid class instantiation
+    }
+
+    public static MemberRepository getInstance() {
+        return MemberRepository.ourInstance;
+    }
+
     @Override
     public boolean exists(Member member) throws SQLException {
         Connection conn = Database.getConnection();

@@ -14,6 +14,16 @@ import java.util.List;
  * Created by lvrma on 03/07/2017.
  */
 public class GroupRepository implements Repository<Group> {
+    private static GroupRepository ourInstance = new GroupRepository();
+
+    private GroupRepository() {
+        // Avoid class instantiation
+    }
+
+    public static GroupRepository getInstance() {
+        return GroupRepository.ourInstance;
+    }
+
     @Override
     public boolean exists(Group group) throws SQLException {
         Connection conn = Database.getConnection();
