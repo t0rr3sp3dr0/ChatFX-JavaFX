@@ -35,13 +35,14 @@ public class MessageRepository implements Repository<Message> {
     public void insert(Message message) throws SQLException {
         Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement("INSERT INTO cf_messages (" +
-                "message_group_id, message_content, message_status, message_timestamp, message_author_id) " +
-                "VALUES (?, ?, ?, ?, ?);");
-        statement.setObject(1, message.getGroupId());
-        statement.setString(2, message.getContent());
-        statement.setString(3, message.getStatus());
-        statement.setTime(4, new Time(DateTime.parse(message.getTime()).getMillis()));
-        statement.setObject(5, message.getAuthorId());
+                "message_id, message_group_id, message_content, message_status, message_timestamp, message_author_id) " +
+                "VALUES (?, ?, ?, ?, ?, ?);");
+        statement.setObject(1, message.getId());
+        statement.setObject(2, message.getGroupId());
+        statement.setString(3, message.getContent());
+        statement.setString(4, message.getStatus());
+        statement.setTime(5, new Time(DateTime.parse(message.getTime()).getMillis()));
+        statement.setObject(6, message.getAuthorId());
         statement.executeUpdate();
     }
 
@@ -85,7 +86,7 @@ public class MessageRepository implements Repository<Message> {
                             .groupId(rs.getInt("message_group_id"))
                             .content(rs.getString("message_content"))
                             .status(rs.getString("message_status"))
-                            .time(rs.getString("message_timestamp"))
+                            .time(new DateTime(rs.getTime("message_timestamp").getTime()).toString())
                             .authorId(rs.getInt("message_author_id"))
             );
         return messages;
@@ -106,7 +107,7 @@ public class MessageRepository implements Repository<Message> {
                 .groupId(rs.getInt("message_group_id"))
                 .content(rs.getString("message_content"))
                 .status(rs.getString("message_status"))
-                .time(rs.getString("message_timestamp"))
+                .time(new DateTime(rs.getTime("message_timestamp").getTime()).toString())
                 .authorId(rs.getInt("message_author_id"));
     }
 }

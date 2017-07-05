@@ -41,7 +41,7 @@ public class Message {
   private Integer groupId = null;
 
   public Message id(Integer id) {
-    this.id = id;
+    this.id = Math.abs(id);
     return this;
   }
 
