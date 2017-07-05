@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import systems.singularity.chatfx.client.Singleton;
@@ -31,6 +32,9 @@ public class MainController implements Initializable {
     private MenuBar menuBar;
 
     @FXML
+    private MenuItem discardModuleMenuItem;
+
+    @FXML
     private TableView<User> tableView;
 
     @FXML
@@ -39,8 +43,21 @@ public class MainController implements Initializable {
     @FXML
     private TabPane tabPane;
 
+    private Node discardModuleNode;
+    private DiscardModuleController discardModuleController;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        Platform.runLater(() -> {
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/discard_module.fxml"));
+                MainController.this.discardModuleController = fxmlLoader.getController();
+                MainController.this.discardModuleNode = fxmlLoader.load();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+
         stageTools.setTabPane(tabPane);
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.SELECTED_TAB);
 
@@ -63,6 +80,12 @@ public class MainController implements Initializable {
         });
 
         tableColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
+
+        discardModuleMenuItem.setOnAction(event -> {
+            Dialog dialog = new Dialog();
+            dialog.getDialogPane().setContent(discardModuleNode);
+            dialog.show();
+        });
 
         new Thread(() -> {
             try {

@@ -222,7 +222,7 @@ public final class RDT {
                         else
                             System.arraycopy(message, i * Constants.MTU, payload, 8, ((message.length - 1) % Constants.MTU) + 1);
 
-                        if (!RDT.dispose(Constants.SENDER_LOSS_PROBABILITY)) {
+                        if (!RDT.dispose(Variables.senderLossProbability)) {
                             DatagramPacket packet = new DatagramPacket(payload, payload.length, this.address, this.port);
                             socket.send(packet);
 
@@ -370,7 +370,7 @@ public final class RDT {
                     final Integer seq = ((payload[4] << 8) & 0xFF00) | (payload[5] & 0x00FF);
                     final Integer port = ((payload[6] << 8) & 0xFF00) | (payload[7] & 0x00FF);
 
-                    if (RDT.dispose(Constants.RECEIVER_LOSS_PROBABILITY)) {
+                    if (RDT.dispose(Variables.receiverLossProbability)) {
                         System.out.printf("DEBUG: message\t\t%d\tDISPOSED\tSEQ(%d)\n", packet.getAddress().hashCode(), seq);
                         continue;
                     }
