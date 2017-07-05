@@ -37,8 +37,8 @@ public class Message {
   @SerializedName("authorId")
   private Integer authorId = null;
 
-  @SerializedName("groupId")
-  private Integer groupId = null;
+  @SerializedName("chatId")
+  private Integer chatId = null;
 
   public Message id(Integer id) {
     this.id = Math.abs(id);
@@ -130,22 +130,22 @@ public class Message {
     this.authorId = authorId;
   }
 
-  public Message groupId(Integer groupId) {
-    this.groupId = groupId;
+  public Message chatId(Integer chatId) {
+    this.chatId = chatId;
     return this;
   }
 
   /**
-   * Get groupId
+   * Get chatId
    *
-   * @return groupId
+   * @return chatId
    **/
-  public Integer getGroupId() {
-    return groupId;
+  public Integer getChatId() {
+    return chatId;
   }
 
-  public void setGroupId(Integer groupId) {
-    this.groupId = groupId;
+  public void setChatId(Integer chatId) {
+    this.chatId = chatId;
   }
 
 
@@ -163,12 +163,12 @@ public class Message {
             Objects.equals(this.status, message.status) &&
             Objects.equals(this.time, message.time) &&
             Objects.equals(this.authorId, message.authorId) &&
-            Objects.equals(this.groupId, message.groupId);
+            Objects.equals(this.chatId, message.chatId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, content, status, time, authorId, groupId);
+    return Objects.hash(id, content, status, time, authorId, chatId);
   }
 
 
@@ -182,7 +182,7 @@ public class Message {
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    time: ").append(toIndentedString(time)).append("\n");
     sb.append("    authorId: ").append(toIndentedString(authorId)).append("\n");
-    sb.append("    groupId: ").append(toIndentedString(groupId)).append("\n");
+    sb.append("    chatId: ").append(toIndentedString(chatId)).append("\n");
     sb.append("}");
     return sb.toString();
   }
