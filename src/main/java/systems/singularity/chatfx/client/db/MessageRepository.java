@@ -38,7 +38,7 @@ public class MessageRepository implements Repository<Message> {
                 "message_id, message_group_id, message_content, message_status, message_timestamp, message_author_id) " +
                 "VALUES (?, ?, ?, ?, ?, ?);");
         statement.setObject(1, message.getId());
-        statement.setObject(2, message.getGroupId());
+        statement.setObject(2, message.getChatId());
         statement.setString(3, message.getContent());
         statement.setString(4, message.getStatus());
         statement.setTime(5, new Time(DateTime.parse(message.getTime()).getMillis()));
@@ -53,7 +53,7 @@ public class MessageRepository implements Repository<Message> {
             PreparedStatement statement = conn.prepareStatement("UPDATE cf_messages SET message_group_id = ?, " +
                     "message_content = ?, message_status = ?, message_timestamp = ?, message_author_id = ? " +
                     "WHERE message_id = ?;");
-            statement.setInt(1, message.getGroupId());
+            statement.setInt(1, message.getChatId());
             statement.setString(2, message.getContent());
             statement.setString(3, message.getStatus());
             statement.setTime(4, new Time(DateTime.parse(message.getTime()).getMillis()));
@@ -83,7 +83,7 @@ public class MessageRepository implements Repository<Message> {
             messages.add(
                     new Message()
                             .id(rs.getInt("message_id"))
-                            .groupId(rs.getInt("message_group_id"))
+                            .chatId(rs.getInt("message_group_id"))
                             .content(rs.getString("message_content"))
                             .status(rs.getString("message_status"))
                             .time(new DateTime(rs.getTime("message_timestamp").getTime()).toString())
@@ -104,7 +104,7 @@ public class MessageRepository implements Repository<Message> {
 
         return new Message()
                 .id(rs.getInt("message_id"))
-                .groupId(rs.getInt("message_group_id"))
+                .chatId(rs.getInt("message_group_id"))
                 .content(rs.getString("message_content"))
                 .status(rs.getString("message_status"))
                 .time(new DateTime(rs.getTime("message_timestamp").getTime()).toString())
