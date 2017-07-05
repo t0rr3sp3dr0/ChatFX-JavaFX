@@ -6,9 +6,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import org.joda.time.DateTime;
@@ -24,9 +25,11 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 /**
  * Created by pedro on 7/3/17.
@@ -34,37 +37,43 @@ import java.util.ResourceBundle;
 public class ChatController implements Initializable {
     private final User user;
     private final boolean[] downloadInProgress = {false};
-    @FXML
-    private ResourceBundle resources;
-    @FXML
-    private URL location;
-    @FXML
-    private Button clearChatButton;
-    @FXML
-    private ListView<Message> listView;
-    @FXML
-    private Label speedLabel;
-    @FXML
-    private VBox root;
-    @FXML
-    private ProgressBar progressBar;
-    @FXML
-    private Button chooseFileButton;
-    @FXML
-    private Button openDownloadsButton;
-    @FXML
-    private Label progressLabel;
-    @FXML
-    private Label etaLabel;
-    @FXML
-    private TextArea textArea;
-    @FXML
-    private TextField textField;
-    @FXML
-    private Button sendButton;
+
     private Node receiveFileNode;
     private Dialog receiveFileDialog;
     private ReceiveFileController receiveFileController;
+
+    @FXML
+    private Parent root;
+
+    @FXML
+    private ListView<User> participantsList;
+
+    @FXML
+    private ListView<Message> messagesList;
+
+    @FXML
+    private Label rttLabel;
+
+    @FXML
+    private Label speedLabel;
+
+    @FXML
+    private ProgressBar progressBar;
+
+    @FXML
+    private Button chooseFileButton;
+
+    @FXML
+    private Label progressLabel;
+
+    @FXML
+    private Label etaLabel;
+
+    @FXML
+    private TextField textField;
+
+    @FXML
+    private Button sendButton;
 
     public ChatController(User user) {
         this.user = user;
@@ -72,6 +81,7 @@ public class ChatController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
         Platform.runLater(() -> {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/receive_file.fxml"));
@@ -83,12 +93,24 @@ public class ChatController implements Initializable {
                 ChatController.this.receiveFileDialog.initModality(Modality.NONE);
                 ChatController.this.receiveFileDialog.getDialogPane().setContent(ChatController.this.receiveFileNode);
 
-                listView.setCellFactory(param -> new ListCell<Message>() {
+                messagesList.setCellFactory(param -> new ListCell<Message>() {
                     @Override
                     protected void updateItem(Message item, boolean empty) {
                         super.updateItem(item, empty);
-                        if (!empty)
+
+                        if (item == null || empty) {
+                            setDisable(true);
+                            setText(null);
+                        } else {
+                            setDisable(false);
                             setText(item.getContent());
+
+                            if (item.getAuthorId().equals(Singleton.getInstance().getUser().getId())) {
+                                setTextAlignment(TextAlignment.RIGHT);
+                                setTooltip(new Tooltip(item.getStatus()));
+                            } else
+                                setTextAlignment(TextAlignment.LEFT);
+                        }
                     }
                 });
             } catch (IOException e) {
@@ -100,18 +122,12 @@ public class ChatController implements Initializable {
             Networking.receiveMessage(this.user, (headers, message) -> {
                 try {
                     if (headers.get("Pragma").equals("message")) {
-
                         MessageRepository.getInstance().insert(message.status("sent"));
-                        List<Message> messages = MessageRepository.getInstance().getAll();
-                        Platform.runLater(() -> listView.setItems(FXCollections.observableArrayList(messages)));
                         Networking.sendACK(message, ChatController.this.user);
-                    } else if (headers.get("Pragma").equals("ack")) {
-                        MessageRepository.getInstance().update(MessageRepository.getInstance()
-                                .get(new Message().id(Integer.parseInt(headers.get("Message-ID"))).status("ack")));
-                    } else if (headers.get("Pragma").equals("seen")) {
-                        MessageRepository.getInstance().update(MessageRepository.getInstance()
-                                .get(new Message().id(Integer.parseInt(headers.get("Message-ID"))).status("seen")));
-                    }
+                    } else if (headers.get("Pragma").equals("ack"))
+                        MessageRepository.getInstance().update(MessageRepository.getInstance().get(new Message().id(Integer.parseInt(headers.get("Message-ID"))).status("ack")));
+                    else if (headers.get("Pragma").equals("seen"))
+                        MessageRepository.getInstance().update(MessageRepository.getInstance().get(new Message().id(Integer.parseInt(headers.get("Message-ID"))).status("seen")));
                 } catch (SQLException | InterruptedException | SocketException | UnknownHostException e) {
                     e.printStackTrace();
                 }
@@ -166,15 +182,15 @@ public class ChatController implements Initializable {
                 if (content.length() > 0) {
                     new Thread(() -> {
                         Message message = new Message()
-                                .content(content.trim()).time(DateTime.now().toString())
-                                .authorId(Singleton.getInstance().getUser().getId());
+                                .authorId(Singleton.getInstance().getUser().getId())
+                                .content(content.trim())
+                                .groupId(ChatController.this.user.getId())
+                                .status("processing")
+                                .time(DateTime.now().toString());
 
                         try {
                             Networking.sendMessage(message.id(message.hashCode()), ChatController.this.user);
-                            MessageRepository.getInstance().insert(message.status(""));
-
-                            List<Message> messages = MessageRepository.getInstance().getAll();
-                            Platform.runLater(() -> listView.setItems(FXCollections.observableArrayList(messages)));
+                            MessageRepository.getInstance().insert(message);
                         } catch (UnknownHostException | SocketException | InterruptedException | SQLException e) {
                             e.printStackTrace();
                         }
@@ -225,5 +241,16 @@ public class ChatController implements Initializable {
             } else
                 chooseFileButton.setDisable(false);
         });
+
+        new Thread(() -> {
+            try {
+                List<Message> messages = Arrays.stream((Message[]) MessageRepository.getInstance().getAll().toArray()).filter(message -> message.getGroupId().equals(ChatController.this.user.getId())).sorted((m1, m2) -> (int) (DateTime.parse(m2.getTime()).getMillis() - DateTime.parse(m1.getTime()).getMillis())).collect(Collectors.toList());
+                Platform.runLater(() -> messagesList.setItems(FXCollections.observableArrayList(messages)));
+
+                Thread.sleep(1000);
+            } catch (SQLException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 }
