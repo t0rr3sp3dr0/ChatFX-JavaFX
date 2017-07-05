@@ -25,7 +25,6 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -183,8 +182,8 @@ public class ChatController implements Initializable {
                     new Thread(() -> {
                         Message message = new Message()
                                 .authorId(Singleton.getInstance().getUser().getId())
-                                .content(content.trim())
-                                .chatId(ChatController.this.user.getId())
+                                .content(content)
+                                .chatId(Singleton.getInstance().getUser().getId() & ChatController.this.user.getId())
                                 .status("processing")
                                 .time(DateTime.now().toString());
 
@@ -244,7 +243,8 @@ public class ChatController implements Initializable {
 
         new Thread(() -> {
             try {
-                List<Message> messages = Arrays.stream((Message[]) MessageRepository.getInstance().getAll().toArray()).filter(message -> message.getChatId().equals(ChatController.this.user.getId())).sorted((m1, m2) -> (int) (DateTime.parse(m2.getTime()).getMillis() - DateTime.parse(m1.getTime()).getMillis())).collect(Collectors.toList());
+                List<Message> messages = MessageRepository.getInstance().getAll().stream().filter(message -> message.getChatId().equals(Singleton.getInstance().getUser().getId() & ChatController.this.user.getId())).collect(Collectors.toList());
+                System.err.printf("MESSAGES: %s", messages);
                 Platform.runLater(() -> messagesList.setItems(FXCollections.observableArrayList(messages)));
 
                 Thread.sleep(1000);

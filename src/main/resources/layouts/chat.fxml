@@ -140,8 +140,8 @@
                         <Insets bottom="4.0" top="4.0"/>
                     </VBox.margin>
                 </ProgressBar>
-                <Button fx:id="chooseFileButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false"
-                        textAlignment="CENTER">
+                <Button fx:id="chooseFileButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="30.0"
+                        mnemonicParsing="false" textAlignment="CENTER">
                     <graphic>
                         <HBox maxHeight="31.0" maxWidth="200.0" prefHeight="31.0" prefWidth="200.0">
                             <children>
