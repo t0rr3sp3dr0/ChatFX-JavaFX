@@ -43,7 +43,7 @@ public final class Networking {
             Protocol.Downloader downloader = Protocol.getDownloader(headers);
             downloader.setCallback(((file, bytesReceived, elapsedTime) -> {
                 final double progress = bytesReceived / contentLength;
-                final double speed = bytesReceived / (elapsedTime * 1e9);
+                final double speed = bytesReceived / (elapsedTime / 1e9);
                 final double remainingTime = (contentLength - bytesReceived) / speed;
 
                 if (callback != null)
