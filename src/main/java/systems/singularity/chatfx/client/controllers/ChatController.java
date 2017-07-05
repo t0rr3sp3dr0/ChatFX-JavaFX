@@ -35,7 +35,7 @@ import java.util.ResourceBundle;
  */
 public class ChatController implements Initializable {
     private final User user;
-
+    private final boolean[] downloadInProgress = {false};
     @FXML
     private ResourceBundle resources;
     @FXML
@@ -64,12 +64,9 @@ public class ChatController implements Initializable {
     private TextField textField;
     @FXML
     private Button sendButton;
-
     private Node receiveFileNode;
     private Dialog receiveFileDialog;
     private ReceiveFileController receiveFileController;
-
-    private final boolean[] downloadInProgress = {false};
 
     public ChatController(User user) {
         this.user = user;
@@ -105,6 +102,7 @@ public class ChatController implements Initializable {
             Networking.receiveMessage(this.user, (headers, message) -> {
                 try {
                     if (headers.get("Pragma").equals("message")) {
+
                         MessageRepository.getInstance().insert(message.status("sent"));
                         List<Message> messages = MessageRepository.getInstance().getAll();
                         Platform.runLater(() -> listView.setItems(FXCollections.observableArrayList(messages)));
