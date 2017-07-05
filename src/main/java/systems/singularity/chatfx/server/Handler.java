@@ -120,6 +120,7 @@ public class Handler extends Thread implements Protocol.Receiver {
                     case "get":
                         switch (pragma[1]) {
                             case "users":
+                                UserRepository.getInstance().update(UserRepository.getInstance().get(new User().username(basic[0])));
 
                                 List<User> users = UserRepository.getInstance().getAll();
                                 Gson gson = new Gson();

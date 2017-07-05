@@ -21,6 +21,19 @@ public class Database {
 
             Database.initializeDatabase();
             Database.initializeTables();
+
+            Database.connection.prepareStatement("UPDATE cf_users SET user_status = 0;").executeUpdate();
+
+            new Thread(() -> {
+                //noinspection InfiniteLoopStatement
+                while (true)
+                    try {
+                        System.out.println("DEBUG: UPDATE user_status\t" + Database.connection.prepareStatement("UPDATE cf_users SET user_status = 0 WHERE ((julianday(CURRENT_TIMESTAMP) - julianday(user_lastSeen)) * 86400) > 2;").executeUpdate());
+                        Thread.sleep(1000);
+                    } catch (SQLException | InterruptedException e) {
+                        e.printStackTrace();
+                    }
+            }).start();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -36,7 +49,7 @@ public class Database {
 
     private static void initializeTables() throws SQLException {
         Statement statement = Database.connection.createStatement();
-        statement.execute("CREATE TABLE IF NOT EXISTS cf_users (user_id INTEGER PRIMARY KEY, user_username VARCHAR(16), user_password VARCHAR(32), user_address VARCHAR(16), user_portChat SMALLINT, user_portFile SMALLINT, user_portRtt SMALLINT, user_status BOOLEAN);");
+        statement.execute("CREATE TABLE IF NOT EXISTS cf_users (user_id INTEGER PRIMARY KEY, user_username VARCHAR(16), user_password VARCHAR(32), user_address VARCHAR(16), user_portChat SMALLINT, user_portFile SMALLINT, user_portRtt SMALLINT, user_status BOOLEAN, user_lastSeen DATETIME);");
     }
 
     public static Connection getConnection() throws SQLException {

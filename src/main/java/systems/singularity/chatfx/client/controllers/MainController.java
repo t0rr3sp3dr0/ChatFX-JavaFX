@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import systems.singularity.chatfx.client.Singleton;
 import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
@@ -67,7 +68,7 @@ public class MainController implements Initializable {
             try {
                 while (true) {
                     Map<String, String> map = new HashMap<>();
-                    map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode(("blá:blá").getBytes())));
+                    map.put("Authorization", "Basic " + Singleton.getInstance().getToken());
                     map.put("Pragma", "get;users");
                     final RDT.Sender sender = RDT.getSender(LoginController.getInetAddress(), LoginController.getPort());
                     Protocol.Sender.sendMessage(sender, map, "Manda esses user aí, seu porra!");

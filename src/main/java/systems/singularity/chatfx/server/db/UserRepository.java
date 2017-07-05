@@ -38,14 +38,13 @@ public class UserRepository implements Repository<User> {
     public void insert(User user) throws SQLException {
         Connection conn = Database.getConnection();
         if (!exists(user)) {
-            PreparedStatement statement = conn.prepareStatement("INSERT INTO cf_users (user_username, user_password, user_address, user_portChat, user_portFile, user_portRtt, user_status) VALUES (?, ?, ?, ?, ?, ?, ?);");
+            PreparedStatement statement = conn.prepareStatement("INSERT INTO cf_users (user_username, user_password, user_address, user_portChat, user_portFile, user_portRtt, user_status, user_lastSeen) VALUES (?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP);");
             statement.setString(1, user.getUsername());
             statement.setString(2, user.getPassword());
             statement.setString(3, user.getAddress());
             statement.setInt(4, user.getPortChat() != null ? user.getPortChat() : -1);
             statement.setInt(5, user.getPortFile() != null ? user.getPortFile() : -1);
             statement.setInt(6, user.getPortRtt() != null ? user.getPortRtt() : -1);
-            statement.setBoolean(7, user.getStatus());
             statement.executeUpdate();
         }
     }
@@ -54,15 +53,14 @@ public class UserRepository implements Repository<User> {
     public void update(User user) throws SQLException {
         Connection conn = Database.getConnection();
         if (exists(user)) {
-            PreparedStatement statement = conn.prepareStatement("UPDATE cf_users SET user_username = ?, user_password = ?, user_address = ?, user_portChat = ?, user_portFile = ?, user_portRtt = ?, user_status = ? WHERE user_id = ?;");
+            PreparedStatement statement = conn.prepareStatement("UPDATE cf_users SET user_username = ?, user_password = ?, user_address = ?, user_portChat = ?, user_portFile = ?, user_portRtt = ?, user_status = 1, user_lastSeen = CURRENT_TIMESTAMP WHERE user_id = ?;");
             statement.setString(1, user.getUsername());
             statement.setString(2, user.getPassword());
             statement.setString(3, user.getAddress());
             statement.setInt(4, user.getPortChat());
             statement.setInt(5, user.getPortFile());
             statement.setInt(6, user.getPortRtt());
-            statement.setBoolean(7, user.getStatus());
-            statement.setInt(8, user.getId());
+            statement.setInt(7, user.getId());
             statement.executeUpdate();
         }
 

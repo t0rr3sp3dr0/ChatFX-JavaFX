@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="server.db" uuid="de014f7c-4b35-472c-bec0-f24f77a58b98">
+    <data-source source="LOCAL" name="server.db" uuid="4e3880d2-9edc-4086-babc-d043ad9ba706">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$USER_HOME$/.local/ChatFX/server.db</jdbc-url>
+      <jdbc-url>jdbc:sqlite:$USER_HOME$/.local/share/ChatFX/server.db</jdbc-url>
       <driver-properties>
         <property name="enable_load_extension" value="true" />
       </driver-properties>

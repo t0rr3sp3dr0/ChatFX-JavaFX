@@ -35,19 +35,19 @@ public class Utilities {
             return Paths.get(System.getProperty("user.home"), ".local", "share").toString();
     }
 
-    public static String MD5(String password) throws NoSuchAlgorithmException {
-        MessageDigest m = MessageDigest.getInstance("MD5");
-        m.update(password.getBytes(), 0, password.length());
-        return stringHexa(m.digest());
+    public static String md5(String s) throws NoSuchAlgorithmException {
+        MessageDigest messageDigest = MessageDigest.getInstance("md5");
+        messageDigest.update(s.getBytes(), 0, s.length());
+        return Utilities.hexString(messageDigest.digest());
     }
 
-    private static String stringHexa(byte[] bytes) {
+    private static String hexString(byte[] bytes) {
         StringBuilder s = new StringBuilder();
-        for (int i = 0; i < bytes.length; i++) {
-            int parteAlta = ((bytes[i] >> 4) & 0xf) << 4;
-            int parteBaixa = bytes[i] & 0xf;
-            if (parteAlta == 0) s.append('0');
-            s.append(Integer.toHexString(parteAlta | parteBaixa));
+        for (byte aByte : bytes) {
+            int upperBound = ((aByte >> 4) & 0xf) << 4;
+            int lowerBound = aByte & 0xf;
+            if (upperBound == 0) s.append('0');
+            s.append(Integer.toHexString(upperBound | lowerBound));
         }
         return s.toString();
     }

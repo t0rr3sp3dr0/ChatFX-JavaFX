@@ -2,6 +2,7 @@ package systems.singularity.chatfx.server.controllers;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
@@ -45,9 +46,15 @@ public class ServerController implements Initializable {
         new Thread(() -> {
             //noinspection InfiniteLoopStatement
             while (true) {
-                Platform.runLater(ServerController.this::updateTable);
                 try {
-                    Thread.sleep(2000);
+                    final ObservableList<User> users = FXCollections.observableArrayList(UserRepository.getInstance().getAll());
+                    Platform.runLater(() -> ServerController.this.updateTable(users));
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -55,12 +62,8 @@ public class ServerController implements Initializable {
         }).start();
     }
 
-    private void updateTable() {
-        try {
-            tvUsers.setItems(FXCollections.observableArrayList(UserRepository.getInstance().getAll()));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    private void updateTable(ObservableList<User> users) {
+        tvUsers.setItems(users);
 
         tcUsername.setCellValueFactory(new PropertyValueFactory<>("username"));
         tcIp.setCellValueFactory(new PropertyValueFactory<>("address"));

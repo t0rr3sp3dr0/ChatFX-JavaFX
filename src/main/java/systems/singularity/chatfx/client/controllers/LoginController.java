@@ -16,6 +16,7 @@ import systems.singularity.chatfx.util.java.Utilities;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +56,7 @@ public class LoginController implements Initializable {
                         inetAddress = InetAddress.getByName(tf_ip.getText());
                         port = Integer.parseInt(tf_port.getText());
                         //ajustar para o RDT
-                        String password = Utilities.MD5(tf_pass.getText());
+                        String password = Utilities.md5(tf_pass.getText());
                         Map<String, String> map = new HashMap<>();
                         map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
                         map.put("Pragma", "login;chat");
@@ -143,6 +144,12 @@ public class LoginController implements Initializable {
     private void login() {
         if (this.logged[0] && this.logged[1] && this.logged[2]) {
             this.logged = new boolean[3];
+
+            try {
+                Singleton.getInstance().setToken(new String(Base64.getEncoder().encode((tf_user.getText() + ":" + Utilities.md5(tf_pass.getText())).getBytes())));
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
 
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/main.fxml"));

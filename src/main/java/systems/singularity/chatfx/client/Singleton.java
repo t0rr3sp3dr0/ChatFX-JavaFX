@@ -17,6 +17,7 @@ public class Singleton extends HashMap<String, Object> {
     private final Map<InetAddress, RDT.Receiver.OnReceiveListener> fileOnReceiveListeners = new HashMap<>();
     private RDT.Receiver chatReceiver = null;
     private RDT.Receiver fileReceiver = null;
+    private String token = null;
 
     private Singleton() {
     }
@@ -65,5 +66,13 @@ public class Singleton extends HashMap<String, Object> {
 
         if (this.fileReceiver != null)
             this.fileReceiver.setOnReceiveListener(address, onReceiveListener);
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }
