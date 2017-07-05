@@ -1,5 +1,6 @@
 package systems.singularity.chatfx.client.controllers;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -59,8 +60,10 @@ public class DiscardModuleController implements Initializable {
         new Thread(() -> {
             //noinspection InfiniteLoopStatement
             while (true) {
-                DiscardModuleController.this.senderLossCountLabel.setText(String.format("%d", Variables.senderLossCount));
-                DiscardModuleController.this.receiverLossCountLabel.setText(String.format("%d", Variables.receiverLossCount));
+                Platform.runLater(() -> {
+                    DiscardModuleController.this.senderLossCountLabel.setText(String.format("%d", Variables.senderLossCount));
+                    DiscardModuleController.this.receiverLossCountLabel.setText(String.format("%d", Variables.receiverLossCount));
+                });
 
                 try {
                     Thread.sleep(1000);
