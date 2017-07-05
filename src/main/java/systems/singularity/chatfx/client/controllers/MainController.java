@@ -44,14 +44,12 @@ public class MainController implements Initializable {
     private TabPane tabPane;
 
     private Node discardModuleNode;
-    private DiscardModuleController discardModuleController;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Platform.runLater(() -> {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/discard_module.fxml"));
-                MainController.this.discardModuleController = fxmlLoader.getController();
                 MainController.this.discardModuleNode = fxmlLoader.load();
             } catch (IOException e) {
                 e.printStackTrace();

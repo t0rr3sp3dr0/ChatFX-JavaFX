@@ -73,8 +73,8 @@ public class ChatController implements Initializable {
         Platform.runLater(() -> {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/receive_file.fxml"));
-                ChatController.this.receiveFileController = fxmlLoader.getController();
                 ChatController.this.receiveFileNode = fxmlLoader.load();
+                ChatController.this.receiveFileController = fxmlLoader.getController();
                 ChatController.this.receiveFileDialog = new Dialog();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -100,13 +100,14 @@ public class ChatController implements Initializable {
                     Platform.runLater(() -> ChatController.this.receiveFileDialog.hide());
                 else
                     Platform.runLater(() -> {
-                        this.receiveFileController.getProgressBar().setProgress(progress);
-                        this.receiveFileController.getProgressLabel().setText(String.format("%.2f%%", progress * 100));
-                        this.receiveFileController.getEtaLabel().setText(String.format("%.0fs", remainingTime));
-                        this.receiveFileController.getSpeedLabel().setText(String.format("%.2f MB/s", speed / (1024 * 1024)));
+                        ChatController.this.receiveFileController.getProgressBar().setProgress(progress);
+                        ChatController.this.receiveFileController.getProgressLabel().setText(String.format("%.2f%%", progress * 100));
+                        ChatController.this.receiveFileController.getEtaLabel().setText(String.format("%.0fs", remainingTime));
+                        ChatController.this.receiveFileController.getSpeedLabel().setText(String.format("%.2f MB/s", speed / (1024 * 1024)));
 
-                        this.receiveFileDialog.setHeaderText("Receiving File");
-                        this.receiveFileDialog.show();
+                        ChatController.this.receiveFileDialog.getDialogPane().setContent(ChatController.this.receiveFileNode);
+                        ChatController.this.receiveFileDialog.setHeaderText("Receiving File");
+                        ChatController.this.receiveFileDialog.show();
                     });
             });
         } catch (UnknownHostException e) {
