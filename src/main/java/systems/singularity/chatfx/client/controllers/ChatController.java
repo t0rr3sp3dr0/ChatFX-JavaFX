@@ -108,6 +108,7 @@ public class ChatController implements Initializable {
                             if (item.getAuthorId().equals(Singleton.getInstance().getUser().getId())) {
                                 setAlignment(Pos.CENTER_RIGHT);
                                 setTooltip(new Tooltip(item.getStatus()));
+                                setStyle("-fx-background-color: yellow");
                             } else
                                 setTextAlignment(TextAlignment.LEFT);
                         }
