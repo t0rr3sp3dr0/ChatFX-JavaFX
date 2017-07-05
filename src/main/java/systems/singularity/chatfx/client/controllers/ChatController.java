@@ -184,7 +184,7 @@ public class ChatController implements Initializable {
                         Message message = new Message()
                                 .authorId(Singleton.getInstance().getUser().getId())
                                 .content(content.trim())
-                                .groupId(ChatController.this.user.getId())
+                                .chatId(ChatController.this.user.getId())
                                 .status("processing")
                                 .time(DateTime.now().toString());
 
@@ -244,7 +244,7 @@ public class ChatController implements Initializable {
 
         new Thread(() -> {
             try {
-                List<Message> messages = Arrays.stream((Message[]) MessageRepository.getInstance().getAll().toArray()).filter(message -> message.getGroupId().equals(ChatController.this.user.getId())).sorted((m1, m2) -> (int) (DateTime.parse(m2.getTime()).getMillis() - DateTime.parse(m1.getTime()).getMillis())).collect(Collectors.toList());
+                List<Message> messages = Arrays.stream((Message[]) MessageRepository.getInstance().getAll().toArray()).filter(message -> message.getChatId().equals(ChatController.this.user.getId())).sorted((m1, m2) -> (int) (DateTime.parse(m2.getTime()).getMillis() - DateTime.parse(m1.getTime()).getMillis())).collect(Collectors.toList());
                 Platform.runLater(() -> messagesList.setItems(FXCollections.observableArrayList(messages)));
 
                 Thread.sleep(1000);
