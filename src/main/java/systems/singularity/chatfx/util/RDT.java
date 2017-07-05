@@ -118,6 +118,9 @@ public final class RDT {
         public Integer ack = -1;
         public Integer fin = -1;
         public Integer repeatedCount = 0;
+        public Integer receivedCount = 0;
+        public Integer threshold = 32;
+
 
         public Connection() {
             this.packets = new PriorityQueue<>();
@@ -244,15 +247,21 @@ public final class RDT {
         public void onACK(final int seq) {
             if (!this.connection.window.contains(seq)) {
                 System.err.printf("DEBUG: Repeated\tACK(%d)\n", seq);
+                this.connection.receivedCount = 0;
                 if (this.connection.repeatedCount == 3) {
                     this.connection.repeatedCount = 0;
-                    this.connection.window.resize(0.875, 0);
+                    this.connection.receivedCount = 0;
+                    this.connection.window.resize(0.5, 0);
                 }
             } else {
                 this.connection.ack = Math.max(this.connection.ack, seq);
                 this.connection.repeatedCount = 0;
+                this.connection.receivedCount++;
                 this.connection.window.removeIf(integer -> integer <= seq);
-                this.connection.window.resize(1, 1);
+                if (false && this.connection.window.getCapacity() < this.connection.threshold && this.connection.receivedCount == this.connection.window.getCapacity()) {
+                    this.connection.receivedCount = 0;
+                    this.connection.window.resize(1, 1);
+                }
                 System.err.printf("DEBUG: Received\tACK(%d)\n", seq);
             }
         }
@@ -277,6 +286,11 @@ public final class RDT {
                             if (Sender.this.connection.ack < packet.seq)
                                 try {
                                     System.err.printf("DEBUG: Timeout\tSEQ(%d)\n", packet.seq);
+
+                                    if (Sender.this.connection.window.getCapacity() >= Sender.this.connection.threshold)
+                                        Sender.this.connection.threshold = Sender.this.connection.window.getCapacity() / 2;
+                                    Sender.this.connection.window.resize(0, 0);
+
                                     Sender.this.socket.send(new DatagramPacket(packet.bytes, packet.bytes.length, Sender.this.address, Sender.this.port));
                                 } catch (IOException e) {
                                     e.printStackTrace();
