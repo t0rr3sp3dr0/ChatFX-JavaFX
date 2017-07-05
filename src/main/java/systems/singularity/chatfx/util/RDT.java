@@ -227,9 +227,12 @@ public final class RDT {
                             socket.send(packet);
 
                             System.err.printf("DEBUG: message\t\t%d\tFIN(%b)\tSEQ(%d)\n", Arrays.hashCode(message), fin, seq);
-                        } else
+                        } else {
+                            synchronized (Variables.class) {
+                                Variables.senderLossCount++;
+                            }
                             System.err.printf("DEBUG: message\t\t%d\tDISPOSED\tSEQ(%d)\n", Arrays.hashCode(message), seq);
-
+                        }
 
                         this.timer.watch(new Packet(seq, payload));
                     }
@@ -371,6 +374,9 @@ public final class RDT {
                     final Integer port = ((payload[6] << 8) & 0xFF00) | (payload[7] & 0x00FF);
 
                     if (RDT.dispose(Variables.receiverLossProbability)) {
+                        synchronized (Variables.class) {
+                            Variables.receiverLossCount++;
+                        }
                         System.out.printf("DEBUG: message\t\t%d\tDISPOSED\tSEQ(%d)\n", packet.getAddress().hashCode(), seq);
                         continue;
                     }

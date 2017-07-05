@@ -84,6 +84,12 @@ public class MainController implements Initializable {
         discardModuleMenuItem.setOnAction(event -> {
             Dialog dialog = new Dialog();
             dialog.getDialogPane().setContent(discardModuleNode);
+            dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+
+            Node closeButton = dialog.getDialogPane().lookupButton(ButtonType.CLOSE);
+            closeButton.managedProperty().bind(closeButton.visibleProperty());
+            closeButton.setVisible(false);
+
             dialog.show();
         });
 
