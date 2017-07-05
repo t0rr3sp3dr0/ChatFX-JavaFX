@@ -9,6 +9,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
 import systems.singularity.chatfx.client.Singleton;
 import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.util.Protocol;
@@ -81,8 +82,10 @@ public class MainController implements Initializable {
 
         discardModuleMenuItem.setOnAction(event -> {
             Dialog dialog = new Dialog();
+            dialog.initModality(Modality.NONE);
             dialog.getDialogPane().setContent(discardModuleNode);
             dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+
 
             Node closeButton = dialog.getDialogPane().lookupButton(ButtonType.CLOSE);
             closeButton.managedProperty().bind(closeButton.visibleProperty());

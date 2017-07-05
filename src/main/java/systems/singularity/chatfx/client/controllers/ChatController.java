@@ -8,6 +8,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import org.joda.time.DateTime;
 import systems.singularity.chatfx.client.Networking;
 import systems.singularity.chatfx.client.Singleton;
@@ -63,6 +64,7 @@ public class ChatController implements Initializable {
     private Dialog receiveFileDialog;
     private ReceiveFileController receiveFileController;
 
+    private final boolean[] downloadInProgress = {false};
 
     public ChatController(User user) {
         this.user = user;
@@ -76,6 +78,10 @@ public class ChatController implements Initializable {
                 ChatController.this.receiveFileNode = fxmlLoader.load();
                 ChatController.this.receiveFileController = fxmlLoader.getController();
                 ChatController.this.receiveFileDialog = new Dialog();
+
+                ChatController.this.receiveFileDialog.setTitle("Receiving File");
+                ChatController.this.receiveFileDialog.initModality(Modality.NONE);
+                ChatController.this.receiveFileDialog.getDialogPane().setContent(ChatController.this.receiveFileNode);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -105,17 +111,28 @@ public class ChatController implements Initializable {
 
         try {
             Networking.receiveFile(this.user, (file, progress, speed, remainingTime) -> Platform.runLater(() -> {
-                if (progress == 1)
-                    ChatController.this.receiveFileDialog.hide();
-                else {
+                if (!downloadInProgress[0]) {
+                    downloadInProgress[0] = true;
+
+                    ChatController.this.receiveFileDialog.setHeaderText(file.getName());
+                    ChatController.this.receiveFileDialog.show();
+                }
+
+                if (progress == 1) {
+                    downloadInProgress[0] = false;
+
+                    ChatController.this.receiveFileDialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+                    Node closeButton = ChatController.this.receiveFileDialog.getDialogPane().lookupButton(ButtonType.CLOSE);
+                    closeButton.managedProperty().bind(closeButton.visibleProperty());
+                    closeButton.setVisible(false);
+
+                    ChatController.this.receiveFileDialog.close();
+                } else {
                     ChatController.this.receiveFileController.getProgressBar().setProgress(progress);
                     ChatController.this.receiveFileController.getProgressLabel().setText(String.format("%.2f%%", progress * 100));
                     ChatController.this.receiveFileController.getEtaLabel().setText(String.format("%.0fs", remainingTime));
                     ChatController.this.receiveFileController.getSpeedLabel().setText(String.format("%.2f MB/s", speed / (1024 * 1024)));
 
-                    ChatController.this.receiveFileDialog.getDialogPane().setContent(ChatController.this.receiveFileNode);
-                    ChatController.this.receiveFileDialog.setHeaderText("Receiving File");
-                    ChatController.this.receiveFileDialog.show();
                 }
             }));
         } catch (UnknownHostException e) {

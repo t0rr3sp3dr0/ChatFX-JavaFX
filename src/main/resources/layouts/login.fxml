@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox maxHeight="183.0" maxWidth="285.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="183.0" prefWidth="285.0"
-      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="systems.singularity.chatfx.client.controllers.LoginController">
+
+<VBox maxHeight="183.0" maxWidth="285.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="183.0" prefWidth="285.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systems.singularity.chatfx.client.controllers.LoginController">
     <children>
       <HBox maxHeight="31.0" minWidth="256.0" prefHeight="31.0" prefWidth="200.0">
          <children>
@@ -14,8 +14,7 @@
                   <Insets />
                </HBox.margin>
             </Label>
-             <TextField fx:id="tf_ip" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0"
-                        promptText="192.168.0.1" text="172.20.4.13"/>
+            <TextField fx:id="tf_ip" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0" promptText="192.168.0.1" text="172.20.4.13" />
          </children>
          <VBox.margin>
             <Insets bottom="2.0" left="4.0" right="4.0" top="4.0" />
@@ -28,8 +27,7 @@
                   <Insets />
                </HBox.margin>
             </Label>
-             <TextField fx:id="tf_port" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0"
-                        promptText="65535" text="1234">
+            <TextField fx:id="tf_port" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0" promptText="65535" text="1234">
                <HBox.margin>
                   <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
                </HBox.margin>
@@ -46,8 +44,7 @@
                         <Insets />
                     </HBox.margin>
                 </Label>
-                <TextField fx:id="tf_user" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0"
-                           promptText="user" text="g1c14"/>
+                <TextField fx:id="tf_user" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0" promptText="user" text="g1c12" />
             </children>
             <VBox.margin>
                 <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
@@ -60,8 +57,7 @@
                         <Insets />
                     </HBox.margin>
                 </Label>
-                <PasswordField fx:id="tf_pass" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0"
-                               promptText="password" text="12345678"/>
+                <PasswordField fx:id="tf_pass" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0" promptText="password" text="12345678" />
             </children>
             <VBox.margin>
                 <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
