@@ -13,6 +13,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import org.joda.time.DateTime;
@@ -164,9 +165,13 @@ public class ChatController implements Initializable {
                     } else {
                         setAlignment(Pos.CENTER_LEFT);
 
-                        Text text = new Text(item.getAuthorId().toString());
-                        text.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, Font.getDefault().getSize()));
-                        setText(text.getText());
+                        Text senderText = new Text(item.getAuthorId().toString());
+                        senderText.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, Font.getDefault().getSize()));
+
+                        Text messageText = new Text(item.getAuthorId().toString());
+
+                        TextFlow textFlow = new TextFlow(senderText, messageText);
+                        setGraphic(textFlow);
                     }
                 }
             }
