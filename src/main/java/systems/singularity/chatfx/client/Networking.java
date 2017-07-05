@@ -60,7 +60,7 @@ public final class Networking {
         Gson gson = new GsonBuilder().create();
         String json = gson.toJson(message);
 
-        Protocol.Sender.sendMessage(RDT.getSender(InetAddress.getByName(user.getAddress()), user.getPortFile()), headers, json);
+        Protocol.Sender.sendMessage(RDT.getSender(InetAddress.getByName(user.getAddress()), user.getPortChat()), headers, json);
     }
 
     public static void receiveMessage(@NotNull final User user, @Nullable final OnMessageListener onMessageListener) throws UnknownHostException {
