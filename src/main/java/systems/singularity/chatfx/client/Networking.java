@@ -31,7 +31,7 @@ public final class Networking {
             final double remainingTime = (file.length() - bytesSent) / speed;
 
             if (callback != null)
-                callback.onCalback(progress, speed, remainingTime);
+                callback.onCallback(progress, speed, remainingTime);
         })).start();
     }
 
@@ -47,7 +47,7 @@ public final class Networking {
                 final double remainingTime = (contentLength - bytesReceived) / speed;
 
                 if (callback != null)
-                    callback.onCalback(progress, speed, remainingTime);
+                    callback.onCallback(progress, speed, remainingTime);
             }));
             downloader.add(Protocol.extractData(bytes));
         });
@@ -72,15 +72,15 @@ public final class Networking {
             Message message = gson.fromJson(new String(data), Message.class);
 
             if (onMessageListener != null)
-                onMessageListener.onMessage(message);
+                onMessageListener.onMessage(headers, message);
         });
     }
 
     public interface TransferCallback {
-        void onCalback(double progress, double speed, double remainingTime);
+        void onCallback(double progress, double speed, double remainingTime);
     }
 
     public interface OnMessageListener {
-        void onMessage(Message message);
+        void onMessage(Map<String, String> headers, Message message);
     }
 }

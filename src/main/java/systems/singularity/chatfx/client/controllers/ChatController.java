@@ -82,10 +82,18 @@ public class ChatController implements Initializable {
         });
 
         try {
-            Networking.receiveMessage(this.user, message -> {
-                Platform.runLater(() -> textArea.setText(textArea.getText() + message.getContent() + '\n'));
+            Networking.receiveMessage(this.user, (headers, message) -> {
                 try {
-                    MessageRepository.getInstance().insert(message);
+                    if (headers.get("Pragma").equals("sendMessage")) {
+                        MessageRepository.getInstance().insert(message.status("sent"));
+                        Platform.runLater(() -> textArea.setText(textArea.getText() + message.getContent() + '\n'));
+                    } else if (headers.get("Pragma").equals("ack")) {
+                        MessageRepository.getInstance().update(MessageRepository.getInstance().
+                                get(new Message().id(Integer.parseInt(headers.get("Message-ID")))).status("ack"));
+                    } else if (headers.get("Pragma").equals("seen")) {
+                        MessageRepository.getInstance().update(MessageRepository.getInstance().
+                                get(new Message().id(Integer.parseInt(headers.get("Message-ID")))).status("seen"));
+                    }
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
