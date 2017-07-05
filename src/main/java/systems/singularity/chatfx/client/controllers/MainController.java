@@ -78,7 +78,7 @@ public class MainController implements Initializable {
                         Platform.runLater(() -> tableView.setItems(FXCollections.observableArrayList(users)));
                     });
 
-                    Thread.sleep(1000);
+                    Thread.sleep(8000);
                 }
             } catch (SocketException | InterruptedException | UnknownHostException e) {
                 e.printStackTrace();

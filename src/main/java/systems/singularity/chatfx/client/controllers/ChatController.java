@@ -59,7 +59,7 @@ public class ChatController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
-            Networking.receiveMessage(this.user, message -> Platform.runLater(() -> textArea.setText(textArea.getText() + message + '\n')));
+            Networking.receiveMessage(this.user, message -> Platform.runLater(() -> textArea.setText(textArea.getText() + message.getContent() + '\n')));
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
