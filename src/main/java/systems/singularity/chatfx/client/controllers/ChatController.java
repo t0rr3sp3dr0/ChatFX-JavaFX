@@ -245,8 +245,10 @@ public class ChatController implements Initializable {
             while (true)
                 try {
                     List<Message> messages = MessageRepository.getInstance().getAll().stream().filter(message -> message.getChatId().equals(Singleton.getInstance().getUser().hashCode() & ChatController.this.user.hashCode())).collect(Collectors.toList());
-                    System.err.printf("MESSAGES: %s", messages);
-                    Platform.runLater(() -> messagesList.setItems(FXCollections.observableArrayList(messages)));
+                    Platform.runLater(() -> {
+                        ChatController.this.messagesList.setItems(FXCollections.observableArrayList(messages));
+                        ChatController.this.messagesList.scrollTo(messages.size() - 1);
+                    });
 
                     Thread.sleep(1000);
                 } catch (SQLException | InterruptedException e) {
