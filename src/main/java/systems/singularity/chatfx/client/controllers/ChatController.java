@@ -165,10 +165,11 @@ public class ChatController implements Initializable {
                                 .authorId(Singleton.getInstance().getUser().getId());
 
                         try {
-                            List<Message> messages = MessageRepository.getInstance().getAll();
-                            Platform.runLater(() -> listView.setItems(FXCollections.observableArrayList(messages)));
                             Networking.sendMessage(message.id(message.hashCode()), ChatController.this.user);
                             MessageRepository.getInstance().insert(message.status(""));
+
+                            List<Message> messages = MessageRepository.getInstance().getAll();
+                            Platform.runLater(() -> listView.setItems(FXCollections.observableArrayList(messages)));
                         } catch (UnknownHostException | SocketException | InterruptedException | SQLException e) {
                             e.printStackTrace();
                         }
