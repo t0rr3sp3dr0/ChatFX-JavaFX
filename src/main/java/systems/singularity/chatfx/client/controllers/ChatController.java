@@ -10,7 +10,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import org.joda.time.DateTime;
@@ -81,7 +80,6 @@ public class ChatController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         Platform.runLater(() -> {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/receive_file.fxml"));
@@ -92,28 +90,6 @@ public class ChatController implements Initializable {
                 ChatController.this.receiveFileDialog.setTitle("Receiving File");
                 ChatController.this.receiveFileDialog.initModality(Modality.NONE);
                 ChatController.this.receiveFileDialog.getDialogPane().setContent(ChatController.this.receiveFileNode);
-
-                messagesList.setCellFactory(param -> new ListCell<Message>() {
-                    @Override
-                    protected void updateItem(Message item, boolean empty) {
-                        super.updateItem(item, empty);
-
-                        if (item == null || empty) {
-                            setDisable(true);
-                            setText(null);
-                        } else {
-                            setDisable(false);
-                            setText(item.getContent());
-
-                            if (item.getAuthorId().equals(Singleton.getInstance().getUser().getId())) {
-                                setAlignment(Pos.CENTER_RIGHT);
-                                setTooltip(new Tooltip(item.getStatus()));
-                                setStyle("-fx-background-color: yellow");
-                            } else
-                                setTextAlignment(TextAlignment.LEFT);
-                        }
-                    }
-                });
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -166,6 +142,27 @@ public class ChatController implements Initializable {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
+
+        messagesList.setCellFactory(param -> new ListCell<Message>() {
+            @Override
+            protected void updateItem(Message item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (item == null || empty) {
+                    setDisable(true);
+                    setText(null);
+                } else {
+                    setDisable(false);
+                    setText(item.getContent());
+
+                    if (item.getAuthorId().equals(Singleton.getInstance().getUser().getId())) {
+                        setAlignment(Pos.CENTER_RIGHT);
+                        setTooltip(new Tooltip(item.getStatus()));
+                    } else
+                        setAlignment(Pos.CENTER_LEFT);
+                }
+            }
+        });
 
         textField.setOnKeyPressed(event -> {
             if (event.getCode().equals(KeyCode.ENTER)) {
@@ -244,15 +241,17 @@ public class ChatController implements Initializable {
         });
 
         new Thread(() -> {
-            try {
-                List<Message> messages = MessageRepository.getInstance().getAll().stream().filter(message -> message.getChatId().equals(Singleton.getInstance().getUser().hashCode() & ChatController.this.user.hashCode())).collect(Collectors.toList());
-                System.err.printf("MESSAGES: %s", messages);
-                Platform.runLater(() -> messagesList.setItems(FXCollections.observableArrayList(messages)));
+            //noinspection InfiniteLoopStatement
+            while (true)
+                try {
+                    List<Message> messages = MessageRepository.getInstance().getAll().stream().filter(message -> message.getChatId().equals(Singleton.getInstance().getUser().hashCode() & ChatController.this.user.hashCode())).collect(Collectors.toList());
+                    System.err.printf("MESSAGES: %s", messages);
+                    Platform.runLater(() -> messagesList.setItems(FXCollections.observableArrayList(messages)));
 
-                Thread.sleep(1000);
-            } catch (SQLException | InterruptedException e) {
-                e.printStackTrace();
-            }
+                    Thread.sleep(1000);
+                } catch (SQLException | InterruptedException e) {
+                    e.printStackTrace();
+                }
         }).start();
     }
 }
