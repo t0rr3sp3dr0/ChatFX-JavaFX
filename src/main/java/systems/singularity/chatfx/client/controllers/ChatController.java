@@ -10,10 +10,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import org.joda.time.DateTime;
@@ -163,15 +159,16 @@ public class ChatController implements Initializable {
                         setTooltip(new Tooltip(item.getStatus()));
                         setText(item.getContent());
                     } else {
-                        setAlignment(Pos.CENTER_LEFT);
+                        try {
+                            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/message_row.fxml"));
+                            setGraphic(fxmlLoader.load());
 
-                        Text senderText = new Text(item.getAuthorId().toString());
-                        senderText.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, Font.getDefault().getSize()));
-
-                        Text messageText = new Text(item.getAuthorId().toString());
-
-                        TextFlow textFlow = new TextFlow(senderText, messageText);
-                        setGraphic(textFlow);
+                            MessageRowController messageRowController = fxmlLoader.getController();
+                            messageRowController.getSenderLabel().setText(ChatController.this.user.getUsername());
+                            messageRowController.getMessageLabel().setText(item.getContent());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
