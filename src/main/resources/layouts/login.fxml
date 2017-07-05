@@ -43,7 +43,7 @@
                     </HBox.margin>
                 </Label>
                 <TextField fx:id="tf_user" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0"
-                           promptText="user" text="g1c14"/>
+                           promptText="user" text="g1c12"/>
             </children>
             <VBox.margin>
                 <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />

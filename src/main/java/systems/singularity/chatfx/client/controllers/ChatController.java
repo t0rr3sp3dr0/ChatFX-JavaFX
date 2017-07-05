@@ -151,9 +151,7 @@ public class ChatController implements Initializable {
                 if (item == null || empty) {
                     setDisable(true);
                     setText(null);
-                } else {
-                    setDisable(false);
-
+                } else
                     if (item.getAuthorId().equals(Singleton.getInstance().getUser().getId())) {
                         setAlignment(Pos.CENTER_RIGHT);
                         setTooltip(new Tooltip(item.getStatus()));
@@ -165,12 +163,13 @@ public class ChatController implements Initializable {
 
                             MessageRowController messageRowController = fxmlLoader.getController();
                             messageRowController.getSenderLabel().setText(ChatController.this.user.getUsername());
+                            messageRowController.getSenderLabel().maxWidthProperty().bind(messagesList.widthProperty().add(-26));
                             messageRowController.getMessageLabel().setText(item.getContent());
+                            messageRowController.getMessageLabel().maxWidthProperty().bind(messagesList.widthProperty().add(-26));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
-                }
             }
         });
 

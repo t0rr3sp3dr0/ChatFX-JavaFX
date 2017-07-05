@@ -5,11 +5,9 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="Infinity" maxWidth="Infinity" minHeight="-Infinity"
-      minWidth="-Infinity" xmlns="http://javafx.com/javafx/8"
-      fx:controller="systems.singularity.chatfx.client.controllers.MessageRowController">
+<VBox xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="systems.singularity.chatfx.client.controllers.MessageRowController">
     <children>
-        <Label fx:id="senderLabel" text="Label">
+        <Label fx:id="senderLabel" text="Label" maxWidth="Infinity" maxHeight="Infinity">
             <font>
                 <Font name="System Bold Italic" size="13.0"/>
             </font>
@@ -17,7 +15,7 @@
                 <Insets bottom="2.0" left="4.0" right="4.0" top="4.0"/>
             </VBox.margin>
         </Label>
-        <Label fx:id="messageLabel" text="Label" wrapText="true">
+        <Label fx:id="messageLabel" text="Label" wrapText="true" maxHeight="Infinity" maxWidth="Infinity">
             <VBox.margin>
                 <Insets bottom="4.0" left="4.0" right="4.0" top="2.0"/>
             </VBox.margin>
