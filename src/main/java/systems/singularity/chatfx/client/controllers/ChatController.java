@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -105,7 +106,7 @@ public class ChatController implements Initializable {
                             setText(item.getContent());
 
                             if (item.getAuthorId().equals(Singleton.getInstance().getUser().getId())) {
-                                setTextAlignment(TextAlignment.RIGHT);
+                                setAlignment(Pos.CENTER_RIGHT);
                                 setTooltip(new Tooltip(item.getStatus()));
                             } else
                                 setTextAlignment(TextAlignment.LEFT);
@@ -183,7 +184,7 @@ public class ChatController implements Initializable {
                         Message message = new Message()
                                 .authorId(Singleton.getInstance().getUser().getId())
                                 .content(content)
-                                .chatId(Singleton.getInstance().getUser().getId() & ChatController.this.user.getId())
+                                .chatId(Singleton.getInstance().getUser().hashCode() & ChatController.this.user.hashCode())
                                 .status("processing")
                                 .time(DateTime.now().toString());
 
@@ -243,7 +244,7 @@ public class ChatController implements Initializable {
 
         new Thread(() -> {
             try {
-                List<Message> messages = MessageRepository.getInstance().getAll().stream().filter(message -> message.getChatId().equals(Singleton.getInstance().getUser().getId() & ChatController.this.user.getId())).collect(Collectors.toList());
+                List<Message> messages = MessageRepository.getInstance().getAll().stream().filter(message -> message.getChatId().equals(Singleton.getInstance().getUser().hashCode() & ChatController.this.user.hashCode())).collect(Collectors.toList());
                 System.err.printf("MESSAGES: %s", messages);
                 Platform.runLater(() -> messagesList.setItems(FXCollections.observableArrayList(messages)));
 
