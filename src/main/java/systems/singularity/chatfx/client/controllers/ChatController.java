@@ -10,6 +10,9 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import org.joda.time.DateTime;
@@ -153,13 +156,18 @@ public class ChatController implements Initializable {
                     setText(null);
                 } else {
                     setDisable(false);
-                    setText(item.getContent());
 
                     if (item.getAuthorId().equals(Singleton.getInstance().getUser().getId())) {
                         setAlignment(Pos.CENTER_RIGHT);
                         setTooltip(new Tooltip(item.getStatus()));
-                    } else
+                        setText(item.getContent());
+                    } else {
                         setAlignment(Pos.CENTER_LEFT);
+
+                        Text text = new Text(item.getAuthorId().toString());
+                        text.setFont(Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, Font.getDefault().getSize()));
+                        setText(text.getText());
+                    }
                 }
             }
         });
