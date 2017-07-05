@@ -146,6 +146,7 @@ public class LoginController implements Initializable {
             this.logged = new boolean[3];
 
             try {
+                Singleton.getInstance().setUsername(tf_user.getText());
                 Singleton.getInstance().setToken(new String(Base64.getEncoder().encode((tf_user.getText() + ":" + Utilities.md5(tf_pass.getText())).getBytes())));
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();

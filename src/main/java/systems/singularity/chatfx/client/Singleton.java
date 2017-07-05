@@ -18,6 +18,7 @@ public class Singleton extends HashMap<String, Object> {
     private RDT.Receiver chatReceiver = null;
     private RDT.Receiver fileReceiver = null;
     private String token = null;
+    private String username = null;
 
     private Singleton() {
     }
@@ -74,5 +75,13 @@ public class Singleton extends HashMap<String, Object> {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }
