@@ -1,13 +1,11 @@
 package systems.singularity.chatfx.client.db;
 
+import org.joda.time.DateTime;
 import systems.singularity.chatfx.interfaces.Repository;
 import systems.singularity.chatfx.models.Message;
 import systems.singularity.chatfx.server.db.Database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +31,7 @@ public class MessageRepository implements Repository<Message> {
         statement.setInt(1, message.getGroupId());
         statement.setString(2, message.getContent());
         statement.setString(3, message.getStatus());
-        statement.setTime(4, message.getTime());
+        statement.setTime(4, new Time(message.getTime().getMillis()));
         statement.setInt(5, message.getAuthorId());
         statement.executeUpdate();
     }
@@ -48,7 +46,7 @@ public class MessageRepository implements Repository<Message> {
             statement.setInt(1, message.getGroupId());
             statement.setString(2, message.getContent());
             statement.setString(3, message.getStatus());
-            statement.setTime(4, message.getTime());
+            statement.setTime(4, new Time(message.getTime().getMillis()));
             statement.setInt(5, message.getAuthorId());
             statement.setInt(6, message.getId());
             statement.executeUpdate();
@@ -72,14 +70,15 @@ public class MessageRepository implements Repository<Message> {
         ResultSet rs = statement.executeQuery();
         ArrayList<Message> messages = new ArrayList<>();
         while (rs.next())
-            messages.add(new Message(
-                    rs.getInt("message_id"),
-                    rs.getInt("message_group_id"),
-                    rs.getString("message_content"),
-                    rs.getString("message_status"),
-                    rs.getTime("message_timestamp"),
-                    rs.getInt("message_author_id")
-            ));
+            messages.add(
+                    new Message()
+                            .id(rs.getInt("message_id"))
+                            .groupId(rs.getInt("message_group_id"))
+                            .content(rs.getString("message_content"))
+                            .status(rs.getString("message_status"))
+                            .time(new DateTime(rs.getTime("message_timestamp")))
+                            .authorId(rs.getInt("message_author_id"))
+            );
         return messages;
     }
 
@@ -89,15 +88,14 @@ public class MessageRepository implements Repository<Message> {
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_messages WHERE message_id = ?;");
         statement.setInt(1, message.getId());
         ResultSet rs = statement.executeQuery();
-        message = null;
-        while (rs.next())
-            message = new Message(
-                    rs.getInt("message_id"),
-                    rs.getInt("message_group_id"),
-                    rs.getString("message_content"),
-                    rs.getString("message_status"),
-                    rs.getTime("message_timestamp"),
-                    rs.getInt("message_author_id"));
-        return message;
+        rs.next();
+
+        return new Message()
+                .id(rs.getInt("message_id"))
+                .groupId(rs.getInt("message_group_id"))
+                .content(rs.getString("message_content"))
+                .status(rs.getString("message_status"))
+                .time(new DateTime(rs.getTime("message_timestamp")))
+                .authorId(rs.getInt("message_author_id"));
     }
 }

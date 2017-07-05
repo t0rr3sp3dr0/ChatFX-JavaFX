@@ -65,11 +65,12 @@ public class MemberRepository implements Repository<Member> {
         ResultSet rs = statement.executeQuery();
         ArrayList<Member> members = new ArrayList<>();
         while (rs.next())
-            members.add(new Member(
-                    rs.getInt("member_id"),
-                    rs.getInt("member_group_id"),
-                    rs.getInt("member_user_id")
-            ));
+            members.add(
+                    new Member()
+                            .id(rs.getInt("member_id"))
+                            .groupId(rs.getInt("member_group_id"))
+                            .userId(rs.getInt("member_user_id"))
+            );
         return members;
     }
 
@@ -79,12 +80,11 @@ public class MemberRepository implements Repository<Member> {
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_members WHERE member_id = ?;");
         statement.setInt(1, member.getId());
         ResultSet rs = statement.executeQuery();
-        member = null;
-        while (rs.next())
-            member = new Member(
-                    rs.getInt("member_id"),
-                    rs.getInt("member_group_id"),
-                    rs.getInt("member_user_id"));
-        return member;
+        rs.next();
+
+        return new Member()
+                .id(rs.getInt("member_id"))
+                .groupId(rs.getInt("member_group_id"))
+                .userId(rs.getInt("member_user_id"));
     }
 }

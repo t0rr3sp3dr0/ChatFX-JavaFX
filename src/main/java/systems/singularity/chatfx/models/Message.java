@@ -30,13 +30,16 @@ public class Message {
   private String content = null;
 
   @SerializedName("status")
-  private Boolean status = null;
+  private String status = null;
 
   @SerializedName("time")
   private DateTime time = null;
 
   @SerializedName("authorId")
   private Integer authorId = null;
+
+  @SerializedName("groupId")
+  private Integer groupId = null;
 
   public Message id(Integer id) {
     this.id = id;
@@ -74,7 +77,7 @@ public class Message {
     this.content = content;
   }
 
-  public Message status(Boolean status) {
+  public Message status(String status) {
     this.status = status;
     return this;
   }
@@ -84,11 +87,11 @@ public class Message {
    *
    * @return status
    **/
-  public Boolean getStatus() {
+  public String getStatus() {
     return status;
   }
 
-  public void setStatus(Boolean status) {
+  public void setStatus(String status) {
     this.status = status;
   }
 
@@ -128,6 +131,24 @@ public class Message {
     this.authorId = authorId;
   }
 
+  public Message groupId(Integer groupId) {
+    this.groupId = groupId;
+    return this;
+  }
+
+  /**
+   * Get groupId
+   *
+   * @return groupId
+   **/
+  public Integer getGroupId() {
+    return groupId;
+  }
+
+  public void setGroupId(Integer groupId) {
+    this.groupId = groupId;
+  }
+
 
   @Override
   public boolean equals(Object o) {
@@ -142,12 +163,13 @@ public class Message {
             Objects.equals(this.content, message.content) &&
             Objects.equals(this.status, message.status) &&
             Objects.equals(this.time, message.time) &&
-            Objects.equals(this.authorId, message.authorId);
+            Objects.equals(this.authorId, message.authorId) &&
+            Objects.equals(this.groupId, message.groupId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, content, status, time, authorId);
+    return Objects.hash(id, content, status, time, authorId, groupId);
   }
 
 
@@ -161,6 +183,7 @@ public class Message {
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    time: ").append(toIndentedString(time)).append("\n");
     sb.append("    authorId: ").append(toIndentedString(authorId)).append("\n");
+    sb.append("    groupId: ").append(toIndentedString(groupId)).append("\n");
     sb.append("}");
     return sb.toString();
   }

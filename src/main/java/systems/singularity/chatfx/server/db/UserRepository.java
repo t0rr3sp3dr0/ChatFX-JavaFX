@@ -85,16 +85,17 @@ public class UserRepository implements Repository<User> {
         ResultSet rs = statement.executeQuery();
         ArrayList<User> users = new ArrayList<>();
         while (rs.next())
-            users.add(new User(
-                    rs.getInt("user_id"),
-                    rs.getString("user_username"),
-                    rs.getString("user_password"),
-                    rs.getString("user_address"),
-                    rs.getInt("user_portChat"),
-                    rs.getInt("user_portFile"),
-                    rs.getInt("user_portRtt"),
-                    rs.getBoolean("user_status")
-            ));
+            users.add(
+                    new User()
+                            .id(rs.getInt("user_id"))
+                            .username(rs.getString("user_username"))
+                            .password(rs.getString("user_password"))
+                            .address(rs.getString("user_address"))
+                            .portChat(rs.getInt("user_portChat"))
+                            .portFile(rs.getInt("user_portFile"))
+                            .portRtt(rs.getInt("user_portRtt"))
+                            .status(rs.getBoolean("user_status"))
+            );
         return users;
     }
 
@@ -104,18 +105,17 @@ public class UserRepository implements Repository<User> {
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_users WHERE user_username = ?;");
         statement.setString(1, user.getUsername());
         ResultSet rs = statement.executeQuery();
-        user = null;
-        while (rs.next())
-            user = new User(
-                    rs.getInt(1),
-                    rs.getString(2),
-                    rs.getString(3),
-                    rs.getString(4),
-                    rs.getInt(5),
-                    rs.getInt(6),
-                    rs.getInt(7),
-                    rs.getBoolean(8));
-        return user;
+        rs.next();
+
+        return new User()
+                .id(rs.getInt(1))
+                .username(rs.getString(2))
+                .password(rs.getString(3))
+                .address(rs.getString(4))
+                .portChat(rs.getInt(5))
+                .portFile(rs.getInt(6))
+                .portRtt(rs.getInt(7))
+                .status(rs.getBoolean(8));
     }
 
 }

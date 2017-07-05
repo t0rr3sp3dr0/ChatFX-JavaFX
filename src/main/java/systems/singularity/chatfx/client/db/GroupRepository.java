@@ -59,10 +59,11 @@ public class GroupRepository implements Repository<Group> {
         ResultSet rs = statement.executeQuery();
         ArrayList<Group> groups = new ArrayList<>();
         while (rs.next())
-            groups.add(new Group(
-                    rs.getInt("group_id"),
-                    rs.getString("group_name")
-            ));
+            groups.add(
+                    new Group()
+                            .id(rs.getInt("group_id"))
+                            .name(rs.getString("group_name"))
+            );
         return groups;
     }
 
@@ -72,11 +73,10 @@ public class GroupRepository implements Repository<Group> {
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_groups WHERE group_id = ?;");
         statement.setInt(1, group.getId());
         ResultSet rs = statement.executeQuery();
-        group = null;
-        while (rs.next())
-            group = new Group(
-                    rs.getInt("group_id"),
-                    rs.getString("group_name"));
-        return group;
+        rs.next();
+
+        return new Group()
+                .id(rs.getInt("group_id"))
+                .name(rs.getString("group_name"));
     }
 }
