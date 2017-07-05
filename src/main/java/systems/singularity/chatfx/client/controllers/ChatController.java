@@ -6,7 +6,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import org.joda.time.DateTime;
 import systems.singularity.chatfx.client.Networking;
 import systems.singularity.chatfx.models.Message;
 import systems.singularity.chatfx.models.User;
@@ -86,8 +85,7 @@ public class ChatController implements Initializable {
                     new Thread(() -> {
                         Message message = new Message()
                                 .id(content.hashCode())
-                                .content(content.trim())
-                                .time(new DateTime());
+                                .content(content.trim());
 
                         try {
                             Networking.sendMessage(message, ChatController.this.user);

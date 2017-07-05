@@ -213,7 +213,7 @@ public final class Protocol {
     }
 
     public static final class Sender {
-        public static synchronized void sendMessage(@NotNull RDT.Sender sender, @NotNull Map<String, String> headers, @NotNull String message) throws InterruptedException {
+        public static void sendMessage(@NotNull RDT.Sender sender, @NotNull Map<String, String> headers, @NotNull String message) throws InterruptedException {
             StringBuilder stringBuilder = new StringBuilder();
             for (String key : headers.keySet())
                 stringBuilder.append(key).append(": ").append(headers.get(key)).append('\n');

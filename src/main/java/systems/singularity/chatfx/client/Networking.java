@@ -65,8 +65,11 @@ public final class Networking {
 
     public static void receiveMessage(@NotNull final User user, @Nullable final OnMessageListener onMessageListener) throws UnknownHostException {
         Singleton.getInstance().setChatOnReceiveListener(InetAddress.getByName(user.getAddress()), (address, port, bytes) -> {
+            Map<String, String> headers = Protocol.extractHeaders(bytes);
+            byte[] data = Protocol.extractData(bytes);
+
             Gson gson = new GsonBuilder().create();
-            Message message = gson.fromJson(new String(bytes), Message.class);
+            Message message = gson.fromJson(new String(data), Message.class);
 
             if (onMessageListener != null)
                 onMessageListener.onMessage(message);

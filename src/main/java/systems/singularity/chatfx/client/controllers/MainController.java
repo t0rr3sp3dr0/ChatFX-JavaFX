@@ -66,7 +66,6 @@ public class MainController implements Initializable {
         new Thread(() -> {
             try {
                 while (true) {
-                    Thread.sleep(3000);
                     Map<String, String> map = new HashMap<>();
                     map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode(("blá:blá").getBytes())));
                     map.put("Pragma", "get;users");
@@ -78,6 +77,8 @@ public class MainController implements Initializable {
 
                         Platform.runLater(() -> tableView.setItems(FXCollections.observableArrayList(users)));
                     });
+
+                    Thread.sleep(1000);
                 }
             } catch (SocketException | InterruptedException | UnknownHostException e) {
                 e.printStackTrace();
