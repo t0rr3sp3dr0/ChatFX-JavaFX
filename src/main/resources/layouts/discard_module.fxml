@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" prefWidth="448.0" xmlns="http://javafx.com/javafx/8"
+      fx:controller="systems.singularity.chatfx.client.controllers.DiscardModuleController">
+    <children>
+        <HBox>
+            <children>
+                <VBox minWidth="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="Sender Loss Probability">
+                            <VBox.margin>
+                                <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                            </VBox.margin>
+                        </Label>
+                        <HBox>
+                            <children>
+                                <TextField fx:id="senderLossProbabilityTextField" alignment="CENTER" maxWidth="50.0"
+                                           text="100" HBox.hgrow="ALWAYS">
+                                    <HBox.margin>
+                                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                                    </HBox.margin>
+                                </TextField>
+                                <Slider fx:id="senderLossProbabilitySlider" maxHeight="50.0" HBox.hgrow="ALWAYS">
+                                    <HBox.margin>
+                                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                                    </HBox.margin>
+                                </Slider>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+                <VBox minWidth="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="Sender Loss Count">
+                            <VBox.margin>
+                                <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                            </VBox.margin>
+                        </Label>
+                        <HBox>
+                            <children>
+                                <Label fx:id="senderLossCountLabel" maxHeight="25.0" minHeight="25.0" prefHeight="25.0"
+                                       text="Label" HBox.hgrow="ALWAYS">
+                                    <HBox.margin>
+                                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                                    </HBox.margin>
+                                </Label>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+        <HBox>
+            <children>
+                <VBox minWidth="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="Receiver Loss Probability">
+                            <VBox.margin>
+                                <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                            </VBox.margin>
+                        </Label>
+                        <HBox>
+                            <children>
+                                <TextField fx:id="receiverLossProbabilityTextField" alignment="CENTER" maxWidth="50.0"
+                                           text="100" HBox.hgrow="ALWAYS">
+                                    <HBox.margin>
+                                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                                    </HBox.margin>
+                                </TextField>
+                                <Slider fx:id="receiverLossProbabilitySlider" maxHeight="50.0" HBox.hgrow="ALWAYS">
+                                    <HBox.margin>
+                                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                                    </HBox.margin>
+                                </Slider>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+                <VBox minWidth="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="Receiver Loss Count">
+                            <VBox.margin>
+                                <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                            </VBox.margin>
+                        </Label>
+                        <HBox>
+                            <children>
+                                <Label fx:id="receiverLossCountLabel" maxHeight="25.0" minHeight="25.0"
+                                       prefHeight="25.0" text="Label" HBox.hgrow="ALWAYS">
+                                    <HBox.margin>
+                                        <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                                    </HBox.margin>
+                                </Label>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+    </children>
+</VBox>
