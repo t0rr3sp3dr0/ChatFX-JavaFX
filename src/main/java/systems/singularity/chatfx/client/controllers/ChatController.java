@@ -84,17 +84,18 @@ public class ChatController implements Initializable {
         try {
             Networking.receiveMessage(this.user, (headers, message) -> {
                 try {
-                    if (headers.get("Pragma").equals("sendMessage")) {
+                    if (headers.get("Pragma").equals("message")) {
                         MessageRepository.getInstance().insert(message.status("sent"));
                         Platform.runLater(() -> textArea.setText(textArea.getText() + message.getContent() + '\n'));
+                        Networking.sendACK(message, ChatController.this.user);
                     } else if (headers.get("Pragma").equals("ack")) {
-                        MessageRepository.getInstance().update(MessageRepository.getInstance().
-                                get(new Message().id(Integer.parseInt(headers.get("Message-ID")))).status("ack"));
+                        MessageRepository.getInstance().update(MessageRepository.getInstance()
+                                .get(new Message().id(Integer.parseInt(headers.get("Message-ID")))).status("ack"));
                     } else if (headers.get("Pragma").equals("seen")) {
-                        MessageRepository.getInstance().update(MessageRepository.getInstance().
-                                get(new Message().id(Integer.parseInt(headers.get("Message-ID")))).status("seen"));
+                        MessageRepository.getInstance().update(MessageRepository.getInstance()
+                                .get(new Message().id(Integer.parseInt(headers.get("Message-ID")))).status("seen"));
                     }
-                } catch (SQLException e) {
+                } catch (SQLException | InterruptedException | SocketException | UnknownHostException e) {
                     e.printStackTrace();
                 }
             });

@@ -55,12 +55,28 @@ public final class Networking {
 
     public static void sendMessage(@NotNull final Message message, @NotNull final User user) throws UnknownHostException, SocketException, InterruptedException {
         Map<String, String> headers = new HashMap<>();
-        headers.put("Pragma", "sendMessage");
+        headers.put("Pragma", "message");
 
         Gson gson = new GsonBuilder().create();
         String json = gson.toJson(message);
 
         Protocol.Sender.sendMessage(RDT.getSender(InetAddress.getByName(user.getAddress()), user.getPortChat()), headers, json);
+    }
+
+    public static void sendACK(@NotNull final Message message, @NotNull final User user) throws UnknownHostException, SocketException, InterruptedException {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Pragma", "ack");
+        headers.put("Message-ID", String.valueOf(message.getId()));
+
+        Protocol.Sender.sendMessage(RDT.getSender(InetAddress.getByName(user.getAddress()), user.getPortChat()), headers, "");
+    }
+
+    public static void sendSeen(@NotNull final Message message, @NotNull final User user) throws UnknownHostException, SocketException, InterruptedException {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Pragma", "seen");
+        headers.put("Message-ID", String.valueOf(message.getId()));
+
+        Protocol.Sender.sendMessage(RDT.getSender(InetAddress.getByName(user.getAddress()), user.getPortChat()), headers, "");
     }
 
     public static void receiveMessage(@NotNull final User user, @Nullable final OnMessageListener onMessageListener) throws UnknownHostException {
