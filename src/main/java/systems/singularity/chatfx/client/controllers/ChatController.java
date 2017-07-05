@@ -1,29 +1,20 @@
 package systems.singularity.chatfx.client.controllers;
 
-import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import org.joda.time.DateTime;
 import systems.singularity.chatfx.client.Networking;
-import systems.singularity.chatfx.client.Singleton;
-import systems.singularity.chatfx.client.db.MessageRepository;
 import systems.singularity.chatfx.models.Message;
 import systems.singularity.chatfx.models.User;
-import systems.singularity.chatfx.util.Protocol;
-import systems.singularity.chatfx.util.RDT;
 
 import java.io.File;
-import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.sql.SQLException;
-import java.sql.Time;
-import java.util.Date;
-import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -69,7 +60,13 @@ public class ChatController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
-            Networking.receiveFile(user, (progress, speed, remainingTime) -> {
+            Networking.receiveMessage(this.user, message -> Platform.runLater(() -> textArea.setText(textArea.getText() + message + '\n')));
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Networking.receiveFile(this.user, (progress, speed, remainingTime) -> {
                 if (progress == 1)
                     System.out.println("FINISHED");
                 else
@@ -78,6 +75,32 @@ public class ChatController implements Initializable {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
+
+        sendButton.setOnAction(event -> {
+            String text = textField.getText();
+
+            if (text != null) {
+                final String content = text.trim();
+
+                if (content.length() > 0) {
+                    new Thread(() -> {
+                        Message message = new Message()
+                                .id(content.hashCode())
+                                .content(content.trim())
+                                .time(new DateTime());
+
+                        try {
+                            Networking.sendMessage(message, ChatController.this.user);
+                        } catch (UnknownHostException | SocketException | InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }).start();
+
+                    textArea.setText(textArea.getText() + textField.getText() + '\n');
+                    textField.setText(null);
+                }
+            }
+        });
 
         chooseFileButton.setOnAction(event -> {
             chooseFileButton.setDisable(true);
@@ -111,7 +134,7 @@ public class ChatController implements Initializable {
                             else
                                 Platform.runLater(() -> {
                                     progressBar.setProgress(progress);
-                                    progressLabel.setText(String.format("%.2f%", progress * 100));
+                                    progressLabel.setText(String.format("%.2f%%", progress * 100));
                                     etaLabel.setText(String.format("%.0fs", remainingTime));
                                     speedLabel.setText(String.format("%.2f MB/s", speed / (1024 * 1024)));
                                 });
@@ -122,25 +145,5 @@ public class ChatController implements Initializable {
             } else
                 chooseFileButton.setDisable(false);
         });
-
-//        sendButton.setOnAction(event -> {
-//            try {
-//                Message message = new Message();
-//                message.setContent(textField.getText());
-//                message.setTime(new Time(new Date().getTime()));
-//                message.setStatus("Sent");
-//                new MessageRepository().insert(message);
-//                String json = new Gson().toJson(message);
-//
-//                RDT.getSender(InetAddress.getByName(user.getAddress()), user.getPortChat()).sendMessage(json.getBytes());
-//
-//                Platform.runLater(() ->
-//                        textArea.appendText("\t\t\t" + textField.getText() + "\n")
-//                );
-//
-//            } catch (SocketException | InterruptedException | UnknownHostException | SQLException e) {
-//                e.printStackTrace();
-//            }
-//        });
     }
 }

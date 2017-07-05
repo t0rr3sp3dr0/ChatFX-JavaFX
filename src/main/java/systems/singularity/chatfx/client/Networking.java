@@ -1,7 +1,10 @@
 package systems.singularity.chatfx.client;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
+import systems.singularity.chatfx.models.Message;
 import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
@@ -10,6 +13,7 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -31,7 +35,7 @@ public final class Networking {
         })).start();
     }
 
-    public static void receiveFile(User user, TransferCallback callback) throws UnknownHostException {
+    public static void receiveFile(@NotNull final User user, @Nullable final TransferCallback callback) throws UnknownHostException {
         Singleton.getInstance().setFileOnReceiveListener(InetAddress.getByName(user.getAddress()), (address, port, bytes) -> {
             Map<String, String> headers = Protocol.extractHeaders(bytes);
             final long contentLength = Long.parseLong(headers.get("Content-Length"));
@@ -49,7 +53,31 @@ public final class Networking {
         });
     }
 
+    public static void sendMessage(@NotNull final Message message, @NotNull final User user) throws UnknownHostException, SocketException, InterruptedException {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Pragma", "sendMessage");
+
+        Gson gson = new GsonBuilder().create();
+        String json = gson.toJson(message);
+
+        Protocol.Sender.sendMessage(RDT.getSender(InetAddress.getByName(user.getAddress()), user.getPortFile()), headers, json);
+    }
+
+    public static void receiveMessage(@NotNull final User user, @Nullable final OnMessageListener onMessageListener) throws UnknownHostException {
+        Singleton.getInstance().setChatOnReceiveListener(InetAddress.getByName(user.getAddress()), (address, port, bytes) -> {
+            Gson gson = new GsonBuilder().create();
+            Message message = gson.fromJson(new String(bytes), Message.class);
+
+            if (onMessageListener != null)
+                onMessageListener.onMessage(message);
+        });
+    }
+
     public interface TransferCallback {
         void onCalback(double progress, double speed, double remainingTime);
+    }
+
+    public interface OnMessageListener {
+        void onMessage(Message message);
     }
 }
