@@ -106,7 +106,7 @@ public class MainController implements Initializable {
                         List<User> users = Arrays.stream(new Gson().fromJson(message, User[].class)).filter(user -> {
                             if (user.getUsername().equals(Singleton.getInstance().getUsername())) {
                                 Singleton.getInstance().setUser(user);
-                                return true;
+                                return false;
                             }
 
                             return user.getStatus();
