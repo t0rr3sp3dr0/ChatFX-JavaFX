@@ -42,11 +42,11 @@
             <children>
                 <VBox minHeight="300.0" minWidth="296.0" prefHeight="300.0" prefWidth="296.0" HBox.hgrow="ALWAYS">
                     <children>
-                        <TextArea fx:id="textArea" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                        <ListView fx:id="listView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                             <VBox.margin>
                                 <Insets bottom="4.0" />
                             </VBox.margin>
-                        </TextArea>
+                        </ListView>
                         <HBox maxHeight="27.0" minHeight="27.0" prefHeight="27.0" prefWidth="200.0">
                             <children>
                                 <TextField fx:id="textField" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" HBox.hgrow="ALWAYS">
@@ -81,11 +81,6 @@
                 </VBox>
                 <VBox maxWidth="200.0" minHeight="300.0" minWidth="200.0" prefHeight="300.0" prefWidth="200.0">
                     <children>
-                        <ListView fx:id="listView" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
-                            <VBox.margin>
-                                <Insets bottom="4.0" />
-                            </VBox.margin>
-                        </ListView>
                         <HBox maxHeight="34.0" prefHeight="100.0" prefWidth="200.0">
                             <children>
                                 <VBox prefHeight="200.0" prefWidth="100.0">

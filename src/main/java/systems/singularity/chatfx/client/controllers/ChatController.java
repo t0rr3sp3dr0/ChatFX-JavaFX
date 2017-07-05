@@ -1,6 +1,8 @@
 package systems.singularity.chatfx.client.controllers;
 
+import com.sun.org.apache.xml.internal.security.algorithms.MessageDigestAlgorithm;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -9,6 +11,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
+import javafx.util.Callback;
 import org.joda.time.DateTime;
 import systems.singularity.chatfx.client.Networking;
 import systems.singularity.chatfx.client.Singleton;
@@ -22,6 +25,8 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -38,7 +43,7 @@ public class ChatController implements Initializable {
     @FXML
     private Button clearChatButton;
     @FXML
-    private ListView<File> listView;
+    private ListView<Message> listView;
     @FXML
     private Label speedLabel;
     @FXML
@@ -82,6 +87,15 @@ public class ChatController implements Initializable {
                 ChatController.this.receiveFileDialog.setTitle("Receiving File");
                 ChatController.this.receiveFileDialog.initModality(Modality.NONE);
                 ChatController.this.receiveFileDialog.getDialogPane().setContent(ChatController.this.receiveFileNode);
+
+                listView.setCellFactory(param -> new ListCell<Message>() {
+                    @Override
+                    protected void updateItem(Message item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (!empty)
+                            setText(item.getContent());
+                    }
+                });
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -92,13 +106,13 @@ public class ChatController implements Initializable {
                 try {
                     if (headers.get("Pragma").equals("message")) {
                         MessageRepository.getInstance().insert(message.status("sent"));
-                        Platform.runLater(() -> textArea.setText(textArea.getText() + message.getContent() + '\n'));
+                        List<Message> messages = MessageRepository.getInstance().getAll();
+                        Platform.runLater(() -> listView.setItems(FXCollections.observableArrayList(messages)));
                         Networking.sendACK(message, ChatController.this.user);
-                   } else if (headers.get("Pragma").equals("ack")) {
+                    } else if (headers.get("Pragma").equals("ack")) {
                         MessageRepository.getInstance().update(MessageRepository.getInstance()
                                 .get(new Message().id(Integer.parseInt(headers.get("Message-ID"))).status("ack")));
-                }
-                     else if (headers.get("Pragma").equals("seen")) {
+                    } else if (headers.get("Pragma").equals("seen")) {
                         MessageRepository.getInstance().update(MessageRepository.getInstance()
                                 .get(new Message().id(Integer.parseInt(headers.get("Message-ID"))).status("seen")));
                     }
@@ -153,7 +167,8 @@ public class ChatController implements Initializable {
                                 .authorId(Singleton.getInstance().getUser().getId());
 
                         try {
-
+                            List<Message> messages = MessageRepository.getInstance().getAll();
+                            Platform.runLater(() -> listView.setItems(FXCollections.observableArrayList(messages)));
                             Networking.sendMessage(message.id(message.hashCode()), ChatController.this.user);
                             MessageRepository.getInstance().insert(message.status(""));
                         } catch (UnknownHostException | SocketException | InterruptedException | SQLException e) {
@@ -161,7 +176,6 @@ public class ChatController implements Initializable {
                         }
                     }).start();
 
-                    textArea.setText(textArea.getText() + textField.getText() + '\n');
                     textField.setText(null);
                 }
             }
