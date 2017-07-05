@@ -32,7 +32,7 @@ public class Utilities {
         else if (OS.contains("MAC"))
             return Paths.get(System.getProperty("user.home"), "Library", "Application Support").toString();
         else
-            return Paths.get(System.getProperty("user.home"), ".local").toString();
+            return Paths.get(System.getProperty("user.home"), ".local", "share").toString();
     }
 
     public static String MD5(String password) throws NoSuchAlgorithmException {

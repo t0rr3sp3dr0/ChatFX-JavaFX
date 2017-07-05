@@ -80,7 +80,9 @@ public class MemberRepository implements Repository<Member> {
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_members WHERE member_id = ?;");
         statement.setInt(1, member.getId());
         ResultSet rs = statement.executeQuery();
-        rs.next();
+
+        if (!rs.next())
+            return null;
 
         return new Member()
                 .id(rs.getInt("member_id"))

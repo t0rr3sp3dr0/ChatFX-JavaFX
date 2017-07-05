@@ -42,9 +42,9 @@ public class UserRepository implements Repository<User> {
             statement.setString(1, user.getUsername());
             statement.setString(2, user.getPassword());
             statement.setString(3, user.getAddress());
-            statement.setInt(4, user.getPortChat());
-            statement.setInt(5, user.getPortFile());
-            statement.setInt(6, user.getPortRtt());
+            statement.setInt(4, user.getPortChat() != null ? user.getPortChat() : -1);
+            statement.setInt(5, user.getPortFile() != null ? user.getPortFile() : -1);
+            statement.setInt(6, user.getPortRtt() != null ? user.getPortRtt() : -1);
             statement.setBoolean(7, user.getStatus());
             statement.executeUpdate();
         }
@@ -105,7 +105,9 @@ public class UserRepository implements Repository<User> {
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_users WHERE user_username = ?;");
         statement.setString(1, user.getUsername());
         ResultSet rs = statement.executeQuery();
-        rs.next();
+
+        if (!rs.next())
+            return null;
 
         return new User()
                 .id(rs.getInt(1))

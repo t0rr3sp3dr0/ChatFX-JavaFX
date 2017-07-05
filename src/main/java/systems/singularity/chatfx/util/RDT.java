@@ -29,7 +29,7 @@ public final class RDT {
     @NotNull
     public static Sender getSender(@NotNull InetAddress address, @NotNull Integer port) throws SocketException, UnknownHostException {
         assert port > 0;
-        System.out.println("\t\t\t\tgetSender(InetAddress, Integer)\t" + port);
+        System.out.printf("DEBUG: getSender(InetAddress, Integer)\t\tPORT(%d)\n", port);
 
         Pair<InetAddress, Integer> key = new Pair<>(address, port);
         synchronized (RDT.senders) {
@@ -44,25 +44,19 @@ public final class RDT {
     }
 
     @NotNull
-    public static Sender newSender(@NotNull InetAddress address, @NotNull Integer port) throws SocketException, UnknownHostException {
+    public static Sender uniqueSender(@NotNull InetAddress address, @NotNull Integer port) throws SocketException, UnknownHostException {
         assert port > 0;
-        System.out.println("\t\t\t\tnewSender(InetAddress, Integer)\t" + port);
+        System.out.printf("DEBUG: uniqueSender(InetAddress, Integer)\t\tPORT(%d)\n", port);
 
-        Pair<InetAddress, Integer> key = new Pair<>(address, port);
-        synchronized (RDT.senders) {
-            Sender sender = new Sender(key.first, key.second);
-            sender.start();
-
-            senders.put(key, sender);
-
-            return sender;
-        }
+        Sender sender = new Sender(address, port);
+        sender.start();
+        return sender;
     }
 
     @NotNull
     public static Receiver getReceiver(@NotNull Integer port) throws SocketException {
         assert port > 0;
-        System.out.println("\t\t\t\tgetReceiver(Integer)\t" + port);
+        System.out.printf("DEBUG: getReceiver(Integer)\t\tPORT(%d)\n", port);
 
         synchronized (RDT.receivers) {
             Receiver receiver = receivers.get(port);
@@ -78,7 +72,7 @@ public final class RDT {
     @NotNull
     public static Receiver getReceiver(@NotNull Sender sender) throws SocketException {
         assert sender.socket.getPort() > 0;
-        System.out.println("\t\t\t\tgetReceiver(Sender)\t" + sender.socket.getLocalPort());
+        System.out.printf("DEBUG: getReceiver(Sender)\t\tPORT(%d)\n", sender.socket.getLocalPort());
 
         synchronized (RDT.receivers) {
             Receiver receiver = receivers.get(sender.socket.getLocalPort());
@@ -154,12 +148,12 @@ public final class RDT {
             this.probe.setOnTimeoutChanged(objects -> Sender.this.timer.setTimeout((Integer) objects[0]));
             this.probe.start();
 
-            System.out.printf("DEBUG: Sender\t\tADDRESS\t%s\tPORT\t%s\tCONNECTION\t%s\n", this.address, this.port, this.connection);
-            System.out.printf("RDT.getReceiver\t%s\tPORT\t%s\n", RDT.getReceiver(Sender.this), this.socket.getLocalPort());
+            System.out.printf("DEBUG: Sender\t\tADDRESS(%s)\tPORT(%s)\tCONNECTION(%s)\n", this.address, this.port, this.connection);
+            System.out.printf("DEBUG: RDT.getReceiver\t%s\tPORT(%s)\n", RDT.getReceiver(Sender.this), this.socket.getLocalPort());
         }
 
         public void sendMessage(byte[] message) throws InterruptedException {
-            System.out.printf("DEBUG: sendMessage\t\tADDRESS\t%s\tPORT\t%s\tCONNECTION\t%s\n", this.address, this.port, this.connection);
+            System.out.printf("DEBUG: sendMessage\t\tADDRESS(%s)\tPORT(%s)\tCONNECTION(%s)\n", this.address, this.port, this.connection);
 
             this.queue.put(message);
 
@@ -168,7 +162,7 @@ public final class RDT {
         }
 
         public void sendACK(Integer seq, Integer port) throws IOException {
-            System.out.printf("DEBUG: sendACK\t\tADDRESS\t%s\tPORT\t%s\tCONNECTION\t%sSEQ\t%s\n", this.address, this.port, this.connection, seq);
+            System.out.printf("DEBUG: sendACK\t\tADDRESS(%s)\tPORT(%s)\tCONNECTION(%s)\tSEQ(%s)\n", this.address, this.port, this.connection, seq);
 
             byte[] payload = new byte[8 + Constants.MTU];
             payload[0] = (byte) 0b10000000;
@@ -229,9 +223,9 @@ public final class RDT {
                             DatagramPacket packet = new DatagramPacket(payload, payload.length, this.address, this.port);
                             socket.send(packet);
 
-                            System.err.printf("%d\tFIN(%b)\tSEQ(%d)\n", Arrays.hashCode(message), fin, seq);
+                            System.err.printf("DEBUG: message\t\t%d\tFIN(%b)\tSEQ(%d)\n", Arrays.hashCode(message), fin, seq);
                         } else
-                            System.err.printf("%d\tDISPOSED\tSEQ(%d)\n", Arrays.hashCode(message), seq);
+                            System.err.printf("DEBUG: message\t\t%d\tDISPOSED\tSEQ(%d)\n", Arrays.hashCode(message), seq);
 
 
                         this.timer.watch(new Packet(seq, payload));
@@ -240,7 +234,7 @@ public final class RDT {
                     //noinspection StatementWithEmptyBody
                     while (this.connection.window.size() > 0) ;
 
-                    System.err.printf("%d\tFIN\n", Arrays.hashCode(message));
+                    System.err.printf("DEBUG: message\t\t%d\tFIN\n", Arrays.hashCode(message));
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
                     break;
@@ -249,7 +243,7 @@ public final class RDT {
 
         public void onACK(final int seq) {
             if (!this.connection.window.contains(seq)) {
-                System.err.printf("Repeated\tACK(%d)\n", seq);
+                System.err.printf("DEBUG: Repeated\tACK(%d)\n", seq);
                 if (this.connection.repeatedCount == 3) {
                     this.connection.repeatedCount = 0;
                     this.connection.window.resize(0.875, 0);
@@ -259,7 +253,7 @@ public final class RDT {
                 this.connection.repeatedCount = 0;
                 this.connection.window.removeIf(integer -> integer <= seq);
                 this.connection.window.resize(1, 1);
-                System.err.printf("Received\tACK(%d)\n", seq);
+                System.err.printf("DEBUG: Received\tACK(%d)\n", seq);
             }
         }
 
@@ -282,7 +276,7 @@ public final class RDT {
                             Packet packet = this.heap.poll().second;
                             if (Sender.this.connection.ack < packet.seq)
                                 try {
-                                    System.err.printf("Timeout\tSEQ(%d)\n", packet.seq);
+                                    System.err.printf("DEBUG: Timeout\tSEQ(%d)\n", packet.seq);
                                     Sender.this.socket.send(new DatagramPacket(packet.bytes, packet.bytes.length, Sender.this.address, Sender.this.port));
                                 } catch (IOException e) {
                                     e.printStackTrace();
@@ -317,27 +311,33 @@ public final class RDT {
         private final DatagramSocket socket;
         private final Map<InetAddress, OnReceiveListener> onReceiveListeners = new HashMap<>();
         private final Map<Pair<InetAddress, Integer>, Connection> connections = new HashMap<>();
+        private final Sender sender;
 
         private Receiver(int port) throws SocketException {
             super();
 
             this.port = port;
-            this.socket = new DatagramSocket(port);
 
+            this.socket = new DatagramSocket(port);
             this.socket.setSoTimeout(0);
 
+            this.sender = null;
+
             assert this.port > 0;
-            System.out.println("\t\t\t\tReceiver(int)\t" + port);
+            System.out.printf("DEBUG: Receiver(int)\t\tPORT(%d)\n", this.port);
         }
 
         private Receiver(Sender sender) {
             super();
 
             this.port = sender.socket.getLocalPort();
+
             this.socket = sender.socket;
 
+            this.sender = sender;
+
             assert this.port > 0;
-            System.out.println("\t\t\t\tReceiver(sender)\t" + port);
+            System.out.printf("DEBUG: Receiver(int)\t\tPORT(%d)\n", this.port);
         }
 
         @Override
@@ -357,12 +357,15 @@ public final class RDT {
                     final Integer port = ((payload[6] << 8) & 0xFF00) | (payload[7] & 0x00FF);
 
                     if (RDT.dispose(Constants.RECEIVER_LOSS_PROBABILITY)) {
-                        System.out.printf("%d\tDISPOSED\tSEQ(%d)\n", packet.getAddress().hashCode(), seq);
+                        System.out.printf("DEBUG: message\t\t%d\tDISPOSED\tSEQ(%d)\n", packet.getAddress().hashCode(), seq);
                         continue;
                     }
 
                     if (ack) {
-                        RDT.getSender(packet.getAddress(), port).onACK(seq);
+                        if (this.sender == null)
+                            RDT.getSender(packet.getAddress(), port).onACK(seq);
+                        else
+                            this.sender.onACK(seq);
 
                         System.out.printf("DEBUG: onACK\t\tADDRESS\t%s\tPORT\t%s\n", packet.getAddress(), port);
                     } else {
@@ -378,14 +381,14 @@ public final class RDT {
                             Packet pkt = new Packet(seq, Arrays.copyOfRange(payload, 8, 8 + Constants.MTU));
 
                             if (seq <= connection.fin || seq < connection.seq || connection.packets.contains(pkt)) {
-                                System.out.printf("\n\n\n\nUnexpected SEQ(%d)\t%d(%d)\n%b\t%b\t%b\n\n\n\n", seq, connection.hashCode(), connection.seq, seq <= connection.fin, seq < connection.seq, connection.packets.contains(pkt));
+                                System.out.printf("DEBUG: Unexpected\tSEQ(%d)\t%d(%d)\n%b\t%b\t%b\n", seq, connection.hashCode(), connection.seq, seq <= connection.fin, seq < connection.seq, connection.packets.contains(pkt));
                                 RDT.getSender(packet.getAddress(), packet.getPort()).sendACK(connection.seq, this.port);
                                 continue;
                             }
 
                             if (seq - 1 >= connection.seq) {
                                 connection.packets.add(pkt);
-                                System.out.printf("%d\tFIN(%b)\tSEQ(%d)\n", connection.hashCode(), fin, seq);
+                                System.out.printf("DEBUG: message\t\t%d\tFIN(%b)\tSEQ(%d)\n", connection.hashCode(), fin, seq);
                             }
 
                             int packetsCount = (int) Math.ceil((double) len / Constants.MTU);

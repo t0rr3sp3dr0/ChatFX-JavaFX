@@ -88,7 +88,9 @@ public class MessageRepository implements Repository<Message> {
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_messages WHERE message_id = ?;");
         statement.setInt(1, message.getId());
         ResultSet rs = statement.executeQuery();
-        rs.next();
+
+        if (!rs.next())
+            return null;
 
         return new Message()
                 .id(rs.getInt("message_id"))

@@ -27,7 +27,7 @@ public final class Networking {
     public static void sendFile(@NotNull final File file, @NotNull final User user, @NotNull final String pragma, @Nullable final TransferCallback callback) throws UnknownHostException, SocketException {
         new Protocol.Uploader(RDT.getSender(InetAddress.getByName(user.getAddress()), user.getPortFile()), pragma, file, (($, bytesSent, elapsedTime) -> {
             final double progress = bytesSent / file.length();
-            final double speed = bytesSent / (elapsedTime * 1e9);
+            final double speed = bytesSent / (elapsedTime / 1e9);
             final double remainingTime = (file.length() - bytesSent) / speed;
 
             if (callback != null)

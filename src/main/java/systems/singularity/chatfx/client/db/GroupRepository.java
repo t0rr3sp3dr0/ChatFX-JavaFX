@@ -73,7 +73,9 @@ public class GroupRepository implements Repository<Group> {
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_groups WHERE group_id = ?;");
         statement.setInt(1, group.getId());
         ResultSet rs = statement.executeQuery();
-        rs.next();
+
+        if (!rs.next())
+            return null;
 
         return new Group()
                 .id(rs.getInt("group_id"))

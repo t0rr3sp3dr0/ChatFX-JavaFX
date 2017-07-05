@@ -60,7 +60,7 @@ public class LoginController implements Initializable {
                         map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
                         map.put("Pragma", "login;chat");
 
-                        RDT.Sender chatSender = RDT.newSender(inetAddress, port);
+                        RDT.Sender chatSender = RDT.uniqueSender(inetAddress, port);
 
                         Singleton.getInstance().setChatReceiver(RDT.getReceiver(chatSender));
                         Singleton.getInstance().setChatOnReceiveListener(inetAddress, (Protocol.Receiver) (address, port1, headers, message) -> {
@@ -76,10 +76,7 @@ public class LoginController implements Initializable {
                         Protocol.Sender.sendMessage(chatSender, map, "Vai tomar no cu, pasg!");
 
 
-//                        Thread.sleep(1000);
-
-
-                        RDT.Sender fileSender = RDT.newSender(inetAddress, port);
+                        RDT.Sender fileSender = RDT.uniqueSender(inetAddress, port);
 
                         map = new HashMap<>();
                         map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
@@ -99,10 +96,7 @@ public class LoginController implements Initializable {
                         Protocol.Sender.sendMessage(fileSender, map, "Vai tomar no cu, file!");
 
 
-//                        Thread.sleep(1000);
-
-
-                        RDT.Sender rttSender = RDT.newSender(inetAddress, port);
+                        RDT.Sender rttSender = RDT.uniqueSender(inetAddress, port);
 
                         map = new HashMap<>();
                         map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
@@ -125,7 +119,6 @@ public class LoginController implements Initializable {
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
-
                 } else {
                     Alert alert = new Alert(Alert.AlertType.WARNING);
                     alert.setTitle("Error");
