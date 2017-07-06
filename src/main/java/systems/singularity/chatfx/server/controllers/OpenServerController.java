@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import systems.singularity.chatfx.server.Handler;
+import systems.singularity.chatfx.util.javafx.Utilities;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -17,6 +18,8 @@ import java.util.ResourceBundle;
  * Created by caesa on 01/07/2017.
  */
 public class OpenServerController implements Initializable {
+    @FXML
+    private Parent root;
     @FXML
     private Button btOpen;
 
@@ -29,7 +32,6 @@ public class OpenServerController implements Initializable {
 
         btOpen.setOnAction(e -> {
             try {
-
                 new Handler(Integer.parseInt(tfPort.getText())).start();
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/server.fxml"));
                 final Parent root = fxmlLoader.load();
@@ -39,6 +41,9 @@ public class OpenServerController implements Initializable {
                 stage.setScene(new Scene(root, 600, 400));
                 stage.show();
 
+                Utilities.setOnCloseRequest(stage);
+
+                ((Stage) OpenServerController.this.root.getScene().getWindow()).close();
             } catch (Exception e1) {
                 e1.printStackTrace();
             }

@@ -8,6 +8,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import java.io.Closeable;
@@ -76,5 +77,23 @@ public final class Utilities {
             alert.showAndWait();
         else
             alert.show();
+    }
+
+    public static void setOnCloseRequest(Stage stage) {
+        stage.setOnCloseRequest(event -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle(null);
+            alert.setHeaderText("Are you sure you want to exit?");
+            alert.setContentText(null);
+
+            Button exitButton = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
+            exitButton.setText("Exit");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK)
+                System.exit(0);
+            else
+                event.consume();
+        });
     }
 }

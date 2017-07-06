@@ -27,6 +27,8 @@ public class LoginController implements Initializable {
     private static InetAddress inetAddress;
     private static int port;
     @FXML
+    private Parent root;
+    @FXML
     private Button bt_login;
     @FXML
     private TextField tf_user;
@@ -161,9 +163,9 @@ public class LoginController implements Initializable {
                     stage.setScene(new Scene(root, 720, 430));
                     stage.show();
 
-                    stage.setOnCloseRequest(e -> {
+                    systems.singularity.chatfx.util.javafx.Utilities.setOnCloseRequest(stage);
 
-                    });
+                    ((Stage) LoginController.this.root.getScene().getWindow()).close();
                 });
             } catch (IOException e1) {
                 e1.printStackTrace();
