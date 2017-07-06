@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import systems.singularity.chatfx.client.Singleton;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
+import systems.singularity.chatfx.util.Variables;
 import systems.singularity.chatfx.util.java.Utilities;
 
 import java.io.IOException;
@@ -62,15 +63,15 @@ public class LoginController implements Initializable {
             loginButton.setOnAction(e -> {
                 if (!userTextField.getText().isEmpty() && !passTextField.getText().isEmpty() && passTextField.getText().length() >= 8 && hostTextField.getText().length() > 0 && portTextField.getText().trim().length() > 0)
                     try {
-                        InetAddress host = InetAddress.getByName(hostTextField.getText());
-                        int port = Integer.parseInt(portTextField.getText());
+                        Variables.Server.address = InetAddress.getByName(hostTextField.getText());
+                        Variables.Server.port = Integer.parseInt(portTextField.getText());
 
                         String password = Utilities.md5(passTextField.getText());
                         String token = new String(Base64.getEncoder().encode((userTextField.getText() + ":" + password).getBytes()));
 
-                        openChatConnection(host, port, token);
-                        openFileConnection(host, port, token);
-                        openRTTConnection(host, port, token);
+                        openChatConnection(token);
+                        openFileConnection(token);
+                        openRTTConnection(token);
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
@@ -109,8 +110,8 @@ public class LoginController implements Initializable {
         alert.show();
     }
 
-    private void openChatConnection(InetAddress host, int port, String token) throws SocketException, UnknownHostException, InterruptedException {
-        RDT.Sender chatSender = RDT.uniqueSender(host, port);
+    private void openChatConnection(String token) throws SocketException, UnknownHostException, InterruptedException {
+        RDT.Sender chatSender = RDT.uniqueSender(Variables.Server.address, Variables.Server.port);
 
         try {
             RDT.Receiver chatReceiver = RDT.getReceiver(Integer.parseInt(chatTextField.getText()));
@@ -129,7 +130,7 @@ public class LoginController implements Initializable {
         chatHeaders.put("Pragma", "login;chat");
 
         Singleton.getInstance().setChatReceiver(RDT.getReceiver(chatSender));
-        Singleton.getInstance().setChatOnReceiveListener(host, (Protocol.Receiver) (address, _port, headers, _message) -> {
+        Singleton.getInstance().setChatOnReceiveListener(Variables.Server.address, (Protocol.Receiver) (address, _port, headers, _message) -> {
             String[] pragma = headers.get("Pragma").split(";");
             if (pragma[0].equals("login") && !pragma[1].equals("401")) {
                 System.out.println("\n\nLOGIN: CHAT\n\n");
@@ -143,8 +144,8 @@ public class LoginController implements Initializable {
         Protocol.Sender.sendMessage(chatSender, chatHeaders, "");
     }
 
-    private void openFileConnection(InetAddress host, int port, String token) throws SocketException, UnknownHostException, InterruptedException {
-        RDT.Sender fileSender = RDT.uniqueSender(host, port);
+    private void openFileConnection(String token) throws SocketException, UnknownHostException, InterruptedException {
+        RDT.Sender fileSender = RDT.uniqueSender(Variables.Server.address, Variables.Server.port);
 
         try {
             RDT.Receiver fileReceiver = RDT.getReceiver(Integer.parseInt(fileTextField.getText()));
@@ -163,7 +164,7 @@ public class LoginController implements Initializable {
         fileHeaders.put("Pragma", "login;file");
 
         Singleton.getInstance().setFileReceiver(RDT.getReceiver(fileSender));
-        Singleton.getInstance().setFileOnReceiveListener(host, (Protocol.Receiver) (address, _port, headers, _message) -> {
+        Singleton.getInstance().setFileOnReceiveListener(Variables.Server.address, (Protocol.Receiver) (address, _port, headers, _message) -> {
             String[] pragma = headers.get("Pragma").split(";");
             if (pragma[0].equals("login") && !pragma[1].equals("401")) {
                 System.out.println("\n\nLOGIN: FILE\n\n");
@@ -177,8 +178,8 @@ public class LoginController implements Initializable {
         Protocol.Sender.sendMessage(fileSender, fileHeaders, "");
     }
 
-    private void openRTTConnection(InetAddress host, int port, String token) throws SocketException, UnknownHostException, InterruptedException {
-        RDT.Sender rttSender = RDT.uniqueSender(host, port);
+    private void openRTTConnection(String token) throws SocketException, UnknownHostException, InterruptedException {
+        RDT.Sender rttSender = RDT.uniqueSender(Variables.Server.address, Variables.Server.port);
 
         try {
             RDT.Receiver rttReceiver = RDT.getReceiver(Integer.parseInt(rttTextField.getText()));
@@ -197,7 +198,7 @@ public class LoginController implements Initializable {
         rttHeaders.put("Pragma", "login;rtt");
 
         RDT.Receiver rttReceiver = RDT.getReceiver(rttSender);
-        rttReceiver.setOnReceiveListener(host, (Protocol.Receiver) (address, _port, headers, _message) -> {
+        rttReceiver.setOnReceiveListener(Variables.Server.address, (Protocol.Receiver) (address, _port, headers, _message) -> {
             String[] pragma = headers.get("Pragma").split(";");
             if (pragma[0].equals("login") && !pragma[1].equals("401")) {
                 System.out.println("\n\nLOGIN: RTT\n\n");
