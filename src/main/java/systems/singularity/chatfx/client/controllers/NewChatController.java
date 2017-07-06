@@ -12,6 +12,7 @@ import systems.singularity.chatfx.client.Singleton;
 import systems.singularity.chatfx.client.db.ChatRepository;
 import systems.singularity.chatfx.client.db.MemberRepository;
 import systems.singularity.chatfx.models.*;
+import systems.singularity.chatfx.server.db.UserRepository;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
 import systems.singularity.chatfx.util.Variables;
@@ -56,11 +57,24 @@ public class NewChatController implements Initializable {
                         List<User> users = Arrays.stream(new Gson().fromJson(message, User[].class)).filter(user -> {
                             if (user.getUsername().equals(Singleton.getInstance().getUsername())) {
                                 Singleton.getInstance().setUser(user);
+                                try {
+                                    UserRepository.getInstance().add(user);
+                                } catch (SQLException e) {
+                                    e.printStackTrace();
+                                }
                                 return false;
                             }
 
                             return user.getStatus();
                         }).collect(Collectors.toList());
+
+                        for (User user : users) {
+                            try {
+                                UserRepository.getInstance().add(user);
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }
 
                         Platform.runLater(() ->
                                 listView.setItems(FXCollections.observableArrayList(users)));

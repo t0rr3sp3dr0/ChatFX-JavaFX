@@ -48,6 +48,20 @@ public class UserRepository implements Repository<User> {
             statement.executeUpdate();
         }
     }
+    public void add(User user) throws SQLException {
+        Connection conn = Database.getConnection();
+        if (!exists(user)) {
+            PreparedStatement statement = conn.prepareStatement("INSERT INTO cf_users (user_id, user_username, user_password, user_address, user_portChat, user_portFile, user_portRtt, user_status, user_lastSeen) VALUES (?, ?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP);");
+            statement.setInt(1, user.getId());
+            statement.setString(2, user.getUsername());
+            statement.setString(3, user.getPassword());
+            statement.setString(4, user.getAddress());
+            statement.setInt(5, user.getPortChat() != null ? user.getPortChat() : -1);
+            statement.setInt(6, user.getPortFile() != null ? user.getPortFile() : -1);
+            statement.setInt(7, user.getPortRtt() != null ? user.getPortRtt() : -1);
+            statement.executeUpdate();
+        }
+    }
 
     @Override
     public void update(User user) throws SQLException {

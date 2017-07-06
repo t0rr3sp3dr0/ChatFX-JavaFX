@@ -279,20 +279,31 @@ public class ChatController implements Initializable {
 
                 if (content.length() > 0) {
                     new Thread(() -> {
+                        Message message = null;
                         for (User user : users) {
-                            Message message = new Message()
+                            while (Singleton.getInstance().getUser() == null)
+                                System.out.println(0);
+
+                            message = new Message()
                                     .authorId(Singleton.getInstance().getUser().getId())
                                     .content(content)
                                     .chatId(ChatController.this.chat.getId())
                                     .status("processing")
                                     .time(DateTime.now().toString());
 
+                            System.err.println(message);
+
                             try {
                                 Networking.sendMessage(message.id(message.hashCode()), user);
-                                MessageRepository.getInstance().insert(message);
-                            } catch (UnknownHostException | SocketException | InterruptedException | SQLException e) {
+                            } catch (UnknownHostException | SocketException | InterruptedException e) {
                                 e.printStackTrace();
                             }
+                        }
+                        try {
+                            System.out.println(message);
+                            MessageRepository.getInstance().insert(message);
+                        } catch (SQLException e) {
+                            e.printStackTrace();
                         }
 
                     }).start();
@@ -351,6 +362,7 @@ public class ChatController implements Initializable {
             while (true)
                 try {
                     List<Message> messages = MessageRepository.getInstance().getAll().stream().filter(message -> message.getChatId().equals(Singleton.getInstance().getUser().hashCode() & ChatController.this.chat.hashCode())).collect(Collectors.toList());
+                    System.out.println(messages);
                     Platform.runLater(() -> {
                         ChatController.this.messagesList.setItems(FXCollections.observableArrayList(messages));
                         ChatController.this.messagesList.scrollTo(messages.size() - 1);
