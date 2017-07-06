@@ -126,6 +126,7 @@ public class MainController implements Initializable {
         });
 
         new Thread(() -> {
+
             try {
                 //noinspection InfiniteLoopStatement
                 while (true) {
@@ -137,8 +138,9 @@ public class MainController implements Initializable {
 
                     RDT.getReceiver(sender).setOnReceiveListener(Variables.Server.address, (Protocol.Receiver) (address, port1, headers, message) -> {
                         List<Chat> chats = Arrays.asList(new Gson().fromJson(message, Chat[].class));
-
-                        Platform.runLater(() -> tableView.setItems(FXCollections.observableArrayList(chats)));
+                        if (chats != null)
+                            Platform.runLater(() ->
+                                    tableView.setItems(FXCollections.observableArrayList(chats)));
                     });
 
                     Thread.sleep(250);
@@ -146,7 +148,11 @@ public class MainController implements Initializable {
             } catch (SocketException | InterruptedException | UnknownHostException e) {
                 e.printStackTrace();
             }
+
+
         }).start();
+
+
     }
 
     private void newTab(Chat chat) {
@@ -161,8 +167,8 @@ public class MainController implements Initializable {
             fxmlLoader.setController(new ChatController(chat));
 
             Tab tab = new Tab();
-            tab.setId(String.valueOf(this.chat[0].getId()));
-            tab.setText(this.chat[0].getName());
+            tab.setId(String.valueOf(chat.getId()));
+            tab.setText(chat.getName());
             tab.setClosable(true);
             tab.setContent(fxmlLoader.load());
             tabPane.getTabs().add(tab);
