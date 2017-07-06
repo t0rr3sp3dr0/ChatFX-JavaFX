@@ -50,7 +50,7 @@ public class MessageRepository implements Repository<Message> {
     public void update(Message message) throws SQLException {
         Connection conn = Database.getConnection();
         if (exists(message)) {
-            PreparedStatement statement = conn.prepareStatement("UPDATE cf_messages SET message_group_id = ?, " +
+            PreparedStatement statement = conn.prepareStatement("UPDATE cf_messages SET message_chat_id = ?, " +
                     "message_content = ?, message_status = ?, message_timestamp = ?, message_author_id = ? " +
                     "WHERE message_id = ?;");
             statement.setInt(1, message.getChatId());
@@ -83,7 +83,7 @@ public class MessageRepository implements Repository<Message> {
             messages.add(
                     new Message()
                             .id(rs.getInt("message_id"))
-                            .chatId(rs.getInt("message_group_id"))
+                            .chatId(rs.getInt("message_chat_id"))
                             .content(rs.getString("message_content"))
                             .status(rs.getString("message_status"))
                             .time(new DateTime(rs.getTime("message_timestamp").getTime()).toString())
@@ -104,7 +104,7 @@ public class MessageRepository implements Repository<Message> {
 
         return new Message()
                 .id(rs.getInt("message_id"))
-                .chatId(rs.getInt("message_group_id"))
+                .chatId(rs.getInt("message_chat_id"))
                 .content(rs.getString("message_content"))
                 .status(rs.getString("message_status"))
                 .time(new DateTime(rs.getTime("message_timestamp").getTime()).toString())

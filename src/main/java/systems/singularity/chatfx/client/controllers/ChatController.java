@@ -361,12 +361,19 @@ public class ChatController implements Initializable {
             //noinspection InfiniteLoopStatement
             while (true)
                 try {
-                    List<Message> messages = MessageRepository.getInstance().getAll().stream().filter(message -> message.getChatId().equals(Singleton.getInstance().getUser().hashCode() & ChatController.this.chat.hashCode())).collect(Collectors.toList());
-                    System.out.println(messages);
-                    Platform.runLater(() -> {
-                        ChatController.this.messagesList.setItems(FXCollections.observableArrayList(messages));
-                        ChatController.this.messagesList.scrollTo(messages.size() - 1);
-                    });
+                    List<Message> messages = MessageRepository.getInstance().getAll();
+                    if(messages != null) {
+                        List<Message> messages1 = messages.stream()
+                                .filter(message ->
+                                        message.getChatId().equals(
+                                                ChatController.this.chat.getId())).collect(Collectors.toList());
+                        System.out.println(messages);
+                        Platform.runLater(() -> {
+                            ChatController.this.messagesList.setItems(FXCollections.observableArrayList(messages1));
+                            ChatController.this.messagesList.scrollTo(messages1.size() - 1);
+                        });
+                    }
+
 
                     Thread.sleep(250);
                 } catch (SQLException | InterruptedException e) {
