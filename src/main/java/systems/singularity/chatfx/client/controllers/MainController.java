@@ -16,6 +16,7 @@ import systems.singularity.chatfx.models.Chat;
 import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
+import systems.singularity.chatfx.util.Variables;
 import systems.singularity.chatfx.util.javafx.StageTools;
 
 import java.io.IOException;
@@ -124,10 +125,20 @@ public class MainController implements Initializable {
                 while (true) {
                     Map<String, String> map = new HashMap<>();
                     map.put("Authorization", "Basic " + Singleton.getInstance().getToken());
+                    map.put("Pragma", "get;users");
                     map.put("Pragma", "get;chats");
                     final RDT.Sender sender = RDT.getSender(LoginController.getInetAddress(), LoginController.getPort());
                     Protocol.Sender.sendMessage(sender, map, "");
 
+                    RDT.Sender sender = RDT.getSender(Variables.Server.address, Variables.Server.port);
+                    Protocol.Sender.sendMessage(sender, map, "");
+
+                    RDT.getReceiver(sender).setOnReceiveListener(Variables.Server.address, (Protocol.Receiver) (address, port1, headers, message) -> {
+                        List<User> users = Arrays.stream(new Gson().fromJson(message, User[].class)).filter(user -> {
+                            if (user.getUsername().equals(Singleton.getInstance().getUsername())) {
+                                Singleton.getInstance().setUser(user);
+                                return false;
+                            }
                     RDT.getReceiver(sender).setOnReceiveListener(LoginController.getInetAddress(), (Protocol.Receiver) (address, port1, headers, message) -> {
                         List<Chat> chats = Arrays.asList(new Gson().fromJson(message, Chat[].class));
 
