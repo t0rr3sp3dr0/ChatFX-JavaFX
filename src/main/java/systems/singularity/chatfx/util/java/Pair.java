@@ -1,10 +1,15 @@
 package systems.singularity.chatfx.util.java;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by pedro on 6/13/17.
  */
 public class Pair<T1, T2> implements Comparable<Pair<T1, T2>> {
+    @SerializedName("first")
     public T1 first;
+
+    @SerializedName("second")
     public T2 second;
 
     public Pair(T1 first, T2 second) {

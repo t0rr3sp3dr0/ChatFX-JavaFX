@@ -46,7 +46,7 @@ public class Member {
   }
 
   public void setId(Integer id) {
-    this.id = id;
+    this.id = Math.abs(id);
   }
 
   public Member chatId(Integer chatId) {

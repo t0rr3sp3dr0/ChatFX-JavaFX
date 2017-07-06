@@ -61,7 +61,7 @@ public class User {
   }
 
   public void setId(Integer id) {
-    this.id = id;
+    this.id = Math.abs(id);
   }
 
   public User username(String username) {

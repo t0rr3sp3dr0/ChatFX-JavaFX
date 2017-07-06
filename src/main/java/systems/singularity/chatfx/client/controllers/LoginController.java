@@ -72,6 +72,8 @@ public class LoginController implements Initializable {
                         openChatConnection(token);
                         openFileConnection(token);
                         openRTTConnection(token);
+
+                        Singleton.getInstance().setServerReceiver(RDT.getReceiver(RDT.getSender(Variables.Server.address, Variables.Server.port)));
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }

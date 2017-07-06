@@ -89,40 +89,48 @@ public class ChatController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        Map<String, String> map = new HashMap<>();
-        map.put("Authorization", "Basic " + Singleton.getInstance().getToken());
-        map.put("Pragma", "get;members");
-        final RDT.Sender sender;
-        try {
-            sender = RDT.getSender(Variables.Server.address, Variables.Server.port);
-            Protocol.Sender.sendMessage(sender, map, "");
+        new Thread(() -> {
+            try {
+                Map<String, String> map = new HashMap<>();
+                map.put("Authorization", "Basic " + Singleton.getInstance().getToken());
+                map.put("Pragma", "get;members");
 
-            RDT.getReceiver(sender).setOnReceiveListener(Variables.Server.address, (Protocol.Receiver) (address, port1, headers, message) -> {
-                List<Member> members = Arrays.stream(new Gson().fromJson(message, Member[].class))
-                        .filter(member -> member.getChatId().equals(chat.getId())).collect(Collectors.toList());
+                RDT.Sender sender = RDT.getSender(Variables.Server.address, Variables.Server.port);
+                Protocol.Sender.sendMessage(sender, map, "");
 
-                for (Member member: members) {
-                    try {
-                        User user = UserRepository.getInstance().get(new User().username(member.getUserUsername()));
-                        if(user != null)
-                            users.add(user);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
+                Singleton.getInstance().setServerOnReceiveListener((Protocol.Receiver) (address, port1, headers, message) -> {
+                    System.out.println("meu json" + message);
+                    if (headers.get("Pragma").equals("members")) {
+
+                        List<Member> members = Arrays.stream(new Gson().fromJson(message, Member[].class))
+                                .filter(member ->
+                                        member.getChatId().equals(chat.getId())).collect(Collectors.toList());
+
+                        for (Member member : members) {
+                            try {
+
+                                User user = UserRepository.getInstance().get(new User().username(member.getUserUsername()));
+                                if (user != null)
+                                    users.add(user);
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        users = users.stream().filter(user -> {
+                            if (user.getUsername().equals(Singleton.getInstance().getUsername())) {
+                                Singleton.getInstance().setUser(user);
+                                return false;
+                            }
+                            return true;
+                        }).collect(Collectors.toList());
                     }
-                }
-                users = users.stream().filter(user -> {
-                    if (user.getUsername().equals(Singleton.getInstance().getUsername())) {
-                        Singleton.getInstance().setUser(user);
-                        return false;
-                    }
-                    return user.getStatus();
-                }).collect(Collectors.toList());
-            });
+                });
 
 
-        } catch (SocketException | UnknownHostException | InterruptedException e) {
-            e.printStackTrace();
-        }
+            } catch (SocketException | UnknownHostException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
 
 
         Platform.runLater(() -> {

@@ -109,7 +109,6 @@ public class MainController implements Initializable {
         });
 
         newChatMenuItem.setOnAction(event -> {
-
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/new_chat.fxml"));
                 final Parent root = fxmlLoader.load();
@@ -126,8 +125,17 @@ public class MainController implements Initializable {
         });
 
         new Thread(() -> {
-
             try {
+
+                Singleton.getInstance().setServerOnReceiveListener((Protocol.Receiver) (address, port1, headers, message) -> {
+                    if (headers.get("Pragma").equals("chats")) {
+                        List<Chat> chats = Arrays.asList(new Gson().fromJson(message, Chat[].class));
+                        if (chats != null)
+                            Platform.runLater(() ->
+                                    tableView.setItems(FXCollections.observableArrayList(chats)));
+                    }
+                });
+
                 //noinspection InfiniteLoopStatement
                 while (true) {
                     Map<String, String> map = new HashMap<>();
@@ -136,14 +144,7 @@ public class MainController implements Initializable {
                     final RDT.Sender sender = RDT.getSender(Variables.Server.address, Variables.Server.port);
                     Protocol.Sender.sendMessage(sender, map, "");
 
-                    RDT.getReceiver(sender).setOnReceiveListener(Variables.Server.address, (Protocol.Receiver) (address, port1, headers, message) -> {
-                        List<Chat> chats = Arrays.asList(new Gson().fromJson(message, Chat[].class));
-                        if (chats != null)
-                            Platform.runLater(() ->
-                                    tableView.setItems(FXCollections.observableArrayList(chats)));
-                    });
-
-                    Thread.sleep(250);
+                    Thread.sleep(2000);
                 }
             } catch (SocketException | InterruptedException | UnknownHostException e) {
                 e.printStackTrace();
@@ -157,8 +158,9 @@ public class MainController implements Initializable {
 
     private void newTab(Chat chat) {
         SelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
+        System.out.println("meu chat" + chat.getId());
         for (Tab e : tabPane.getTabs())
-            if (e.getId() != null && e.getId().equals(chat.getName())) {
+            if (e.getId() != null && e.getId().equals(String.valueOf(chat.getId()))) {
                 selectionModel.select(e);
                 return;
             }
