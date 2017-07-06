@@ -7,9 +7,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
+import javafx.stage.Stage;
 import systems.singularity.chatfx.client.Singleton;
 import systems.singularity.chatfx.client.db.ChatRepository;
 import systems.singularity.chatfx.models.Chat;
@@ -116,6 +119,20 @@ public class MainController implements Initializable {
         });
 
         newChatMenuItem.setOnAction(event -> {
+
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/main.fxml"));
+                fxmlLoader.setController(MainController.getInstance());
+                final Parent root = fxmlLoader.load();
+                Platform.runLater(() -> {
+                    Stage stage = new Stage();
+                    stage.setScene(new Scene(root, 720, 430));
+                    stage.show();
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
 
         });
 
