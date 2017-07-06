@@ -53,7 +53,7 @@ public class LoginController implements Initializable {
         try {
             bt_login.setOnAction(e -> {
 
-                if (!tf_user.getText().isEmpty() && !tf_pass.getText().isEmpty() && tf_pass.getText().length() >= 8) {
+                if (!tf_user.getText().isEmpty() && !tf_ip.getText().isEmpty() && !tf_port.getText().isEmpty() && !tf_pass.getText().isEmpty() && tf_pass.getText().length() >= 8) {
                     try {
                         inetAddress = InetAddress.getByName(tf_ip.getText());
                         port = Integer.parseInt(tf_port.getText());
@@ -76,7 +76,7 @@ public class LoginController implements Initializable {
                             }
                         });
 
-                        Protocol.Sender.sendMessage(chatSender, map, "Vai tomar no cu, pasg!");
+                        Protocol.Sender.sendMessage(chatSender, map, "");
 
 
                         RDT.Sender fileSender = RDT.uniqueSender(inetAddress, port);
@@ -96,7 +96,7 @@ public class LoginController implements Initializable {
                             }
                         });
 
-                        Protocol.Sender.sendMessage(fileSender, map, "Vai tomar no cu, file!");
+                        Protocol.Sender.sendMessage(fileSender, map, "");
 
 
                         RDT.Sender rttSender = RDT.uniqueSender(inetAddress, port);
@@ -118,7 +118,7 @@ public class LoginController implements Initializable {
                             }
                         });
 
-                        Protocol.Sender.sendMessage(rttSender, map, "Vai tomar no cu, rtt!");
+                        Protocol.Sender.sendMessage(rttSender, map, "");
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
@@ -132,6 +132,8 @@ public class LoginController implements Initializable {
                         error = "Password field is invalid.";
                     else if (tf_pass.getText().length() < 8)
                         error = "Password field is invalid. Minimum of 8 characters.";
+                    else
+                        error = "Invalid field for server";
                     alert.setHeaderText(error);
                     Button exitButton = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
                     exitButton.setText("OK");

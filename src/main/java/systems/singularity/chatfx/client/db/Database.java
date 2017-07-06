@@ -38,7 +38,8 @@ public class Database {
         Statement statement = Database.getConnection().createStatement();
         statement.execute("CREATE TABLE IF NOT EXISTS cf_messages (message_id INTEGER, message_chat_id INTEGER NULL, message_content VARCHAR, message_status VARCHAR(8), message_timestamp DATETIME, message_author_id INTEGER NOT NULL);");
         statement.execute("CREATE TABLE IF NOT EXISTS cf_groups (group_id INTEGER PRIMARY KEY, group_name VARCHAR(25));");
-        statement.execute("CREATE TABLE IF NOT EXISTS cf_members (member_id INTEGER PRIMARY KEY, member_group_id INTEGER NOT NULL, member_user_id INTEGER NOT NULL);");
+        statement.execute("CREATE TABLE IF NOT EXISTS cf_members (member_id INTEGER PRIMARY KEY, member_chat_id INTEGER NOT NULL, member_user_username VARCHAR(16));");
+        statement.execute("CREATE TABLE IF NOT EXISTS cf_chats (chat_id INTEGER PRIMARY KEY, chat_name VARCHAR(25), chat_isGroup BOOLEAN);");
     }
 
     public static Connection getConnection() throws SQLException {

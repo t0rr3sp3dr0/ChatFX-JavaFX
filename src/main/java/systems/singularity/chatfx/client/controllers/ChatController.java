@@ -1,5 +1,6 @@
 package systems.singularity.chatfx.client.controllers;
 
+import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -17,8 +18,12 @@ import org.joda.time.DateTime;
 import systems.singularity.chatfx.client.Networking;
 import systems.singularity.chatfx.client.Singleton;
 import systems.singularity.chatfx.client.db.MessageRepository;
+import systems.singularity.chatfx.models.Chat;
+import systems.singularity.chatfx.models.Member;
 import systems.singularity.chatfx.models.Message;
 import systems.singularity.chatfx.models.User;
+import systems.singularity.chatfx.server.db.UserRepository;
+import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
 
 import java.io.File;
@@ -28,16 +33,15 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * Created by pedro on 7/3/17.
  */
 public class ChatController implements Initializable {
-    private final User user;
+    private final Chat chat;
+    private final ArrayList<User> users = new ArrayList<>();
     private final boolean[] downloadInProgress = {false};
 
     private Node receiveFileNode;
@@ -77,12 +81,40 @@ public class ChatController implements Initializable {
     @FXML
     private Button sendButton;
 
-    public ChatController(User user) {
-        this.user = user;
+    public ChatController(Chat chat) {
+        this.chat = chat;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+        Map<String, String> map = new HashMap<>();
+        map.put("Authorization", "Basic " + Singleton.getInstance().getToken());
+        map.put("Pragma", "get;members");
+        final RDT.Sender sender;
+        try {
+            sender = RDT.getSender(LoginController.getInetAddress(), LoginController.getPort());
+            Protocol.Sender.sendMessage(sender, map, "");
+
+            RDT.getReceiver(sender).setOnReceiveListener(LoginController.getInetAddress(), (Protocol.Receiver) (address, port1, headers, message) -> {
+                List<Member> members = Arrays.stream(new Gson().fromJson(message, Member[].class))
+                        .filter(member -> member.getChatId().equals(chat.getId())).collect(Collectors.toList());
+
+                for (Member member: members) {
+                    try {
+                        User user = UserRepository.getInstance().get(new User().username(member.getUserUsername()));
+                        if(user != null)
+                            users.add(user);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+
+        } catch (SocketException | UnknownHostException | InterruptedException e) {
+            e.printStackTrace();
+        }
 
 
         Platform.runLater(() -> {
@@ -101,57 +133,62 @@ public class ChatController implements Initializable {
         });
 
         try {
-            Networking.receiveMessage(this.user, (headers, message) -> {
-                try {
-                    if (headers.get("Pragma").equals("message")) {
-                        MessageRepository.getInstance().insert(message.status("sent"));
-                        Networking.sendACK(message, ChatController.this.user);
-                    } else if (headers.get("Pragma").equals("ack"))
-                        MessageRepository.getInstance().update(MessageRepository.getInstance().get(new Message().id(Integer.parseInt(headers.get("Message-ID"))).status("ack")));
-                    else if (headers.get("Pragma").equals("seen"))
-                        MessageRepository.getInstance().update(MessageRepository.getInstance().get(new Message().id(Integer.parseInt(headers.get("Message-ID"))).status("seen")));
-                } catch (SQLException | InterruptedException | SocketException | UnknownHostException e) {
-                    e.printStackTrace();
-                }
-            });
+            for (User user : users)
+                Networking.receiveMessage(user, (headers, message) -> {
+                    try {
+                        if (headers.get("Pragma").equals("message")) {
+                            MessageRepository.getInstance().insert(message.status("sent"));
+                            Networking.sendACK(message, user);
+                        } else if (headers.get("Pragma").equals("ack"))
+                            MessageRepository.getInstance().update(MessageRepository.getInstance().get(new Message().id(Integer.parseInt(headers.get("Message-ID"))).status("ack")));
+                        else if (headers.get("Pragma").equals("seen"))
+                            MessageRepository.getInstance().update(MessageRepository.getInstance().get(new Message().id(Integer.parseInt(headers.get("Message-ID"))).status("seen")));
+                    } catch (SQLException | InterruptedException | SocketException | UnknownHostException e) {
+                        e.printStackTrace();
+                    }
+                });
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
 
         try {
-            Networking.receiveFile(this.user, (file, progress, speed, remainingTime) -> Platform.runLater(() -> {
-                if (!downloadInProgress[0]) {
-                    downloadInProgress[0] = true;
+            for (User user : users)
+                Networking.receiveFile(user, (file, progress, speed, remainingTime) -> Platform.runLater(() -> {
+                    if (!downloadInProgress[0]) {
+                        downloadInProgress[0] = true;
 
-                    ChatController.this.receiveFileDialog.setHeaderText(file.getName());
-                    ChatController.this.receiveFileDialog.show();
-                }
+                        ChatController.this.receiveFileDialog.setHeaderText(file.getName());
+                        ChatController.this.receiveFileDialog.show();
+                    }
 
-                if (progress == 1) {
-                    downloadInProgress[0] = false;
+                    if (progress == 1) {
+                        downloadInProgress[0] = false;
 
-                    ChatController.this.receiveFileDialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
-                    Node closeButton = ChatController.this.receiveFileDialog.getDialogPane().lookupButton(ButtonType.CLOSE);
-                    closeButton.managedProperty().bind(closeButton.visibleProperty());
-                    closeButton.setVisible(false);
+                        ChatController.this.receiveFileDialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+                        Node closeButton = ChatController.this.receiveFileDialog.getDialogPane().lookupButton(ButtonType.CLOSE);
+                        closeButton.managedProperty().bind(closeButton.visibleProperty());
+                        closeButton.setVisible(false);
 
-                    ChatController.this.receiveFileDialog.close();
-                } else {
-                    ChatController.this.receiveFileController.getProgressBar().setProgress(progress);
-                    ChatController.this.receiveFileController.getProgressLabel().setText(String.format("%.2f%%", progress * 100));
-                    ChatController.this.receiveFileController.getEtaLabel().setText(String.format("%.0fs", remainingTime));
-                    ChatController.this.receiveFileController.getSpeedLabel().setText(String.format("%.2f MB/s", speed / (1024 * 1024)));
+                        ChatController.this.receiveFileDialog.close();
+                    } else {
+                        ChatController.this.receiveFileController.getProgressBar().setProgress(progress);
+                        ChatController.this.receiveFileController.getProgressLabel().setText(String.format("%.2f%%", progress * 100));
+                        ChatController.this.receiveFileController.getEtaLabel().setText(String.format("%.0fs", remainingTime));
+                        ChatController.this.receiveFileController.getSpeedLabel().setText(String.format("%.2f MB/s", speed / (1024 * 1024)));
 
-                }
-            }));
+                    }
+                }));
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
 
         try {
-            RDT.RTT.Probe probe = new RDT.RTT.Probe(InetAddress.getByName(this.user.getAddress()), this.user.getPortRtt());
-            probe.setOnRTTListenner(objects -> Platform.runLater(() -> ChatController.this.rttLabel.setText(String.format("%.3f ms", ((double) objects[0]) / 1e6))));
-            probe.start();
+            for (User user : users) {
+                RDT.RTT.Probe probe = new RDT.RTT.Probe(InetAddress.getByName(user.getAddress()), user.getPortRtt());
+                probe.setOnRTTListenner(objects -> Platform.runLater(() -> ChatController.this.rttLabel.setText(String.format("%.3f ms", ((double) objects[0]) / 1e6))));
+                probe.start();
+            }
+
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
@@ -199,7 +236,8 @@ public class ChatController implements Initializable {
                             setGraphic(fxmlLoader.load());
 
                             ReceiverMessageRowController messageRowController = fxmlLoader.getController();
-                            messageRowController.getSenderLabel().setText(ChatController.this.user.getUsername());
+                            //nome do grupo
+                            messageRowController.getSenderLabel().setText(ChatController.this.chat.getName());
                             messageRowController.getSenderLabel().maxWidthProperty().bind(messagesList.widthProperty().add(-26));
                             messageRowController.getMessageLabel().setText(item.getContent());
                             messageRowController.getMessageLabel().maxWidthProperty().bind(messagesList.widthProperty().add(-26));
@@ -225,19 +263,22 @@ public class ChatController implements Initializable {
 
                 if (content.length() > 0) {
                     new Thread(() -> {
-                        Message message = new Message()
-                                .authorId(Singleton.getInstance().getUser().getId())
-                                .content(content)
-                                .chatId(Singleton.getInstance().getUser().hashCode() & ChatController.this.user.hashCode())
-                                .status("processing")
-                                .time(DateTime.now().toString());
+                        for (User user : users) {
+                            Message message = new Message()
+                                    .authorId(Singleton.getInstance().getUser().getId())
+                                    .content(content)
+                                    .chatId(ChatController.this.chat.getId())
+                                    .status("processing")
+                                    .time(DateTime.now().toString());
 
-                        try {
-                            Networking.sendMessage(message.id(message.hashCode()), ChatController.this.user);
-                            MessageRepository.getInstance().insert(message);
-                        } catch (UnknownHostException | SocketException | InterruptedException | SQLException e) {
-                            e.printStackTrace();
+                            try {
+                                Networking.sendMessage(message.id(message.hashCode()), user);
+                                MessageRepository.getInstance().insert(message);
+                            } catch (UnknownHostException | SocketException | InterruptedException | SQLException e) {
+                                e.printStackTrace();
+                            }
                         }
+
                     }).start();
 
                     textField.setText(null);
@@ -260,25 +301,28 @@ public class ChatController implements Initializable {
                 Optional<ButtonType> result = confirm.showAndWait();
                 if (result.isPresent() && result.get() == ButtonType.OK)
                     try {
-                        Networking.sendFile(file, user, "", (($, progress, speed, remainingTime) -> Platform.runLater(() -> {
-                            if (progress == 1) {
-                                chooseFileButton.setDisable(false);
+                        for (User user : users) {
+                            Networking.sendFile(file, user, "", (($, progress, speed, remainingTime) -> Platform.runLater(() -> {
+                                if (progress == 1) {
+                                    chooseFileButton.setDisable(false);
 
-                                Alert info = new Alert(Alert.AlertType.INFORMATION);
-                                info.setHeaderText("Upload Finished Successfully!");
-                                info.show();
+                                    Alert info = new Alert(Alert.AlertType.INFORMATION);
+                                    info.setHeaderText("Upload Finished Successfully!");
+                                    info.show();
 
-                                progressBar.setProgress(0);
-                                progressLabel.setText(null);
-                                etaLabel.setText(null);
-                                speedLabel.setText(null);
-                            } else {
-                                progressBar.setProgress(progress);
-                                progressLabel.setText(String.format("%.2f%%", progress * 100));
-                                etaLabel.setText(String.format("%.0fs", remainingTime));
-                                speedLabel.setText(String.format("%.2f MB/s", speed / (1024 * 1024)));
-                            }
-                        })));
+                                    progressBar.setProgress(0);
+                                    progressLabel.setText(null);
+                                    etaLabel.setText(null);
+                                    speedLabel.setText(null);
+                                } else {
+                                    progressBar.setProgress(progress);
+                                    progressLabel.setText(String.format("%.2f%%", progress * 100));
+                                    etaLabel.setText(String.format("%.0fs", remainingTime));
+                                    speedLabel.setText(String.format("%.2f MB/s", speed / (1024 * 1024)));
+                                }
+                            })));
+                        }
+
                     } catch (SocketException | UnknownHostException e) {
                         e.printStackTrace();
                     }
@@ -290,7 +334,7 @@ public class ChatController implements Initializable {
             //noinspection InfiniteLoopStatement
             while (true)
                 try {
-                    List<Message> messages = MessageRepository.getInstance().getAll().stream().filter(message -> message.getChatId().equals(Singleton.getInstance().getUser().hashCode() & ChatController.this.user.hashCode())).collect(Collectors.toList());
+                    List<Message> messages = MessageRepository.getInstance().getAll().stream().filter(message -> message.getChatId().equals(Singleton.getInstance().getUser().hashCode() & ChatController.this.chat.hashCode())).collect(Collectors.toList());
                     Platform.runLater(() -> {
                         ChatController.this.messagesList.setItems(FXCollections.observableArrayList(messages));
                         ChatController.this.messagesList.scrollTo(messages.size() - 1);

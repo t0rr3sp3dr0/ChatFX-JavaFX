@@ -1,6 +1,10 @@
 package systems.singularity.chatfx.server;
 
 import com.google.gson.Gson;
+import systems.singularity.chatfx.client.db.ChatRepository;
+import systems.singularity.chatfx.client.db.MemberRepository;
+import systems.singularity.chatfx.models.Chat;
+import systems.singularity.chatfx.models.Member;
 import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.server.db.UserRepository;
 import systems.singularity.chatfx.util.Protocol;
@@ -118,14 +122,42 @@ public class Handler extends Thread implements Protocol.Receiver {
                         break;
 
                     case "get":
+                        Gson gson = new Gson();
+                        String json;
+                        Map<String, String> map = new HashMap<>();
                         switch (pragma[1]) {
                             case "users":
                                 UserRepository.getInstance().update(UserRepository.getInstance().get(new User().username(basic[0])));
 
                                 List<User> users = UserRepository.getInstance().getAll();
-                                Gson gson = new Gson();
-                                String json = gson.toJson(users);
-                                Map<String, String> map = new HashMap<>();
+                                json = gson.toJson(users);
+                                map = new HashMap<>();
+                                map.put("Pragma", "OK");
+
+                                try {
+                                    Protocol.Sender.sendMessage(RDT.getSender(address, port), map, json);
+                                } catch (InterruptedException | SocketException | UnknownHostException e) {
+                                    e.printStackTrace();
+                                }
+                                break;
+                            case "chats":
+                                List<Chat> chats = ChatRepository.getInstance().getAll();
+                                gson = new Gson();
+                                json = gson.toJson(chats);
+                                map = new HashMap<>();
+                                map.put("Pragma", "OK");
+
+                                try {
+                                    Protocol.Sender.sendMessage(RDT.getSender(address, port), map, json);
+                                } catch (InterruptedException | SocketException | UnknownHostException e) {
+                                    e.printStackTrace();
+                                }
+                                break;
+                            case "members":
+                                List<Member> members = MemberRepository.getInstance().getAll();
+                                gson = new Gson();
+                                json = gson.toJson(members);
+                                map = new HashMap<>();
                                 map.put("Pragma", "OK");
 
                                 try {

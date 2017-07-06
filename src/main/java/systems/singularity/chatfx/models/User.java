@@ -47,7 +47,7 @@ public class User {
   private Boolean status = null;
 
   public User id(Integer id) {
-    this.id = id;
+    this.id = Math.abs(id);
     return this;
   }
 

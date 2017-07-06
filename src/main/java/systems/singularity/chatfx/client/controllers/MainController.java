@@ -11,6 +11,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import systems.singularity.chatfx.client.Singleton;
+import systems.singularity.chatfx.client.db.ChatRepository;
+import systems.singularity.chatfx.models.Chat;
 import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
@@ -21,13 +23,27 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by caesa on 01/07/2017.
  */
 public class MainController implements Initializable {
     public static final StageTools stageTools = new StageTools();
+    private final Chat[] chat = new Chat[1];
+
+    private static MainController ourInstance = new MainController();
+
+    private MainController() {
+        // Avoid class instantiation
+    }
+
+    public static MainController getInstance() {
+        return MainController.ourInstance;
+    }
+
+    public void setChat(Chat chat) {
+        this.chat[0] = chat;
+    }
 
     @FXML
     private MenuBar menuBar;
@@ -39,10 +55,10 @@ public class MainController implements Initializable {
     private MenuItem newChatMenuItem;
 
     @FXML
-    private TableView<User> tableView;
+    private TableView<Chat> tableView;
 
     @FXML
-    private TableColumn<User, String> tableColumn;
+    private TableColumn<Chat, String> tableColumn;
 
     @FXML
     private TabPane tabPane;
@@ -63,25 +79,26 @@ public class MainController implements Initializable {
         stageTools.setTabPane(tabPane);
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.SELECTED_TAB);
 
-        SelectionModel<User> tableViewSelectionModel = tableView.getSelectionModel();
+        SelectionModel<Chat> tableViewSelectionModel = tableView.getSelectionModel();
         tableViewSelectionModel.selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null)
-                newTab(newValue);
-        });
+                    if (newValue != null)
+                        newTab(newValue);
+                }
+        );
 
         SelectionModel<Tab> tabSelectionModel = tabPane.getSelectionModel();
         tabSelectionModel.selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null)
                 tableViewSelectionModel.select(null);
             else
-                for (User user : tableView.getItems())
-                    if (user.getUsername().equals(newValue.getId())) {
-                        tableViewSelectionModel.select(user);
+                for (Chat chat : tableView.getItems())
+                    if (chat.getName().equals(newValue.getId())) {
+                        tableViewSelectionModel.select(chat);
                         break;
                     }
         });
 
-        tableColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
+        tableColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 
         discardModuleMenuItem.setOnAction(event -> {
             Dialog dialog = new Dialog();
@@ -107,21 +124,14 @@ public class MainController implements Initializable {
                 while (true) {
                     Map<String, String> map = new HashMap<>();
                     map.put("Authorization", "Basic " + Singleton.getInstance().getToken());
-                    map.put("Pragma", "get;users");
+                    map.put("Pragma", "get;chats");
                     final RDT.Sender sender = RDT.getSender(LoginController.getInetAddress(), LoginController.getPort());
-                    Protocol.Sender.sendMessage(sender, map, "Manda esses user aí, seu porra!");
+                    Protocol.Sender.sendMessage(sender, map, "");
 
                     RDT.getReceiver(sender).setOnReceiveListener(LoginController.getInetAddress(), (Protocol.Receiver) (address, port1, headers, message) -> {
-                        List<User> users = Arrays.stream(new Gson().fromJson(message, User[].class)).filter(user -> {
-                            if (user.getUsername().equals(Singleton.getInstance().getUsername())) {
-                                Singleton.getInstance().setUser(user);
-                                return false;
-                            }
+                        List<Chat> chats = Arrays.asList(new Gson().fromJson(message, Chat[].class));
 
-                            return user.getStatus();
-                        }).collect(Collectors.toList());
-
-                        Platform.runLater(() -> tableView.setItems(FXCollections.observableArrayList(users)));
+                        Platform.runLater(() -> tableView.setItems(FXCollections.observableArrayList(chats)));
                     });
 
                     Thread.sleep(250);
@@ -132,20 +142,20 @@ public class MainController implements Initializable {
         }).start();
     }
 
-    private void newTab(User user) {
+    private void newTab(Chat chat) {
         SelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
         for (Tab e : tabPane.getTabs())
-            if (e.getId() != null && e.getId().equals(user.getUsername())) {
+            if (e.getId() != null && e.getId().equals(this.chat[0].getName())) {
                 selectionModel.select(e);
                 return;
             }
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/chat.fxml"));
-            fxmlLoader.setController(new ChatController(user));
+            fxmlLoader.setController(new ChatController(chat));
 
             Tab tab = new Tab();
-            tab.setId(user.getUsername());
-            tab.setText(user.getUsername());
+            tab.setId(String.valueOf(this.chat[0].getId()));
+            tab.setText(this.chat[0].getName());
             tab.setClosable(true);
             tab.setContent(fxmlLoader.load());
             tabPane.getTabs().add(tab);
