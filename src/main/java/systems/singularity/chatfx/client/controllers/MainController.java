@@ -111,8 +111,7 @@ public class MainController implements Initializable {
         newChatMenuItem.setOnAction(event -> {
 
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/main.fxml"));
-                fxmlLoader.setController(MainController.getInstance());
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/new_chat.fxml"));
                 final Parent root = fxmlLoader.load();
                 Platform.runLater(() -> {
                     Stage stage = new Stage();
