@@ -13,10 +13,10 @@ import systems.singularity.chatfx.client.db.ChatRepository;
 import systems.singularity.chatfx.client.db.MemberRepository;
 import systems.singularity.chatfx.models.Chat;
 import systems.singularity.chatfx.models.Member;
-import systems.singularity.chatfx.models.Message;
 import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
+import systems.singularity.chatfx.util.Variables;
 
 import java.net.SocketException;
 import java.net.URL;
