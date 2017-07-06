@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
  */
 public class ChatController implements Initializable {
     private final Chat chat;
-    private final ArrayList<User> users = new ArrayList<>();
+    private List<User> users = new ArrayList<>();
     private final boolean[] downloadInProgress = {false};
 
     private Node receiveFileNode;
@@ -110,6 +110,13 @@ public class ChatController implements Initializable {
                         e.printStackTrace();
                     }
                 }
+                users = users.stream().filter(user -> {
+                    if (user.getUsername().equals(Singleton.getInstance().getUsername())) {
+                        Singleton.getInstance().setUser(user);
+                        return false;
+                    }
+                    return user.getStatus();
+                }).collect(Collectors.toList());
             });
 
 
