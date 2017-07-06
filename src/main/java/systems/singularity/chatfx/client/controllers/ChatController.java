@@ -109,9 +109,7 @@ public class ChatController implements Initializable {
                         for (Member member : members) {
                             try {
 
-                                User user = UserRepository.getInstance().get(new User().username(member.getUserUsername()));
-                                if (user != null)
-                                    users.add(user);
+                                users = UserRepository.getInstance().getMore(new User().username(member.getUserUsername()));
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }
@@ -281,13 +279,12 @@ public class ChatController implements Initializable {
                     new Thread(() -> {
                         Message message = null;
                         for (User user : users) {
-                            while (Singleton.getInstance().getUser() == null)
-                                System.out.println(0);
+                            System.out.println(chat.getId());
 
                             message = new Message()
                                     .authorId(Singleton.getInstance().getUser().getId())
                                     .content(content)
-                                    .chatId(ChatController.this.chat.getId())
+                                    .chatId(chat.getId())
                                     .status("processing")
                                     .time(DateTime.now().toString());
 
@@ -362,7 +359,7 @@ public class ChatController implements Initializable {
             while (true)
                 try {
                     List<Message> messages = MessageRepository.getInstance().getAll();
-                    if(messages != null) {
+                    if (messages != null) {
                         List<Message> messages1 = messages.stream()
                                 .filter(message ->
                                         message.getChatId().equals(

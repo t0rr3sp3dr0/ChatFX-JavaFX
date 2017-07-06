@@ -132,4 +132,26 @@ public class UserRepository implements Repository<User> {
                 .status(rs.getBoolean(8));
     }
 
+    public List<User> getMore(User user) throws SQLException {
+        Connection conn = Database.getConnection();
+        PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_users WHERE user_username = ?;");
+        statement.setString(1, user.getUsername());
+        ResultSet rs = statement.executeQuery();
+
+        ArrayList<User> users = new ArrayList<>();
+        while (rs.next())
+            users.add(
+                    new User()
+                            .id(rs.getInt("user_id"))
+                            .username(rs.getString("user_username"))
+                            .password(rs.getString("user_password"))
+                            .address(rs.getString("user_address"))
+                            .portChat(rs.getInt("user_portChat"))
+                            .portFile(rs.getInt("user_portFile"))
+                            .portRtt(rs.getInt("user_portRtt"))
+                            .status(rs.getBoolean("user_status"))
+            );
+        return users;
+    }
+
 }
