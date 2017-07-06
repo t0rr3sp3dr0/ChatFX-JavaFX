@@ -5,10 +5,10 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -148,27 +148,32 @@ public class ChatController implements Initializable {
             protected void updateItem(Message item, boolean empty) {
                 super.updateItem(item, empty);
 
-                if (item == null || empty) {
-                    setDisable(true);
-                    setText(null);
-                } else
-                    if (item.getAuthorId().equals(Singleton.getInstance().getUser().getId())) {
-                        setAlignment(Pos.CENTER_RIGHT);
-                        setTooltip(new Tooltip(item.getStatus()));
-                        setText(item.getContent());
-                    } else {
-                        try {
-                            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/message_row.fxml"));
+                if (item != null && !empty)
+                    try {
+                        if (item.getAuthorId().equals(Singleton.getInstance().getUser().getId())) {
+                            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/anchor.fxml"));
                             setGraphic(fxmlLoader.load());
 
-                            MessageRowController messageRowController = fxmlLoader.getController();
+                            SenderMessageRowController senderRowController = fxmlLoader.getController();
+                            senderRowController.getMessageLabel().setText(item.getContent());
+                            senderRowController.getMessageLabel().maxWidthProperty().bind(messagesList.widthProperty().add(-26));
+
+                            if (Math.random() % 2 == 0)
+                                senderRowController.getCheckImage().setImage(new Image("/icons/ic_done.png"));
+                            else
+                                senderRowController.getCheckImage().setImage(new Image("/icons/ic_done_all.png"));
+                        } else {
+                            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/receiver_message_row.fxml"));
+                            setGraphic(fxmlLoader.load());
+
+                            ReceiverMessageRowController messageRowController = fxmlLoader.getController();
                             messageRowController.getSenderLabel().setText(ChatController.this.user.getUsername());
                             messageRowController.getSenderLabel().maxWidthProperty().bind(messagesList.widthProperty().add(-26));
                             messageRowController.getMessageLabel().setText(item.getContent());
                             messageRowController.getMessageLabel().maxWidthProperty().bind(messagesList.widthProperty().add(-26));
-                        } catch (IOException e) {
-                            e.printStackTrace();
                         }
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
             }
         });

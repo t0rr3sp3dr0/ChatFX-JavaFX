@@ -9,7 +9,7 @@ import java.util.ResourceBundle;
 /**
  * Created by phts on 05/07/17.
  */
-public class MessageRowController {
+public class ReceiverMessageRowController {
 
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
@@ -26,8 +26,8 @@ public class MessageRowController {
     @FXML
         // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
-        assert senderLabel != null : "fx:id=\"senderLabel\" was not injected: check your FXML file 'message_row.fxml'.";
-        assert messageLabel != null : "fx:id=\"messageLabel\" was not injected: check your FXML file 'message_row.fxml'.";
+        assert senderLabel != null : "fx:id=\"senderLabel\" was not injected: check your FXML file 'receiver_message_row.fxml'.";
+        assert messageLabel != null : "fx:id=\"messageLabel\" was not injected: check your FXML file 'receiver_message_row.fxml'.";
     }
 
     public Label getSenderLabel() {
