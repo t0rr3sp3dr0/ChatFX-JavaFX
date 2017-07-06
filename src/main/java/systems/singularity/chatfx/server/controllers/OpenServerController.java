@@ -38,7 +38,7 @@ public class OpenServerController implements Initializable {
 
                 Stage stage = new Stage();
                 stage.setTitle("Server");
-                stage.setScene(new Scene(root, 600, 400));
+                stage.setScene(new Scene(root, 652, 400));
                 stage.show();
 
                 Utilities.setOnCloseRequest(stage);

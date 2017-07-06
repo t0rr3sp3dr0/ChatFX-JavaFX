@@ -20,6 +20,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         File file = new File(Constants.PERSISTENT_DIRECTORY);
+        //noinspection StatementWithEmptyBody
         if (!file.exists() && file.mkdir()) ;
 
         Parent root = FXMLLoader.load(getClass().getResource("/layouts/login.fxml"));

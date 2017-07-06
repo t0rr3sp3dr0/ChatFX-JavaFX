@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<TableView xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="systems.singularity.chatfx.server.controllers.ServerController" fx:id="tvUsers"
-           maxHeight="300.0" maxWidth="600.0" prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8">
+<TableView xmlns:fx="http://javafx.com/fxml/1" fx:id="tvUsers" xmlns="http://javafx.com/javafx/8"
+           fx:controller="systems.singularity.chatfx.server.controllers.ServerController">
     <columns>
-        <TableColumn fx:id="tcUsername" prefWidth="95.0" text="username"/>
-        <TableColumn fx:id="tcIp" prefWidth="199.0" text="ip"/>
-        <TableColumn fx:id="tcChat" prefWidth="86.0" text="chat port "/>
-        <TableColumn fx:id="tcFile" prefWidth="77.0" text="file port"/>
-        <TableColumn fx:id="tcRtt" prefWidth="73.0" text="rtt port"/>
-        <TableColumn fx:id="tcStatus" prefWidth="69.0" text="status"/>
+        <TableColumn fx:id="tcUsername" prefWidth="100.0" text="Username"/>
+        <TableColumn fx:id="tcIp" prefWidth="150.0" text="Address"/>
+        <TableColumn fx:id="tcChat" prefWidth="100.0" text="Chat Port"/>
+        <TableColumn fx:id="tcFile" prefWidth="100.0" text="File Port"/>
+        <TableColumn fx:id="tcRtt" prefWidth="100.0" text="RTT Port"/>
+        <TableColumn fx:id="tcStatus" prefWidth="100.0" text="Online"/>
     </columns>
 </TableView>
