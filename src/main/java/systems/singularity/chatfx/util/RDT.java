@@ -512,6 +512,7 @@ public final class RDT {
 
             private OnEventListener onRTTFailed = null;
             private OnEventListener onTimeoutChanged = null;
+            private OnEventListener onRTT = null;
 
             public Probe(InetAddress address, int port) {
                 this.address = address;
@@ -540,6 +541,9 @@ public final class RDT {
                                 socket.receive(packet);
                             } while (bytes[0] != seq);
                             this.sample = System.nanoTime() - this.sample;
+
+                            if (this.onRTT != null)
+                                this.onRTT.onEvent(this.sample);
 
                             this.estimated = (1 - Probe.ALPHA) * this.estimated + Probe.ALPHA * this.sample;
                             this.deviation = (1 - Probe.BETA) * this.deviation + Probe.BETA * Math.abs(this.sample - this.estimated);
@@ -571,6 +575,10 @@ public final class RDT {
 
             public void setOnTimeoutChanged(OnEventListener onTimeoutChanged) {
                 this.onTimeoutChanged = onTimeoutChanged;
+            }
+
+            public void setOnRTTListenner(OnEventListener onRTT) {
+                this.onRTT = onRTT;
             }
         }
     }

@@ -19,9 +19,11 @@ import systems.singularity.chatfx.client.Singleton;
 import systems.singularity.chatfx.client.db.MessageRepository;
 import systems.singularity.chatfx.models.Message;
 import systems.singularity.chatfx.models.User;
+import systems.singularity.chatfx.util.RDT;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -140,6 +142,14 @@ public class ChatController implements Initializable {
 
                 }
             }));
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            RDT.RTT.Probe probe = new RDT.RTT.Probe(InetAddress.getByName(this.user.getAddress()), this.user.getPortRtt());
+            probe.setOnRTTListenner(objects -> Platform.runLater(() -> ChatController.this.rttLabel.setText(String.format("%.3f ms", ((double) objects[0]) / 1e6))));
+            probe.start();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
