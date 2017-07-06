@@ -46,11 +46,10 @@ public class NewChatController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         button.setOnAction(event -> {
             if (!textField.getText().isEmpty()) {
+                List<User> users = new ArrayList<>(listView.getSelectionModel().getSelectedItems());
+                users.add(Singleton.getInstance().getUser());
                 Platform.runLater(() -> {
                     try {
-
-                        List<User> users = listView.getSelectionModel().getSelectedItems();
-                        users.add(Singleton.getInstance().getUser());
                         Chat chat = new Chat().name(textField.getText());
                         chat.setGroup(users.size() > 2);
                         chat.id(chat.hashCode());
@@ -63,7 +62,6 @@ public class NewChatController implements Initializable {
                         }
 
                         ChatRepository.getInstance().insert(chat);
-
                         MainController.getInstance().setChat(chat);
                         ((Stage) NewChatController.this.root.getScene().getWindow()).close();
 
@@ -88,7 +86,8 @@ public class NewChatController implements Initializable {
             @Override
             protected void updateItem(User item, boolean empty) {
                 super.updateItem(item, empty);
-                setText(item.getUsername());
+                if (!empty)
+                    setText(item.getUsername());
             }
         });
 
@@ -96,28 +95,24 @@ public class NewChatController implements Initializable {
         new Thread(() -> {
             try {
                 //noinspection InfiniteLoopStatement
-                while (true) {
-                    Map<String, String> map = new HashMap<>();
-                    map.put("Authorization", "Basic " + Singleton.getInstance().getToken());
-                    map.put("Pragma", "get;users");
-                    final RDT.Sender sender = RDT.getSender(LoginController.getInetAddress(), LoginController.getPort());
-                    Protocol.Sender.sendMessage(sender, map, "");
+                Map<String, String> map = new HashMap<>();
+                map.put("Authorization", "Basic " + Singleton.getInstance().getToken());
+                map.put("Pragma", "get;users");
+                final RDT.Sender sender = RDT.getSender(LoginController.getInetAddress(), LoginController.getPort());
+                Protocol.Sender.sendMessage(sender, map, "");
 
-                    RDT.getReceiver(sender).setOnReceiveListener(LoginController.getInetAddress(), (Protocol.Receiver) (address, port1, headers, message) -> {
-                        List<User> users = Arrays.stream(new Gson().fromJson(message, User[].class)).filter(user -> {
-                            if (user.getUsername().equals(Singleton.getInstance().getUsername())) {
-                                Singleton.getInstance().setUser(user);
-                                return false;
-                            }
+                RDT.getReceiver(sender).setOnReceiveListener(LoginController.getInetAddress(), (Protocol.Receiver) (address, port1, headers, message) -> {
+                    List<User> users = Arrays.stream(new Gson().fromJson(message, User[].class)).filter(user -> {
+                        if (user.getUsername().equals(Singleton.getInstance().getUsername())) {
+                            Singleton.getInstance().setUser(user);
+                            return false;
+                        }
 
-                            return user.getStatus();
-                        }).collect(Collectors.toList());
+                        return user.getStatus();
+                    }).collect(Collectors.toList());
 
-                        Platform.runLater(() -> listView.setItems(FXCollections.observableArrayList(users)));
-                    });
-
-                    Thread.sleep(250);
-                }
+                    Platform.runLater(() -> listView.setItems(FXCollections.observableArrayList(users)));
+                });
             } catch (SocketException | InterruptedException | UnknownHostException e) {
                 e.printStackTrace();
             }
