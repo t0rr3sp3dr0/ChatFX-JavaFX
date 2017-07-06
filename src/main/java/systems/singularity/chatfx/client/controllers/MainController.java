@@ -158,7 +158,7 @@ public class MainController implements Initializable {
     private void newTab(Chat chat) {
         SelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
         for (Tab e : tabPane.getTabs())
-            if (e.getId() != null && e.getId().equals(this.chat[0].getName())) {
+            if (e.getId() != null && e.getId().equals(chat.getName())) {
                 selectionModel.select(e);
                 return;
             }
