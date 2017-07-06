@@ -141,6 +141,8 @@ public class Handler extends Thread implements Protocol.Receiver {
                                 }
                                 break;
                             case "chats":
+                                UserRepository.getInstance().update(UserRepository.getInstance().get(new User().username(basic[0])));
+
                                 List<Chat> chats = ChatRepository.getInstance().getAll();
                                 gson = new Gson();
                                 json = gson.toJson(chats);
@@ -154,6 +156,8 @@ public class Handler extends Thread implements Protocol.Receiver {
                                 }
                                 break;
                             case "members":
+                                UserRepository.getInstance().update(UserRepository.getInstance().get(new User().username(basic[0])));
+
                                 List<Member> members = MemberRepository.getInstance().getAll();
                                 gson = new Gson();
                                 json = gson.toJson(members);

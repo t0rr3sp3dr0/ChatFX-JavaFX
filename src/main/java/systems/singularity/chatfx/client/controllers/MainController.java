@@ -14,9 +14,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import systems.singularity.chatfx.client.Singleton;
-import systems.singularity.chatfx.client.db.ChatRepository;
 import systems.singularity.chatfx.models.Chat;
-import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
 import systems.singularity.chatfx.util.Variables;
@@ -33,9 +31,21 @@ import java.util.*;
  */
 public class MainController implements Initializable {
     public static final StageTools stageTools = new StageTools();
-    private final Chat[] chat = new Chat[1];
-
     private static MainController ourInstance = new MainController();
+    private final Chat[] chat = new Chat[1];
+    @FXML
+    private MenuBar menuBar;
+    @FXML
+    private MenuItem discardModuleMenuItem;
+    @FXML
+    private MenuItem newChatMenuItem;
+    @FXML
+    private TableView<Chat> tableView;
+    @FXML
+    private TableColumn<Chat, String> tableColumn;
+    @FXML
+    private TabPane tabPane;
+    private Node discardModuleNode;
 
     private MainController() {
         // Avoid class instantiation
@@ -48,26 +58,6 @@ public class MainController implements Initializable {
     public void setChat(Chat chat) {
         this.chat[0] = chat;
     }
-
-    @FXML
-    private MenuBar menuBar;
-
-    @FXML
-    private MenuItem discardModuleMenuItem;
-
-    @FXML
-    private MenuItem newChatMenuItem;
-
-    @FXML
-    private TableView<Chat> tableView;
-
-    @FXML
-    private TableColumn<Chat, String> tableColumn;
-
-    @FXML
-    private TabPane tabPane;
-
-    private Node discardModuleNode;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -142,21 +132,11 @@ public class MainController implements Initializable {
                 while (true) {
                     Map<String, String> map = new HashMap<>();
                     map.put("Authorization", "Basic " + Singleton.getInstance().getToken());
-                    map.put("Pragma", "get;users");
                     map.put("Pragma", "get;chats");
-                    final RDT.Sender sender = RDT.getSender(LoginController.getInetAddress(), LoginController.getPort());
-                    Protocol.Sender.sendMessage(sender, map, "");
-
-                    RDT.Sender sender = RDT.getSender(Variables.Server.address, Variables.Server.port);
+                    final RDT.Sender sender = RDT.getSender(Variables.Server.address, Variables.Server.port);
                     Protocol.Sender.sendMessage(sender, map, "");
 
                     RDT.getReceiver(sender).setOnReceiveListener(Variables.Server.address, (Protocol.Receiver) (address, port1, headers, message) -> {
-                        List<User> users = Arrays.stream(new Gson().fromJson(message, User[].class)).filter(user -> {
-                            if (user.getUsername().equals(Singleton.getInstance().getUsername())) {
-                                Singleton.getInstance().setUser(user);
-                                return false;
-                            }
-                    RDT.getReceiver(sender).setOnReceiveListener(LoginController.getInetAddress(), (Protocol.Receiver) (address, port1, headers, message) -> {
                         List<Chat> chats = Arrays.asList(new Gson().fromJson(message, Chat[].class));
 
                         Platform.runLater(() -> tableView.setItems(FXCollections.observableArrayList(chats)));

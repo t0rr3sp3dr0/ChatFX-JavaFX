@@ -15,8 +15,11 @@ import systems.singularity.chatfx.util.RDT;
 import systems.singularity.chatfx.util.java.Utilities;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.HashMap;
@@ -57,7 +60,7 @@ public class LoginController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         try {
             loginButton.setOnAction(e -> {
-                if (!userTextField.getText().isEmpty() && !passTextField.getText().isEmpty() && passTextField.getText().length() >= 8 && portTextField.getText().trim().length() > 0)
+                if (!userTextField.getText().isEmpty() && !passTextField.getText().isEmpty() && passTextField.getText().length() >= 8 && hostTextField.getText().length() > 0 && portTextField.getText().trim().length() > 0)
                     try {
                         InetAddress host = InetAddress.getByName(hostTextField.getText());
                         int port = Integer.parseInt(portTextField.getText());
@@ -65,69 +68,9 @@ public class LoginController implements Initializable {
                         String password = Utilities.md5(passTextField.getText());
                         String token = new String(Base64.getEncoder().encode((userTextField.getText() + ":" + password).getBytes()));
 
-                        Map<String, String> chatHeaders = new HashMap<>();
-                        chatHeaders.put("Authorization", "Basic " + token);
-                        chatHeaders.put("Pragma", "login;chat");
-
-                        RDT.Sender chatSender = RDT.uniqueSender(host, port);
-
-                        Singleton.getInstance().setChatReceiver(RDT.getReceiver(chatSender));
-                        Singleton.getInstance().setChatOnReceiveListener(host, (Protocol.Receiver) (address, $, headers, message) -> {
-                            String[] pragma = headers.get("Pragma").split(";");
-                            if (pragma[0].equals("login") && !pragma[1].equals("401")) {
-                                System.out.println("\n\nLOGIN: CHAT\n\n");
-
-                                this.logged[0] = true;
-                                login();
-                            } else
-                                Platform.runLater(LoginController.this::accessDenied);
-                        });
-
-                        Protocol.Sender.sendMessage(chatSender, chatHeaders, "");
-
-
-                        RDT.Sender fileSender = RDT.uniqueSender(host, port);
-
-                        Map<String, String> fileHeaders = new HashMap<>();
-                        fileHeaders.put("Authorization", "Basic " + token);
-                        fileHeaders.put("Pragma", "login;file");
-
-                        Singleton.getInstance().setFileReceiver(RDT.getReceiver(fileSender));
-                        Singleton.getInstance().setFileOnReceiveListener(host, (Protocol.Receiver) (address, $, headers, message) -> {
-                            String[] pragma = headers.get("Pragma").split(";");
-                            if (pragma[0].equals("login") && !pragma[1].equals("401")) {
-                                System.out.println("\n\nLOGIN: FILE\n\n");
-
-                                this.logged[1] = true;
-                                login();
-                            } else
-                                Platform.runLater(LoginController.this::accessDenied);
-                        });
-
-                        Protocol.Sender.sendMessage(fileSender, fileHeaders, "");
-
-
-                        RDT.Sender rttSender = RDT.uniqueSender(host, port);
-
-                        Map<String, String> rttHeaders = new HashMap<>();
-                        rttHeaders.put("Authorization", "Basic " + token);
-                        rttHeaders.put("Pragma", "login;rtt");
-
-                        RDT.Receiver rttReceiver = RDT.getReceiver(rttSender);
-                        rttReceiver.setOnReceiveListener(host, (Protocol.Receiver) (address, $, headers, message) -> {
-                            String[] pragma = headers.get("Pragma").split(";");
-                            if (pragma[0].equals("login") && !pragma[1].equals("401")) {
-                                System.out.println("\n\nLOGIN: RTT\n\n");
-
-                                new RDT.RTT.Echo(rttSender).start();
-
-                                this.logged[2] = true;
-                                login();
-                            } else
-                                Platform.runLater(LoginController.this::accessDenied);
-                        });
-
-                        Protocol.Sender.sendMessage(rttSender, rttHeaders, "");
+                        openChatConnection(host, port, token);
+                        openFileConnection(host, port, token);
+                        openRTTConnection(host, port, token);
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
@@ -142,6 +85,10 @@ public class LoginController implements Initializable {
                             error = "Password field is invalid.";
                         else if (passTextField.getText().length() < 8)
                             error = "Password field is invalid. Minimum of 8 characters.";
+                        else if (hostTextField.getText().length() <= 0)
+                            error = "Invalid server hostname.";
+                        else if (portTextField.getText().length() <= 0)
+                            error = "Invalid server port.";
                         alert.setHeaderText(error);
                         Button exitButton = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
                         exitButton.setText("OK");
@@ -160,6 +107,110 @@ public class LoginController implements Initializable {
         Button exitButton = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
         exitButton.setText("OK");
         alert.show();
+    }
+
+    private void openChatConnection(InetAddress host, int port, String token) throws SocketException, UnknownHostException, InterruptedException {
+        RDT.Sender chatSender = RDT.uniqueSender(host, port);
+
+        try {
+            RDT.Receiver chatReceiver = RDT.getReceiver(Integer.parseInt(chatTextField.getText()));
+            Field receiverSocker = chatReceiver.getClass().getDeclaredField("socket");
+            receiverSocker.setAccessible(true);
+
+            Field field = chatSender.getClass().getDeclaredField("socket");
+            field.setAccessible(true);
+            field.set(chatSender, receiverSocker.get(chatReceiver));
+        } catch (NumberFormatException | IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
+        Map<String, String> chatHeaders = new HashMap<>();
+        chatHeaders.put("Authorization", "Basic " + token);
+        chatHeaders.put("Pragma", "login;chat");
+
+        Singleton.getInstance().setChatReceiver(RDT.getReceiver(chatSender));
+        Singleton.getInstance().setChatOnReceiveListener(host, (Protocol.Receiver) (address, _port, headers, _message) -> {
+            String[] pragma = headers.get("Pragma").split(";");
+            if (pragma[0].equals("login") && !pragma[1].equals("401")) {
+                System.out.println("\n\nLOGIN: CHAT\n\n");
+
+                this.logged[0] = true;
+                login();
+            } else
+                Platform.runLater(LoginController.this::accessDenied);
+        });
+
+        Protocol.Sender.sendMessage(chatSender, chatHeaders, "");
+    }
+
+    private void openFileConnection(InetAddress host, int port, String token) throws SocketException, UnknownHostException, InterruptedException {
+        RDT.Sender fileSender = RDT.uniqueSender(host, port);
+
+        try {
+            RDT.Receiver fileReceiver = RDT.getReceiver(Integer.parseInt(fileTextField.getText()));
+            Field receiverSocker = fileReceiver.getClass().getDeclaredField("socket");
+            receiverSocker.setAccessible(true);
+
+            Field field = fileSender.getClass().getDeclaredField("socket");
+            field.setAccessible(true);
+            field.set(fileSender, receiverSocker.get(fileReceiver));
+        } catch (NumberFormatException | IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
+        Map<String, String> fileHeaders = new HashMap<>();
+        fileHeaders.put("Authorization", "Basic " + token);
+        fileHeaders.put("Pragma", "login;file");
+
+        Singleton.getInstance().setFileReceiver(RDT.getReceiver(fileSender));
+        Singleton.getInstance().setFileOnReceiveListener(host, (Protocol.Receiver) (address, _port, headers, _message) -> {
+            String[] pragma = headers.get("Pragma").split(";");
+            if (pragma[0].equals("login") && !pragma[1].equals("401")) {
+                System.out.println("\n\nLOGIN: FILE\n\n");
+
+                this.logged[1] = true;
+                login();
+            } else
+                Platform.runLater(LoginController.this::accessDenied);
+        });
+
+        Protocol.Sender.sendMessage(fileSender, fileHeaders, "");
+    }
+
+    private void openRTTConnection(InetAddress host, int port, String token) throws SocketException, UnknownHostException, InterruptedException {
+        RDT.Sender rttSender = RDT.uniqueSender(host, port);
+
+        try {
+            RDT.Receiver rttReceiver = RDT.getReceiver(Integer.parseInt(rttTextField.getText()));
+            Field receiverSocker = rttReceiver.getClass().getDeclaredField("socket");
+            receiverSocker.setAccessible(true);
+
+            Field field = rttSender.getClass().getDeclaredField("socket");
+            field.setAccessible(true);
+            field.set(rttSender, receiverSocker.get(rttReceiver));
+        } catch (NumberFormatException | IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
+        Map<String, String> rttHeaders = new HashMap<>();
+        rttHeaders.put("Authorization", "Basic " + token);
+        rttHeaders.put("Pragma", "login;rtt");
+
+        RDT.Receiver rttReceiver = RDT.getReceiver(rttSender);
+        rttReceiver.setOnReceiveListener(host, (Protocol.Receiver) (address, _port, headers, _message) -> {
+            String[] pragma = headers.get("Pragma").split(";");
+            if (pragma[0].equals("login") && !pragma[1].equals("401")) {
+                System.out.println("\n\nLOGIN: RTT\n\n");
+
+                new RDT.RTT.Echo(rttSender).start();
+
+                this.logged[2] = true;
+                login();
+            } else
+                Platform.runLater(LoginController.this::accessDenied);
+        });
+
+        Protocol.Sender.sendMessage(rttSender, rttHeaders, "");
     }
 
     private void login() {

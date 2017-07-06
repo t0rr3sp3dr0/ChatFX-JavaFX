@@ -13,10 +13,10 @@ import systems.singularity.chatfx.client.db.ChatRepository;
 import systems.singularity.chatfx.client.db.MemberRepository;
 import systems.singularity.chatfx.models.Chat;
 import systems.singularity.chatfx.models.Member;
-import systems.singularity.chatfx.models.Message;
 import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
+import systems.singularity.chatfx.util.Variables;
 
 import java.net.SocketException;
 import java.net.URL;
@@ -100,10 +100,10 @@ public class NewChatController implements Initializable {
                     Map<String, String> map = new HashMap<>();
                     map.put("Authorization", "Basic " + Singleton.getInstance().getToken());
                     map.put("Pragma", "get;users");
-                    final RDT.Sender sender = RDT.getSender(LoginController.getInetAddress(), LoginController.getPort());
+                    final RDT.Sender sender = RDT.getSender(Variables.Server.address, Variables.Server.port);
                     Protocol.Sender.sendMessage(sender, map, "");
 
-                    RDT.getReceiver(sender).setOnReceiveListener(LoginController.getInetAddress(), (Protocol.Receiver) (address, port1, headers, message) -> {
+                    RDT.getReceiver(sender).setOnReceiveListener(Variables.Server.address, (Protocol.Receiver) (address, port1, headers, message) -> {
                         List<User> users = Arrays.stream(new Gson().fromJson(message, User[].class)).filter(user -> {
                             if (user.getUsername().equals(Singleton.getInstance().getUsername())) {
                                 Singleton.getInstance().setUser(user);

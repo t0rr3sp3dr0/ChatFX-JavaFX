@@ -25,6 +25,7 @@ import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.server.db.UserRepository;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
+import systems.singularity.chatfx.util.Variables;
 
 import java.io.File;
 import java.io.IOException;
@@ -93,10 +94,10 @@ public class ChatController implements Initializable {
         map.put("Pragma", "get;members");
         final RDT.Sender sender;
         try {
-            sender = RDT.getSender(LoginController.getInetAddress(), LoginController.getPort());
+            sender = RDT.getSender(Variables.Server.address, Variables.Server.port);
             Protocol.Sender.sendMessage(sender, map, "");
 
-            RDT.getReceiver(sender).setOnReceiveListener(LoginController.getInetAddress(), (Protocol.Receiver) (address, port1, headers, message) -> {
+            RDT.getReceiver(sender).setOnReceiveListener(Variables.Server.address, (Protocol.Receiver) (address, port1, headers, message) -> {
                 List<Member> members = Arrays.stream(new Gson().fromJson(message, Member[].class))
                         .filter(member -> member.getChatId().equals(chat.getId())).collect(Collectors.toList());
 
