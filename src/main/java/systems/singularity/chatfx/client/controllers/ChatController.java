@@ -108,8 +108,8 @@ public class ChatController implements Initializable {
 
                         for (Member member : members) {
                             try {
-
-                                users = UserRepository.getInstance().getMore(new User().username(member.getUserUsername()));
+                                User user = UserRepository.getInstance().get(new User().username(member.getUserUsername()));
+                                users.add(user);
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }
@@ -298,7 +298,8 @@ public class ChatController implements Initializable {
                         }
                         try {
                             System.out.println(message);
-                            MessageRepository.getInstance().insert(message);
+                            if(message != null)
+                                MessageRepository.getInstance().insert(message);
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }

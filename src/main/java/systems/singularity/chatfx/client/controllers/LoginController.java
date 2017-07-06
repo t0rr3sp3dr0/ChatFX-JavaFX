@@ -10,6 +10,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import systems.singularity.chatfx.client.Singleton;
+import systems.singularity.chatfx.models.User;
+import systems.singularity.chatfx.server.db.UserRepository;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
 import systems.singularity.chatfx.util.Variables;
@@ -22,6 +24,7 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -222,8 +225,9 @@ public class LoginController implements Initializable {
 
             try {
                 Singleton.getInstance().setUsername(userTextField.getText());
+                Singleton.getInstance().setUser(UserRepository.getInstance().get(new User().username(userTextField.getText())));
                 Singleton.getInstance().setToken(new String(Base64.getEncoder().encode((userTextField.getText() + ":" + Utilities.md5(passTextField.getText())).getBytes())));
-            } catch (NoSuchAlgorithmException e) {
+            } catch (NoSuchAlgorithmException | SQLException e) {
                 e.printStackTrace();
             }
 
