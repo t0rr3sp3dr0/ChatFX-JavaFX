@@ -18,9 +18,9 @@
                 </Menu>
             </menus>
         </MenuBar>
-        <HBox maxHeight="Infinity" VBox.vgrow="ALWAYS">
+        <HBox minHeight="-Infinity" maxHeight="Infinity" VBox.vgrow="ALWAYS">
             <children>
-                <TableView fx:id="tableView" maxHeight="Infinity" maxWidth="200.0" minWidth="200.0">
+                <TableView fx:id="tableView" minHeight="-Infinity" maxHeight="Infinity" maxWidth="200.0" minWidth="200.0">
                     <columns>
                         <TableColumn fx:id="tableColumn" maxWidth="198.0" minWidth="198.0" prefWidth="198.0" resizable="false" text="Online" />
                     </columns>

@@ -18,16 +18,17 @@ public class SenderMessageRowController {
     @FXML // URL location of the FXML file that was given to the FXMLLoader
     private URL location;
 
-    @FXML // fx:id="messageLabel"
-    private Label messageLabel; // Value injected by FXMLLoader
-
     @FXML // fx:id="checkImage"
     private ImageView checkImage; // Value injected by FXMLLoader
+
+    @FXML // fx:id="messageLabel"
+    private Label messageLabel; // Value injected by FXMLLoader
 
     @FXML
         // This method is called by the FXMLLoader when initialization is complete
     void initialize() {
-        assert messageLabel != null : "fx:id=\"messageLabel\" was not injected: check your FXML file 'receiver_message_row.fxml'.";
+        assert checkImage != null : "fx:id=\"checkImage\" was not injected: check your FXML file 'sender_message_row.fxml'.";
+        assert messageLabel != null : "fx:id=\"messageLabel\" was not injected: check your FXML file 'sender_message_row.fxml'.";
     }
 
     public Label getMessageLabel() {

@@ -10,11 +10,11 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<HBox fx:id="root" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<HBox fx:id="root" prefHeight="270.0" prefWidth="450.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <VBox HBox.hgrow="ALWAYS">
             <children>
-                <ListView fx:id="messagesList" VBox.vgrow="ALWAYS">
+                <ListView fx:id="messagesList" minWidth="320.0" VBox.vgrow="ALWAYS">
                     <VBox.margin>
                         <Insets bottom="4.0" />
                     </VBox.margin>
@@ -51,37 +51,37 @@
                 <Insets bottom="8.0" left="8.0" right="4.0" top="8.0" />
             </HBox.margin>
         </VBox>
-        <VBox>
+        <VBox HBox.hgrow="ALWAYS">
             <children>
-                <ListView fx:id="participantsList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                <ListView fx:id="participantsList" minWidth="160.0" VBox.vgrow="ALWAYS">
                     <VBox.margin>
                         <Insets bottom="4.0" />
                     </VBox.margin>
                 </ListView>
-                <HBox maxHeight="34.0" prefHeight="100.0" prefWidth="200.0">
+                <HBox maxHeight="30.0">
                     <children>
-                        <VBox prefHeight="200.0" prefWidth="100.0">
+                        <VBox maxHeight="30.0" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                             <children>
-                                <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                                <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                     <children>
                                         <Label alignment="CENTER" maxWidth="Infinity" text="RTT" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                                     </children>
                                 </HBox>
-                                <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                                <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                     <children>
                                         <Label fx:id="rttLabel" alignment="CENTER" maxWidth="Infinity" text="--" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                                     </children>
                                 </HBox>
                             </children>
                         </VBox>
-                        <VBox prefHeight="200.0" prefWidth="100.0">
+                        <VBox maxHeight="30.0" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                             <children>
-                                <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                                <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                     <children>
                                         <Label alignment="CENTER" maxWidth="Infinity" text="Progress" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                                     </children>
                                 </HBox>
-                                <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                                <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                     <children>
                                         <Label fx:id="progressLabel" alignment="CENTER" maxWidth="Infinity" text="--" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                                     </children>
@@ -93,30 +93,30 @@
                         <Insets bottom="4.0" top="4.0" />
                     </VBox.margin>
                 </HBox>
-                <HBox maxHeight="34.0" prefHeight="100.0" prefWidth="200.0">
+                <HBox maxHeight="30.0" VBox.vgrow="NEVER">
                     <children>
-                        <VBox prefHeight="200.0" prefWidth="100.0">
+                        <VBox maxHeight="30.0" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                             <children>
-                                <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                                <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                     <children>
                                         <Label alignment="CENTER" maxWidth="Infinity" text="ETA" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                                     </children>
                                 </HBox>
-                                <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                                <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                     <children>
                                         <Label fx:id="etaLabel" alignment="CENTER" maxWidth="Infinity" text="--" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                                     </children>
                                 </HBox>
                             </children>
                         </VBox>
-                        <VBox prefHeight="200.0" prefWidth="100.0">
+                        <VBox maxHeight="30.0" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                             <children>
-                                <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                                <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                     <children>
                                         <Label alignment="CENTER" maxWidth="Infinity" text="Speed" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                                     </children>
                                 </HBox>
-                                <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                                <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="NEVER">
                                     <children>
                                         <Label fx:id="speedLabel" alignment="CENTER" maxWidth="Infinity" text="--" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                                     </children>
@@ -133,11 +133,11 @@
                         <Insets bottom="4.0" top="4.0" />
                     </VBox.margin>
                 </ProgressBar>
-                <Button fx:id="chooseFileButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="30.0" mnemonicParsing="false" textAlignment="CENTER">
+                <Button fx:id="chooseFileButton" alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" textAlignment="CENTER">
                     <graphic>
-                        <HBox maxHeight="31.0" maxWidth="200.0" prefHeight="31.0" prefWidth="200.0">
+                        <HBox maxHeight="31.0">
                             <children>
-                                <Label alignment="CENTER" contentDisplay="CENTER" maxHeight="31.0" maxWidth="180.0" prefHeight="31.0" prefWidth="180.0" text="Choose File" textAlignment="CENTER" />
+                                <Label alignment="CENTER" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Choose File" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                                 <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
                                         <Image url="@/icons/ic_attach_file.png" />

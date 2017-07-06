@@ -5,6 +5,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
@@ -148,21 +149,40 @@ public class ChatController implements Initializable {
             protected void updateItem(Message item, boolean empty) {
                 super.updateItem(item, empty);
 
-                if (item != null && !empty)
+                if (item == null || empty) {
+                    setAlignment(Pos.CENTER_LEFT);
+                    setGraphic(null);
+                } else
                     try {
                         if (item.getAuthorId().equals(Singleton.getInstance().getUser().getId())) {
-                            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/anchor.fxml"));
+                            setAlignment(Pos.CENTER_RIGHT);
+
+                            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/sender_message_row.fxml"));
                             setGraphic(fxmlLoader.load());
 
                             SenderMessageRowController senderRowController = fxmlLoader.getController();
                             senderRowController.getMessageLabel().setText(item.getContent());
                             senderRowController.getMessageLabel().maxWidthProperty().bind(messagesList.widthProperty().add(-26));
 
-                            if (Math.random() % 2 == 0)
-                                senderRowController.getCheckImage().setImage(new Image("/icons/ic_done.png"));
-                            else
-                                senderRowController.getCheckImage().setImage(new Image("/icons/ic_done_all.png"));
+                            switch (item.getStatus()) {
+                                case "processing":
+                                    senderRowController.getCheckImage().setImage(new Image("/icons/ic_schedule.png"));
+                                    break;
+
+                                case "sent":
+                                    senderRowController.getCheckImage().setImage(new Image("/icons/ic_done.png"));
+                                    break;
+
+                                case "seen":
+                                    senderRowController.getCheckImage().setImage(new Image("/icons/ic_done_all.png"));
+                                    break;
+
+                                default:
+                                    break;
+                            }
                         } else {
+                            setAlignment(Pos.CENTER_LEFT);
+
                             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/receiver_message_row.fxml"));
                             setGraphic(fxmlLoader.load());
 
@@ -264,7 +284,7 @@ public class ChatController implements Initializable {
                         ChatController.this.messagesList.scrollTo(messages.size() - 1);
                     });
 
-                    Thread.sleep(1000);
+                    Thread.sleep(250);
                 } catch (SQLException | InterruptedException e) {
                     e.printStackTrace();
                 }

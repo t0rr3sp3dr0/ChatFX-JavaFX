@@ -36,6 +36,9 @@ public class MainController implements Initializable {
     private MenuItem discardModuleMenuItem;
 
     @FXML
+    private MenuItem newChatMenuItem;
+
+    @FXML
     private TableView<User> tableView;
 
     @FXML
@@ -94,8 +97,13 @@ public class MainController implements Initializable {
             dialog.show();
         });
 
+        newChatMenuItem.setOnAction(event -> {
+
+        });
+
         new Thread(() -> {
             try {
+                //noinspection InfiniteLoopStatement
                 while (true) {
                     Map<String, String> map = new HashMap<>();
                     map.put("Authorization", "Basic " + Singleton.getInstance().getToken());
@@ -116,7 +124,7 @@ public class MainController implements Initializable {
                         Platform.runLater(() -> tableView.setItems(FXCollections.observableArrayList(users)));
                     });
 
-                    Thread.sleep(500);
+                    Thread.sleep(250);
                 }
             } catch (SocketException | InterruptedException | UnknownHostException e) {
                 e.printStackTrace();

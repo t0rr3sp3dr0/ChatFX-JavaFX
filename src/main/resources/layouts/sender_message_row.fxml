@@ -1,16 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8"
-      fx:controller="systems.singularity.chatfx.client.controllers.SenderMessageRowController">
+
+<HBox alignment="CENTER_RIGHT" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systems.singularity.chatfx.client.controllers.SenderMessageRowController">
     <children>
-        <Label fx:id="messageLabel" text="Label" wrapText="true" maxHeight="Infinity" maxWidth="Infinity">
+        <Label fx:id="messageLabel" alignment="CENTER_RIGHT" maxHeight="Infinity" maxWidth="Infinity" text="Label" wrapText="true" HBox.hgrow="ALWAYS">
             <VBox.margin>
-                <Insets bottom="4.0" left="4.0" right="4.0" top="2.0"/>
+                <Insets bottom="4.0" left="4.0" right="4.0" top="2.0" />
             </VBox.margin>
+         <HBox.margin>
+            <Insets bottom="4.0" left="4.0" right="2.0" top="4.0" />
+         </HBox.margin>
         </Label>
+      <ImageView fx:id="checkImage" fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true" HBox.hgrow="NEVER">
+         <HBox.margin>
+            <Insets bottom="4.0" left="2.0" right="4.0" top="4.0" />
+         </HBox.margin></ImageView>
     </children>
-</VBox>
+</HBox>
