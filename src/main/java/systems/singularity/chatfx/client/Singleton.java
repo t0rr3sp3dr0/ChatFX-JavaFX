@@ -17,7 +17,7 @@ public class Singleton extends HashMap<String, Object> {
     private static Singleton ourInstance = new Singleton();
     private final Map<InetAddress, RDT.Receiver.OnReceiveListener> chatOnReceiveListeners = new HashMap<>();
     private final Map<InetAddress, RDT.Receiver.OnReceiveListener> fileOnReceiveListeners = new HashMap<>();
-    private final Map<ChatController, Boolean> downloadInProgress = new HashMap<>();
+    private final Map<User, ChatController> chatControllers = new HashMap<>();
     private RDT.Receiver chatReceiver = null;
     private RDT.Receiver fileReceiver = null;
     private String token = null;
@@ -97,11 +97,7 @@ public class Singleton extends HashMap<String, Object> {
         this.user = user;
     }
 
-    public void putDownloadInProgress(ChatController chatController, Boolean b) {
-        this.downloadInProgress.put(chatController, b);
-    }
-
-    public boolean getDownloadInProgress(ChatController chatController) {
-        return this.downloadInProgress.get(chatController);
+    public Map<User, ChatController> getChatControllers() {
+        return this.chatControllers;
     }
 }

@@ -124,8 +124,6 @@ public class ChatController implements Initializable {
                     } else if (headers.get("Pragma").equals("ack")) {
                         MessageRepository.getInstance().update(MessageRepository.getInstance().get(new Message().id(Integer.parseInt(headers.get("Message-ID")))).status("sent"));
                         sendButton.setDisable(false);
-                        textField.setDisable(false);
-                        textField.requestFocus();
                     } else if (headers.get("Pragma").equals("seen"))
                         MessageRepository.getInstance().update(MessageRepository.getInstance().get(new Message().id(Integer.parseInt(headers.get("Message-ID")))).status("seen"));
                 } catch (SQLException | InterruptedException | SocketException | UnknownHostException e) {
@@ -138,15 +136,15 @@ public class ChatController implements Initializable {
 
         try {
             Networking.receiveFile(this.user, (file, progress, speed, remainingTime) -> Platform.runLater(() -> {
-                if (!Singleton.getInstance().getDownloadInProgress(ChatController.this)) {
-                    Singleton.getInstance().putDownloadInProgress(ChatController.this, true);
+                if (!downloadInProgress[0]) {
+                    downloadInProgress[0] = true;
 
                     ChatController.this.receiveFileDialog.setHeaderText(file.getName());
                     ChatController.this.receiveFileDialog.show();
                 }
 
                 if (progress == 1) {
-                    Singleton.getInstance().putDownloadInProgress(ChatController.this, false);
+                    downloadInProgress[0] = false;
 
                     ChatController.this.receiveFileDialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
                     Node closeButton = ChatController.this.receiveFileDialog.getDialogPane().lookupButton(ButtonType.CLOSE);
@@ -237,7 +235,6 @@ public class ChatController implements Initializable {
 
         sendButton.setOnAction(event -> {
             sendButton.setDisable(true);
-            textField.setDisable(true);
 
             String text = textField.getText();
 
