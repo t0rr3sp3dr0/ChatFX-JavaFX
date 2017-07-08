@@ -2,6 +2,7 @@ package systems.singularity.chatfx.client;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
+import systems.singularity.chatfx.client.controllers.ChatController;
 import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.util.RDT;
 
@@ -16,6 +17,7 @@ public class Singleton extends HashMap<String, Object> {
     private static Singleton ourInstance = new Singleton();
     private final Map<InetAddress, RDT.Receiver.OnReceiveListener> chatOnReceiveListeners = new HashMap<>();
     private final Map<InetAddress, RDT.Receiver.OnReceiveListener> fileOnReceiveListeners = new HashMap<>();
+    private final Map<ChatController, Boolean> downloadInProgress = new HashMap<>();
     private RDT.Receiver chatReceiver = null;
     private RDT.Receiver fileReceiver = null;
     private String token = null;
@@ -93,5 +95,13 @@ public class Singleton extends HashMap<String, Object> {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public void putDownloadInProgress(ChatController chatController, Boolean b) {
+        this.downloadInProgress.put(chatController, b);
+    }
+
+    public boolean getDownloadInProgress(ChatController chatController) {
+        return this.downloadInProgress.get(chatController);
     }
 }
