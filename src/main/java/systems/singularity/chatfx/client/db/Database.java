@@ -19,6 +19,7 @@ public class Database {
         try {
             Class.forName("org.sqlite.JDBC");
 
+            Database.initializeDatabase();
             Database.initializeTables();
         } catch (Exception e) {
             throw new RuntimeException(e);

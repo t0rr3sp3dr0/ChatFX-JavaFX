@@ -16,6 +16,7 @@ import javafx.stage.Modality;
 import org.joda.time.DateTime;
 import systems.singularity.chatfx.client.Networking;
 import systems.singularity.chatfx.client.Singleton;
+import systems.singularity.chatfx.client.db.Database;
 import systems.singularity.chatfx.client.db.MessageRepository;
 import systems.singularity.chatfx.models.Message;
 import systems.singularity.chatfx.models.User;
@@ -228,7 +229,9 @@ public class ChatController implements Initializable {
                         Message message = new Message()
                                 .authorId(Singleton.getInstance().getUser().getId())
                                 .content(content)
-                                .chatId(Singleton.getInstance().getUser().hashCode() & ChatController.this.user.hashCode());
+                                .chatId(Singleton.getInstance().getUser().hashCode() & ChatController.this.user.hashCode())
+                                .time(DateTime.now().toString())
+                                .status("processing");
 
                         try {
                             Networking.sendMessage(message.id(message.hashCode()), ChatController.this.user);
