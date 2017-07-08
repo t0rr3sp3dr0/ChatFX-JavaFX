@@ -28,7 +28,7 @@ public class Database {
                 //noinspection InfiniteLoopStatement
                 while (true)
                     try {
-                        System.out.println("DEBUG: UPDATE user_status\t" + Database.connection.prepareStatement("UPDATE cf_users SET user_status = 0 WHERE ((julianday(CURRENT_TIMESTAMP) - julianday(user_lastSeen)) * 86400) > 5;").executeUpdate());
+                        Database.connection.prepareStatement("UPDATE cf_users SET user_status = 0 WHERE ((julianday(CURRENT_TIMESTAMP) - julianday(user_lastSeen)) * 86400) > 5;").executeUpdate();
                         Thread.sleep(1000);
                     } catch (SQLException | InterruptedException e) {
                         e.printStackTrace();

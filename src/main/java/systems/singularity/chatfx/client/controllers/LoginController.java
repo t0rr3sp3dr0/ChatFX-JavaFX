@@ -133,8 +133,6 @@ public class LoginController implements Initializable {
         Singleton.getInstance().setChatOnReceiveListener(Variables.Server.address, (Protocol.Receiver) (address, _port, headers, _message) -> {
             String[] pragma = headers.get("Pragma").split(";");
             if (pragma[0].equals("login") && !pragma[1].equals("401")) {
-                System.out.println("\n\nLOGIN: CHAT\n\n");
-
                 this.logged[0] = true;
                 login();
             } else
@@ -167,8 +165,6 @@ public class LoginController implements Initializable {
         Singleton.getInstance().setFileOnReceiveListener(Variables.Server.address, (Protocol.Receiver) (address, _port, headers, _message) -> {
             String[] pragma = headers.get("Pragma").split(";");
             if (pragma[0].equals("login") && !pragma[1].equals("401")) {
-                System.out.println("\n\nLOGIN: FILE\n\n");
-
                 this.logged[1] = true;
                 login();
             } else
@@ -201,8 +197,6 @@ public class LoginController implements Initializable {
         rttReceiver.setOnReceiveListener(Variables.Server.address, (Protocol.Receiver) (address, _port, headers, _message) -> {
             String[] pragma = headers.get("Pragma").split(";");
             if (pragma[0].equals("login") && !pragma[1].equals("401")) {
-                System.out.println("\n\nLOGIN: RTT\n\n");
-
                 new RDT.RTT.Echo(rttSender).start();
 
                 this.logged[2] = true;

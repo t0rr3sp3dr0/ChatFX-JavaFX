@@ -104,7 +104,7 @@ public class MainController implements Initializable {
                     map.put("Authorization", "Basic " + Singleton.getInstance().getToken());
                     map.put("Pragma", "get;users");
                     final RDT.Sender sender = RDT.getSender(Variables.Server.address, Variables.Server.port);
-                    Protocol.Sender.sendMessage(sender, map, "Manda esses user aí, seu porra!");
+                    Protocol.Sender.sendMessage(sender, map, "");
 
                     RDT.getReceiver(sender).setOnReceiveListener(Variables.Server.address, (Protocol.Receiver) (address, port1, headers, message) -> {
                         List<User> users = Arrays.stream(new Gson().fromJson(message, User[].class)).filter(user -> {

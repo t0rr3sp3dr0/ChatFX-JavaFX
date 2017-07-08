@@ -55,8 +55,6 @@ public final class Protocol {
                 headerBuffer.append((char) b);
 
         String rawHeaders = headerBuffer.toString().trim();
-        System.err.println(rawHeaders);
-
         for (String header : rawHeaders.split("\n")) {
             String[] strings = header.split(": ");
             if (strings.length == 2)
