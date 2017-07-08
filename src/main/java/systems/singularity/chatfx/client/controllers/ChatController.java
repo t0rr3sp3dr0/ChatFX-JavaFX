@@ -20,6 +20,7 @@ import systems.singularity.chatfx.client.db.MessageRepository;
 import systems.singularity.chatfx.models.Message;
 import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.util.RDT;
+import systems.singularity.chatfx.util.java.Pair;
 
 import java.io.File;
 import java.io.IOException;
@@ -84,22 +85,25 @@ public class ChatController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Platform.runLater(() -> {
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/receive_file.fxml"));
-                ChatController.this.receiveFileNode = fxmlLoader.load();
-                ChatController.this.receiveFileController = fxmlLoader.getController();
-                ChatController.this.receiveFileDialog = Singleton.getInstance().getReceiveFileDialogs().computeIfAbsent(this.user, k -> {
+            Pair<Dialog, ReceiveFileController> pair = Singleton.getInstance().getReceiveDialogs().computeIfAbsent(this.user, k -> {
+                try {
                     Dialog dialog = new Dialog();
 
                     dialog.setTitle("Receiving File");
                     dialog.initModality(Modality.NONE);
                     dialog.getDialogPane().setContent(ChatController.this.receiveFileNode);
 
-                    return dialog;
-                });
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/receive_file.fxml"));
+                    ChatController.this.receiveFileNode = fxmlLoader.load();
+
+                    return new Pair<>(dialog, fxmlLoader.getController());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            ChatController.this.receiveFileDialog = pair.first;
+            ChatController.this.receiveFileController = pair.second;
         });
 
         try {

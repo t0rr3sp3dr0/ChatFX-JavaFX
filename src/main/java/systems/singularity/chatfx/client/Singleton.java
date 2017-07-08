@@ -4,8 +4,10 @@ import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import javafx.scene.control.Dialog;
 import systems.singularity.chatfx.client.controllers.ChatController;
+import systems.singularity.chatfx.client.controllers.ReceiveFileController;
 import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.util.RDT;
+import systems.singularity.chatfx.util.java.Pair;
 
 import java.net.InetAddress;
 import java.util.HashMap;
@@ -18,8 +20,7 @@ public class Singleton extends HashMap<String, Object> {
     private static Singleton ourInstance = new Singleton();
     private final Map<InetAddress, RDT.Receiver.OnReceiveListener> chatOnReceiveListeners = new HashMap<>();
     private final Map<InetAddress, RDT.Receiver.OnReceiveListener> fileOnReceiveListeners = new HashMap<>();
-    private final Map<User, ChatController> chatControllers = new HashMap<>();
-    private final Map<User, Dialog> receiveFileDialogs = new HashMap<>();
+    private final Map<User, Pair<Dialog, ReceiveFileController>> receiveDialogs = new HashMap<>();
     private RDT.Receiver chatReceiver = null;
     private RDT.Receiver fileReceiver = null;
     private String token = null;
@@ -99,11 +100,7 @@ public class Singleton extends HashMap<String, Object> {
         this.user = user;
     }
 
-    public Map<User, ChatController> getChatControllers() {
-        return this.chatControllers;
-    }
-
-    public Map<User, Dialog> getReceiveFileDialogs() {
-        return this.receiveFileDialogs;
+    public Map<User, Pair<Dialog, ReceiveFileController>> getReceiveDialogs() {
+        return this.receiveDialogs;
     }
 }

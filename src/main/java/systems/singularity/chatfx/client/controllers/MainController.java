@@ -155,7 +155,7 @@ public class MainController implements Initializable {
             }
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/chat.fxml"));
-            fxmlLoader.setController(Singleton.getInstance().getChatControllers().computeIfAbsent(user, k -> new ChatController(user, selectionModel)));
+            fxmlLoader.setController(new ChatController(user, selectionModel));
 
             Tab tab = new Tab();
             tab.setId(user.getUsername());
