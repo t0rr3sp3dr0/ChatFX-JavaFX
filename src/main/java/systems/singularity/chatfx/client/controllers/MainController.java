@@ -61,12 +61,12 @@ public class MainController implements Initializable {
         });
 
         stageTools.setTabPane(tabPane);
-        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.SELECTED_TAB);
+        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
 
         SelectionModel<User> tableViewSelectionModel = tableView.getSelectionModel();
         tableViewSelectionModel.selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null)
-                newTab(newValue);
+                openTab(newValue);
         });
 
         SelectionModel<Tab> tabSelectionModel = tabPane.getSelectionModel();
@@ -121,7 +121,26 @@ public class MainController implements Initializable {
                             return user.getStatus();
                         }).collect(Collectors.toList());
 
+
                         Platform.runLater(() -> tableView.setItems(FXCollections.observableArrayList(users)));
+
+                        final List<Tab> tabsToBeClosed = tabPane.getTabs().filtered(tab -> {
+                            for (User user : users)
+                                if (user.getUsername().equals(tab.getId()))
+                                    return false;
+                            return true;
+                        });
+                        for (Tab tab : tabsToBeClosed)
+                            Platform.runLater(() -> tabPane.getTabs().remove(tab));
+
+                        final List<User> usersToBeOpened = users.stream().filter(user -> {
+                            for (Tab tab : tabPane.getTabs())
+                                if (tab.getId().equals(user.getUsername()))
+                                    return false;
+                            return true;
+                        }).collect(Collectors.toList());
+                        for (User user : usersToBeOpened)
+                            Platform.runLater(() -> MainController.this.openTab(user));
                     });
 
                     Thread.sleep(250);
@@ -132,7 +151,7 @@ public class MainController implements Initializable {
         }).start();
     }
 
-    private void newTab(User user) {
+    private void openTab(User user) {
         SelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
         for (Tab e : tabPane.getTabs())
             if (e.getId() != null && e.getId().equals(user.getUsername())) {
@@ -153,5 +172,14 @@ public class MainController implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void closeTab(User user) {
+        SelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
+        for (Tab e : tabPane.getTabs())
+            if (e.getId() != null && e.getId().equals(user.getUsername())) {
+                tabPane.getTabs().remove(e);
+                return;
+            }
     }
 }
