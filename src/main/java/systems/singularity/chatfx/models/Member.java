@@ -25,14 +25,14 @@ public class Member {
   @SerializedName("id")
   private Integer id = null;
 
-  @SerializedName("chatId")
-  private Integer chatId = null;
+  @SerializedName("groupId")
+  private Integer groupId = null;
 
-  @SerializedName("userUsername")
-  private String userUsername = null;
+  @SerializedName("userId")
+  private Integer userId = null;
 
   public Member id(Integer id) {
-    this.id = Math.abs(id);
+    this.id = id;
     return this;
   }
 
@@ -46,43 +46,43 @@ public class Member {
   }
 
   public void setId(Integer id) {
-    this.id = Math.abs(id);
+    this.id = id;
   }
 
-  public Member chatId(Integer chatId) {
-    this.chatId = chatId;
+  public Member groupId(Integer groupId) {
+    this.groupId = groupId;
     return this;
   }
 
   /**
-   * Get chatId
+   * Get groupId
    *
-   * @return chatId
+   * @return groupId
    **/
-  public Integer getChatId() {
-    return chatId;
+  public Integer getGroupId() {
+    return groupId;
   }
 
-  public void setChatId(Integer chatId) {
-    this.chatId = chatId;
+  public void setGroupId(Integer groupId) {
+    this.groupId = groupId;
   }
 
-  public Member userUsername(String userUsername) {
-    this.userUsername = userUsername;
+  public Member userId(Integer userId) {
+    this.userId = userId;
     return this;
   }
 
   /**
-   * Get userUsername
+   * Get userId
    *
-   * @return userUsername
+   * @return userId
    **/
-  public String getUserUsername() {
-    return userUsername;
+  public Integer getUserId() {
+    return userId;
   }
 
-  public void setUserUsername(String userUsername) {
-    this.userUsername = userUsername;
+  public void setUserId(Integer userId) {
+    this.userId = userId;
   }
 
 
@@ -96,13 +96,13 @@ public class Member {
     }
     Member member = (Member) o;
     return Objects.equals(this.id, member.id) &&
-            Objects.equals(this.chatId, member.chatId) &&
-            Objects.equals(this.userUsername, member.userUsername);
+            Objects.equals(this.groupId, member.groupId) &&
+            Objects.equals(this.userId, member.userId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, chatId, userUsername);
+    return Objects.hash(id, groupId, userId);
   }
 
 
@@ -112,8 +112,8 @@ public class Member {
     sb.append("class Member {\n");
 
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
-    sb.append("    chatId: ").append(toIndentedString(chatId)).append("\n");
-    sb.append("    userUsername: ").append(toIndentedString(userUsername)).append("\n");
+    sb.append("    groupId: ").append(toIndentedString(groupId)).append("\n");
+    sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
     sb.append("}");
     return sb.toString();
   }

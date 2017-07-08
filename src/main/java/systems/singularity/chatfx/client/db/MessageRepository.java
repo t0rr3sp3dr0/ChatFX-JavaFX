@@ -35,13 +35,14 @@ public class MessageRepository implements Repository<Message> {
     public void insert(Message message) throws SQLException {
         Connection conn = Database.getConnection();
         PreparedStatement statement = conn.prepareStatement("INSERT INTO cf_messages (" +
-                "message_chat_id, message_content, message_status, message_timestamp, message_author_id) " +
-                "VALUES (?, ?, ?, ?, ?);");
-        statement.setObject(1, message.getChatId());
-        statement.setString(2, message.getContent());
-        statement.setString(3, message.getStatus());
-        statement.setTime(4, new Time(DateTime.parse(message.getTime()).getMillis()));
-        statement.setObject(5, message.getAuthorId());
+                "message_id, message_chat_id, message_content, message_status, message_timestamp, message_author_id) " +
+                "VALUES (?, ?, ?, ?, ?, ?);");
+        statement.setObject(1, message.getId());
+        statement.setObject(2, message.getChatId());
+        statement.setString(3, message.getContent());
+        statement.setString(4, message.getStatus());
+        statement.setTime(5, new Time(DateTime.parse(message.getTime()).getMillis()));
+        statement.setObject(6, message.getAuthorId());
         statement.executeUpdate();
     }
 

@@ -7,14 +7,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
-import javafx.stage.Stage;
 import systems.singularity.chatfx.client.Singleton;
-import systems.singularity.chatfx.models.Chat;
+import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
 import systems.singularity.chatfx.util.Variables;
@@ -25,39 +22,33 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by caesa on 01/07/2017.
  */
 public class MainController implements Initializable {
     public static final StageTools stageTools = new StageTools();
-    private static MainController ourInstance = new MainController();
-    private final Chat[] chat = new Chat[1];
+
     @FXML
     private MenuBar menuBar;
+
     @FXML
     private MenuItem discardModuleMenuItem;
+
     @FXML
     private MenuItem newChatMenuItem;
+
     @FXML
-    private TableView<Chat> tableView;
+    private TableView<User> tableView;
+
     @FXML
-    private TableColumn<Chat, String> tableColumn;
+    private TableColumn<User, String> tableColumn;
+
     @FXML
     private TabPane tabPane;
+
     private Node discardModuleNode;
-
-    private MainController() {
-        // Avoid class instantiation
-    }
-
-    public static MainController getInstance() {
-        return MainController.ourInstance;
-    }
-
-    public void setChat(Chat chat) {
-        this.chat[0] = chat;
-    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -73,26 +64,25 @@ public class MainController implements Initializable {
         stageTools.setTabPane(tabPane);
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.SELECTED_TAB);
 
-        SelectionModel<Chat> tableViewSelectionModel = tableView.getSelectionModel();
+        SelectionModel<User> tableViewSelectionModel = tableView.getSelectionModel();
         tableViewSelectionModel.selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-                    if (newValue != null)
-                        newTab(newValue);
-                }
-        );
+            if (newValue != null)
+                newTab(newValue);
+        });
 
         SelectionModel<Tab> tabSelectionModel = tabPane.getSelectionModel();
         tabSelectionModel.selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null)
                 tableViewSelectionModel.select(null);
             else
-                for (Chat chat : tableView.getItems())
-                    if (chat.getName().equals(newValue.getId())) {
-                        tableViewSelectionModel.select(chat);
+                for (User user : tableView.getItems())
+                    if (user.getUsername().equals(newValue.getId())) {
+                        tableViewSelectionModel.select(user);
                         break;
                     }
         });
 
-        tableColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        tableColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
 
         discardModuleMenuItem.setOnAction(event -> {
             Dialog dialog = new Dialog();
@@ -109,68 +99,54 @@ public class MainController implements Initializable {
         });
 
         newChatMenuItem.setOnAction(event -> {
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/new_chat.fxml"));
-                final Parent root = fxmlLoader.load();
-                Platform.runLater(() -> {
-                    Stage stage = new Stage();
-                    stage.setScene(new Scene(root, 720, 430));
-                    stage.show();
-                });
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
 
         });
 
         new Thread(() -> {
             try {
-
-                Singleton.getInstance().setServerOnReceiveListener((Protocol.Receiver) (address, port1, headers, message) -> {
-                    if (headers.get("Pragma").equals("chats")) {
-                        List<Chat> chats = Arrays.asList(new Gson().fromJson(message, Chat[].class));
-                        if (chats != null)
-                            Platform.runLater(() ->
-                                    tableView.setItems(FXCollections.observableArrayList(chats)));
-                    }
-                });
-
                 //noinspection InfiniteLoopStatement
                 while (true) {
                     Map<String, String> map = new HashMap<>();
                     map.put("Authorization", "Basic " + Singleton.getInstance().getToken());
-                    map.put("Pragma", "get;chats");
+                    map.put("Pragma", "get;users");
                     final RDT.Sender sender = RDT.getSender(Variables.Server.address, Variables.Server.port);
-                    Protocol.Sender.sendMessage(sender, map, "");
+                    Protocol.Sender.sendMessage(sender, map, "Manda esses user aí, seu porra!");
 
-                    Thread.sleep(2000);
+                    RDT.getReceiver(sender).setOnReceiveListener(Variables.Server.address, (Protocol.Receiver) (address, port1, headers, message) -> {
+                        List<User> users = Arrays.stream(new Gson().fromJson(message, User[].class)).filter(user -> {
+                            if (user.getUsername().equals(Singleton.getInstance().getUsername())) {
+                                Singleton.getInstance().setUser(user);
+                                return false;
+                            }
+
+                            return user.getStatus();
+                        }).collect(Collectors.toList());
+
+                        Platform.runLater(() -> tableView.setItems(FXCollections.observableArrayList(users)));
+                    });
+
+                    Thread.sleep(250);
                 }
             } catch (SocketException | InterruptedException | UnknownHostException e) {
                 e.printStackTrace();
             }
-
-
         }).start();
-
-
     }
 
-    private void newTab(Chat chat) {
+    private void newTab(User user) {
         SelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
-        System.out.println("meu chat" + chat.getId());
         for (Tab e : tabPane.getTabs())
-            if (e.getId() != null && e.getId().equals(String.valueOf(chat.getId()))) {
+            if (e.getId() != null && e.getId().equals(user.getUsername())) {
                 selectionModel.select(e);
                 return;
             }
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/chat.fxml"));
-            fxmlLoader.setController(new ChatController(chat));
+            fxmlLoader.setController(new ChatController(user));
 
             Tab tab = new Tab();
-            tab.setId(String.valueOf(chat.getId()));
-            tab.setText(chat.getName());
+            tab.setId(user.getUsername());
+            tab.setText(user.getUsername());
             tab.setClosable(true);
             tab.setContent(fxmlLoader.load());
             tabPane.getTabs().add(tab);

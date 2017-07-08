@@ -48,20 +48,6 @@ public class UserRepository implements Repository<User> {
             statement.executeUpdate();
         }
     }
-    public void add(User user) throws SQLException {
-        Connection conn = Database.getConnection();
-        if (!exists(user)) {
-            PreparedStatement statement = conn.prepareStatement("INSERT INTO cf_users (user_id, user_username, user_password, user_address, user_portChat, user_portFile, user_portRtt, user_status, user_lastSeen) VALUES (?, ?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP);");
-            statement.setInt(1, user.getId());
-            statement.setString(2, user.getUsername());
-            statement.setString(3, user.getPassword());
-            statement.setString(4, user.getAddress());
-            statement.setInt(5, user.getPortChat() != null ? user.getPortChat() : -1);
-            statement.setInt(6, user.getPortFile() != null ? user.getPortFile() : -1);
-            statement.setInt(7, user.getPortRtt() != null ? user.getPortRtt() : -1);
-            statement.executeUpdate();
-        }
-    }
 
     @Override
     public void update(User user) throws SQLException {
@@ -130,28 +116,6 @@ public class UserRepository implements Repository<User> {
                 .portFile(rs.getInt(6))
                 .portRtt(rs.getInt(7))
                 .status(rs.getBoolean(8));
-    }
-
-    public List<User> getMore(User user) throws SQLException {
-        Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_users WHERE user_username = ?;");
-        statement.setString(1, user.getUsername());
-        ResultSet rs = statement.executeQuery();
-
-        ArrayList<User> users = new ArrayList<>();
-        while (rs.next())
-            users.add(
-                    new User()
-                            .id(rs.getInt("user_id"))
-                            .username(rs.getString("user_username"))
-                            .password(rs.getString("user_password"))
-                            .address(rs.getString("user_address"))
-                            .portChat(rs.getInt("user_portChat"))
-                            .portFile(rs.getInt("user_portFile"))
-                            .portRtt(rs.getInt("user_portRtt"))
-                            .status(rs.getBoolean("user_status"))
-            );
-        return users;
     }
 
 }

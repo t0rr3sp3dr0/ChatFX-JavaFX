@@ -27,10 +27,10 @@ public class MemberRepository implements Repository<Member> {
     @Override
     public boolean exists(Member member) throws SQLException {
         Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_members WHERE (member_chat_id = ? " +
-                "AND member_user_username = ?);");
-        statement.setInt(1, member.getChatId());
-        statement.setString(2, member.getUserUsername());
+        PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_members WHERE (member_group_id = ? " +
+                "AND member_user_id = ?);");
+        statement.setInt(1, member.getGroupId());
+        statement.setInt(2, member.getUserId());
         ResultSet rs = statement.executeQuery();
         return rs.next();
     }
@@ -39,9 +39,9 @@ public class MemberRepository implements Repository<Member> {
     public void insert(Member member) throws SQLException {
         Connection conn = Database.getConnection();
         if (!exists(member)) {
-            PreparedStatement statement = conn.prepareStatement("INSERT INTO cf_members (member_chat_id, member_user_username) VALUES (?, ?);");
-            statement.setInt(1, member.getChatId());
-            statement.setString(2, member.getUserUsername());
+            PreparedStatement statement = conn.prepareStatement("INSERT INTO cf_members (member_group_id, member_user_id) VALUES (?, ?);");
+            statement.setInt(1, member.getGroupId());
+            statement.setInt(2, member.getUserId());
             statement.executeUpdate();
         }
     }
@@ -50,9 +50,9 @@ public class MemberRepository implements Repository<Member> {
     public void update(Member member) throws SQLException {
         Connection conn = Database.getConnection();
         if (exists(member)) {
-            PreparedStatement statement = conn.prepareStatement("UPDATE cf_members SET member_chat_id = ?, member_user_id = ? WHERE member_id = ?;");
-            statement.setInt(1, member.getChatId());
-            statement.setString(2, member.getUserUsername());
+            PreparedStatement statement = conn.prepareStatement("UPDATE cf_members SET member_group_id = ?, member_user_id = ? WHERE member_id = ?;");
+            statement.setInt(1, member.getGroupId());
+            statement.setInt(2, member.getUserId());
             statement.setInt(3, member.getId());
             statement.executeUpdate();
         }
@@ -78,8 +78,8 @@ public class MemberRepository implements Repository<Member> {
             members.add(
                     new Member()
                             .id(rs.getInt("member_id"))
-                            .chatId(rs.getInt("member_chat_id"))
-                            .userUsername(rs.getString("member_user_username"))
+                            .groupId(rs.getInt("member_group_id"))
+                            .userId(rs.getInt("member_user_id"))
             );
         return members;
     }
@@ -96,7 +96,7 @@ public class MemberRepository implements Repository<Member> {
 
         return new Member()
                 .id(rs.getInt("member_id"))
-                .chatId(rs.getInt("member_chat_id"))
-                .userUsername(rs.getString("member_user_username"));
+                .groupId(rs.getInt("member_group_id"))
+                .userId(rs.getInt("member_user_id"));
     }
 }

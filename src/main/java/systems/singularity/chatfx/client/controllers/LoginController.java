@@ -11,7 +11,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import systems.singularity.chatfx.client.Singleton;
 import systems.singularity.chatfx.models.User;
-import systems.singularity.chatfx.server.db.UserRepository;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
 import systems.singularity.chatfx.util.Variables;
@@ -225,16 +224,17 @@ public class LoginController implements Initializable {
 
             try {
                 Singleton.getInstance().setUsername(userTextField.getText());
-                Singleton.getInstance().setUser(UserRepository.getInstance().get(new User().username(userTextField.getText())));
+//                Singleton.getInstance().setUser(UserRepository.getInstance().get(new User().username(userTextField.getText())));
                 Singleton.getInstance().setToken(new String(Base64.getEncoder().encode((userTextField.getText() + ":" + Utilities.md5(passTextField.getText())).getBytes())));
-            } catch (NoSuchAlgorithmException | SQLException e) {
+//            } catch (NoSuchAlgorithmException | SQLException e) {
+//                e.printStackTrace();
+//            }
+            } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
             }
 
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/main.fxml"));
-                fxmlLoader.setController(MainController.getInstance());
-                final Parent root = fxmlLoader.load();
+                final Parent root = new FXMLLoader(getClass().getResource("/layouts/main.fxml")).load();
 
                 Platform.runLater(() -> {
                     Stage stage = new Stage();
@@ -249,6 +249,5 @@ public class LoginController implements Initializable {
                 e.printStackTrace();
             }
         }
-
     }
 }
