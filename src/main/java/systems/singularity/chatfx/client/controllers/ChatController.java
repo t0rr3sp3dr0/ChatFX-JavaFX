@@ -28,10 +28,7 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -39,6 +36,7 @@ import java.util.stream.Collectors;
  */
 public class ChatController implements Initializable {
     private final User user;
+    private final SelectionModel<Tab> selectionModel;
     private final boolean[] downloadInProgress = {false};
 
     private Node receiveFileNode;
@@ -78,8 +76,9 @@ public class ChatController implements Initializable {
     @FXML
     private Button sendButton;
 
-    public ChatController(User user) {
+    public ChatController(User user, SelectionModel<Tab> selectionModel) {
         this.user = user;
+        this.selectionModel = selectionModel;
     }
 
     @Override
@@ -103,12 +102,27 @@ public class ChatController implements Initializable {
             Networking.receiveMessage(this.user, (headers, message) -> {
                 try {
                     if (headers.get("Pragma").equals("message")) {
-                        MessageRepository.getInstance().insert(message.status("sent").time(DateTime.now().toString()).chatId(ChatController.this.user.getUsername().hashCode()));
+                        MessageRepository.getInstance().insert(message.status("sent").time(DateTime.now().toString()).chatId(Singleton.getInstance().getUser().getId().hashCode() + ChatController.this.user.getUsername().hashCode()));
                         Networking.sendACK(message, ChatController.this.user);
+
+                        new Thread(() -> {
+                            while (!ChatController.this.selectionModel.getSelectedItem().getId().equals(ChatController.this.user.getUsername()))
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+
+                            try {
+                                Networking.sendSeen(message, ChatController.this.user);
+                            } catch (UnknownHostException | SocketException | InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }).start();
                     } else if (headers.get("Pragma").equals("ack"))
-                        MessageRepository.getInstance().update(MessageRepository.getInstance().get(new Message().id(Integer.parseInt(headers.get("Message-ID"))).status("ack")));
+                        MessageRepository.getInstance().update(MessageRepository.getInstance().get(new Message().id(Integer.parseInt(headers.get("Message-ID")))).status("sent"));
                     else if (headers.get("Pragma").equals("seen"))
-                        MessageRepository.getInstance().update(MessageRepository.getInstance().get(new Message().id(Integer.parseInt(headers.get("Message-ID"))).status("seen")));
+                        MessageRepository.getInstance().update(MessageRepository.getInstance().get(new Message().id(Integer.parseInt(headers.get("Message-ID")))).status("seen"));
                 } catch (SQLException | InterruptedException | SocketException | UnknownHostException e) {
                     e.printStackTrace();
                 }
@@ -173,7 +187,7 @@ public class ChatController implements Initializable {
 
                             SenderMessageRowController senderRowController = fxmlLoader.getController();
                             senderRowController.getMessageLabel().setText(item.getContent());
-                            senderRowController.getMessageLabel().maxWidthProperty().bind(messagesList.widthProperty().add(-26));
+                            senderRowController.getMessageLabel().maxWidthProperty().bind(messagesList.widthProperty().add(-72));
 
                             switch (item.getStatus()) {
                                 case "processing":
@@ -199,9 +213,9 @@ public class ChatController implements Initializable {
 
                             ReceiverMessageRowController messageRowController = fxmlLoader.getController();
                             messageRowController.getSenderLabel().setText(ChatController.this.user.getUsername());
-                            messageRowController.getSenderLabel().maxWidthProperty().bind(messagesList.widthProperty().add(-26));
+                            messageRowController.getSenderLabel().maxWidthProperty().bind(messagesList.widthProperty().add(-72));
                             messageRowController.getMessageLabel().setText(item.getContent());
-                            messageRowController.getMessageLabel().maxWidthProperty().bind(messagesList.widthProperty().add(-26));
+                            messageRowController.getMessageLabel().maxWidthProperty().bind(messagesList.widthProperty().add(-72));
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -227,7 +241,7 @@ public class ChatController implements Initializable {
                         Message message = new Message()
                                 .authorId(Singleton.getInstance().getUser().getId())
                                 .content(content)
-                                .chatId(ChatController.this.user.getUsername().hashCode())
+                                .chatId(Singleton.getInstance().getUser().getId().hashCode() + ChatController.this.user.getUsername().hashCode())
                                 .status("processing")
                                 .time(DateTime.now().toString());
 
@@ -289,7 +303,7 @@ public class ChatController implements Initializable {
             //noinspection InfiniteLoopStatement
             while (true)
                 try {
-                    List<Message> messages = MessageRepository.getInstance().getAll().stream().filter(message -> message.getChatId().equals(ChatController.this.user.getUsername().hashCode())).collect(Collectors.toList());
+                    List<Message> messages = MessageRepository.getInstance().getAll().stream().filter(message -> message.getChatId().equals(Singleton.getInstance().getUser().getId().hashCode() + ChatController.this.user.getUsername().hashCode())).collect(Collectors.toList());
                     Platform.runLater(() -> {
                         ChatController.this.messagesList.setItems(FXCollections.observableArrayList(messages));
                         ChatController.this.messagesList.scrollTo(messages.size() - 1);
