@@ -149,7 +149,7 @@ public class MainController implements Initializable {
         SelectionModel<Tab> selectionModel = tabPane.getSelectionModel();
         for (Tab e : tabPane.getTabs())
             if (e.getId() != null && e.getId().equals(user.getUsername())) {
-                selectionModel.select(e);
+//                selectionModel.select(e);
                 return;
             }
         try {
@@ -162,7 +162,7 @@ public class MainController implements Initializable {
             tab.setClosable(true);
             tab.setContent(fxmlLoader.load());
             tabPane.getTabs().add(tab);
-            selectionModel.select(tab);
+//            selectionModel.select(tab);
         } catch (IOException e) {
             e.printStackTrace();
         }

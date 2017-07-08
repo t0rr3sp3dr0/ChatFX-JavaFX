@@ -53,7 +53,7 @@
         </VBox>
         <VBox HBox.hgrow="ALWAYS">
             <children>
-                <ListView fx:id="participantsList" minWidth="160.0" VBox.vgrow="ALWAYS">
+                <ListView fx:id="participantsList" minWidth="160.0" visible="false" VBox.vgrow="ALWAYS">
                     <VBox.margin>
                         <Insets bottom="4.0" />
                     </VBox.margin>
