@@ -88,11 +88,15 @@ public class ChatController implements Initializable {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/receive_file.fxml"));
                 ChatController.this.receiveFileNode = fxmlLoader.load();
                 ChatController.this.receiveFileController = fxmlLoader.getController();
-                ChatController.this.receiveFileDialog = Singleton.getInstance().getReceiveFileDialogs().computeIfAbsent(this.user, k -> new Dialog());
+                ChatController.this.receiveFileDialog = Singleton.getInstance().getReceiveFileDialogs().computeIfAbsent(this.user, k -> {
+                    Dialog dialog = new Dialog();
 
-                ChatController.this.receiveFileDialog.setTitle("Receiving File");
-                ChatController.this.receiveFileDialog.initModality(Modality.NONE);
-                ChatController.this.receiveFileDialog.getDialogPane().setContent(ChatController.this.receiveFileNode);
+                    dialog.setTitle("Receiving File");
+                    dialog.initModality(Modality.NONE);
+                    dialog.getDialogPane().setContent(ChatController.this.receiveFileNode);
+
+                    return dialog;
+                });
             } catch (IOException e) {
                 e.printStackTrace();
             }
