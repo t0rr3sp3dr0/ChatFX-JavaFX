@@ -147,7 +147,7 @@ public final class RDT {
             this.probe.setOnTimeoutChanged(objects -> Sender.this.timer.setTimeout((Integer) objects[0]));
             this.probe.start();
 
-            RDT.getReceiver(Sender.this)
+            RDT.getReceiver(Sender.this);
         }
 
         public void sendMessage(byte[] message) throws InterruptedException {
