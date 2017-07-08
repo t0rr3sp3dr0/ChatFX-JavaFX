@@ -2,6 +2,7 @@ package systems.singularity.chatfx.client;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
+import javafx.scene.control.Dialog;
 import systems.singularity.chatfx.client.controllers.ChatController;
 import systems.singularity.chatfx.models.User;
 import systems.singularity.chatfx.util.RDT;
@@ -18,6 +19,7 @@ public class Singleton extends HashMap<String, Object> {
     private final Map<InetAddress, RDT.Receiver.OnReceiveListener> chatOnReceiveListeners = new HashMap<>();
     private final Map<InetAddress, RDT.Receiver.OnReceiveListener> fileOnReceiveListeners = new HashMap<>();
     private final Map<User, ChatController> chatControllers = new HashMap<>();
+    private final Map<User, Dialog> receiveFileDialogs = new HashMap<>();
     private RDT.Receiver chatReceiver = null;
     private RDT.Receiver fileReceiver = null;
     private String token = null;
@@ -99,5 +101,9 @@ public class Singleton extends HashMap<String, Object> {
 
     public Map<User, ChatController> getChatControllers() {
         return this.chatControllers;
+    }
+
+    public Map<User, Dialog> getReceiveFileDialogs() {
+        return this.receiveFileDialogs;
     }
 }

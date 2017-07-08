@@ -88,7 +88,7 @@ public class ChatController implements Initializable {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/receive_file.fxml"));
                 ChatController.this.receiveFileNode = fxmlLoader.load();
                 ChatController.this.receiveFileController = fxmlLoader.getController();
-                ChatController.this.receiveFileDialog = new Dialog();
+                ChatController.this.receiveFileDialog = Singleton.getInstance().getReceiveFileDialogs().computeIfAbsent(this.user, k -> new Dialog());
 
                 ChatController.this.receiveFileDialog.setTitle("Receiving File");
                 ChatController.this.receiveFileDialog.initModality(Modality.NONE);
@@ -104,8 +104,6 @@ public class ChatController implements Initializable {
                     if (headers.get("Pragma").equals("message")) {
                         MessageRepository.getInstance().insert(message.status("sent").time(DateTime.now().toString()).chatId(Singleton.getInstance().getUser().getId().hashCode() + ChatController.this.user.getUsername().hashCode()));
                         Networking.sendACK(message, ChatController.this.user);
-
-                        Platform.runLater(() -> ChatController.this.messagesList.scrollTo(ChatController.this.messagesList.getItems().size() - 1));
 
                         new Thread(() -> {
                             while (!ChatController.this.selectionModel.getSelectedItem().getId().equals(ChatController.this.user.getUsername()))
@@ -309,7 +307,14 @@ public class ChatController implements Initializable {
             while (true)
                 try {
                     List<Message> messages = MessageRepository.getInstance().getAll().stream().filter(message -> message.getChatId().equals(Singleton.getInstance().getUser().getId().hashCode() + ChatController.this.user.getUsername().hashCode())).collect(Collectors.toList());
-                    Platform.runLater(() -> ChatController.this.messagesList.setItems(FXCollections.observableArrayList(messages)));
+                    Platform.runLater(() -> {
+                        boolean b = messages.size() != ChatController.this.messagesList.getItems().size();
+
+                        ChatController.this.messagesList.setItems(FXCollections.observableArrayList(messages));
+
+                        if (b)
+                            ChatController.this.messagesList.scrollTo(ChatController.this.messagesList.getItems().size() - 1);
+                    });
 
                     Thread.sleep(250);
                 } catch (SQLException | InterruptedException e) {

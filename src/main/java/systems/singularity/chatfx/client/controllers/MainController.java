@@ -60,6 +60,7 @@ public class MainController implements Initializable {
 
         stageTools.setTabPane(tabPane);
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        tableView.setPlaceholder(new Label("There is no users online!"));
 
         SelectionModel<User> tableViewSelectionModel = tableView.getSelectionModel();
         tableViewSelectionModel.selectedItemProperty().addListener((observable, oldValue, newValue) -> {
