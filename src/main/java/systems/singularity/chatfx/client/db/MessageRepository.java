@@ -76,7 +76,7 @@ public class MessageRepository implements Repository<Message> {
     @Override
     public List<Message> getAll() throws SQLException {
         Connection conn = Database.getConnection();
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_messages;");
+        PreparedStatement statement = conn.prepareStatement("SELECT * FROM cf_messages ORDER BY message_timestamp ASC;");
         ResultSet rs = statement.executeQuery();
         ArrayList<Message> messages = new ArrayList<>();
         while (rs.next())

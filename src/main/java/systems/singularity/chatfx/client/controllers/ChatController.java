@@ -16,7 +16,6 @@ import javafx.stage.Modality;
 import org.joda.time.DateTime;
 import systems.singularity.chatfx.client.Networking;
 import systems.singularity.chatfx.client.Singleton;
-import systems.singularity.chatfx.client.db.Database;
 import systems.singularity.chatfx.client.db.MessageRepository;
 import systems.singularity.chatfx.models.Message;
 import systems.singularity.chatfx.models.User;
@@ -29,6 +28,7 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -84,8 +84,6 @@ public class ChatController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
-
         Platform.runLater(() -> {
             try {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/receive_file.fxml"));
@@ -105,7 +103,7 @@ public class ChatController implements Initializable {
             Networking.receiveMessage(this.user, (headers, message) -> {
                 try {
                     if (headers.get("Pragma").equals("message")) {
-                        MessageRepository.getInstance().insert(message.status("sent"));
+                        MessageRepository.getInstance().insert(message.status("sent").time(DateTime.now().toString()).chatId(ChatController.this.user.getUsername().hashCode()));
                         Networking.sendACK(message, ChatController.this.user);
                     } else if (headers.get("Pragma").equals("ack"))
                         MessageRepository.getInstance().update(MessageRepository.getInstance().get(new Message().id(Integer.parseInt(headers.get("Message-ID"))).status("ack")));
@@ -229,9 +227,9 @@ public class ChatController implements Initializable {
                         Message message = new Message()
                                 .authorId(Singleton.getInstance().getUser().getId())
                                 .content(content)
-                                .chatId(Singleton.getInstance().getUser().hashCode() & ChatController.this.user.hashCode())
-                                .time(DateTime.now().toString())
-                                .status("processing");
+                                .chatId(ChatController.this.user.getUsername().hashCode())
+                                .status("processing")
+                                .time(DateTime.now().toString());
 
                         try {
                             Networking.sendMessage(message.id(message.hashCode()), ChatController.this.user);
@@ -291,7 +289,7 @@ public class ChatController implements Initializable {
             //noinspection InfiniteLoopStatement
             while (true)
                 try {
-                    List<Message> messages = MessageRepository.getInstance().getAll().stream().filter(message -> message.getChatId().equals(Singleton.getInstance().getUser().hashCode() & ChatController.this.user.hashCode())).collect(Collectors.toList());
+                    List<Message> messages = MessageRepository.getInstance().getAll().stream().filter(message -> message.getChatId().equals(ChatController.this.user.getUsername().hashCode())).collect(Collectors.toList());
                     Platform.runLater(() -> {
                         ChatController.this.messagesList.setItems(FXCollections.observableArrayList(messages));
                         ChatController.this.messagesList.scrollTo(messages.size() - 1);

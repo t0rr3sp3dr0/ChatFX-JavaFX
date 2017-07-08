@@ -38,31 +38,31 @@ public class DiscardModuleController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.senderLossProbabilitySlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Variables.DiscardModule.senderLossProbability = newValue.doubleValue() / 100;
+            Variables.senderLossProbability = newValue.doubleValue() / 100;
             DiscardModuleController.this.senderLossProbabilityTextField.setText(String.format("%.0f", newValue.doubleValue()));
         });
         this.senderLossProbabilityTextField.setOnKeyPressed(event -> {
             if (event.getCode().equals(KeyCode.ENTER))
                 this.senderLossProbabilitySlider.setValue(Double.parseDouble(DiscardModuleController.this.senderLossProbabilityTextField.getText()));
         });
-        this.senderLossProbabilityTextField.setText(String.format("%.0f", Variables.DiscardModule.senderLossProbability));
+        this.senderLossProbabilityTextField.setText(String.format("%.0f", Variables.senderLossProbability));
 
         this.receiverLossProbabilitySlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Variables.DiscardModule.receiverLossProbability = newValue.doubleValue() / 100;
+            Variables.receiverLossProbability = newValue.doubleValue() / 100;
             DiscardModuleController.this.receiverLossProbabilityTextField.setText(String.format("%.0f", newValue.doubleValue()));
         });
         this.receiverLossProbabilityTextField.setOnKeyPressed(event -> {
             if (event.getCode().equals(KeyCode.ENTER))
                 this.receiverLossProbabilitySlider.setValue(Double.parseDouble(DiscardModuleController.this.receiverLossProbabilityTextField.getText()));
         });
-        this.receiverLossProbabilityTextField.setText(String.format("%.0f", Variables.DiscardModule.receiverLossProbability));
+        this.receiverLossProbabilityTextField.setText(String.format("%.0f", Variables.receiverLossProbability));
 
         new Thread(() -> {
             //noinspection InfiniteLoopStatement
             while (true) {
                 Platform.runLater(() -> {
-                    DiscardModuleController.this.senderLossCountLabel.setText(String.format("%d", Variables.DiscardModule.senderLossCount));
-                    DiscardModuleController.this.receiverLossCountLabel.setText(String.format("%d", Variables.DiscardModule.receiverLossCount));
+                    DiscardModuleController.this.senderLossCountLabel.setText(String.format("%d", Variables.senderLossCount));
+                    DiscardModuleController.this.receiverLossCountLabel.setText(String.format("%d", Variables.receiverLossCount));
                 });
 
                 try {
