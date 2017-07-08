@@ -12,7 +12,6 @@
             <menus>
                 <Menu mnemonicParsing="false" text="ChatFX">
                     <items>
-                  <MenuItem fx:id="newChatMenuItem" mnemonicParsing="false" text="New Chat" />
                         <MenuItem fx:id="discardModuleMenuItem" mnemonicParsing="false" text="Discard Module" />
                     </items>
                 </Menu>

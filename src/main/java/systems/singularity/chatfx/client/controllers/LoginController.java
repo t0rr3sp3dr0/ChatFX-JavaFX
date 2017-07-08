@@ -7,15 +7,20 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import systems.singularity.chatfx.client.Singleton;
 import systems.singularity.chatfx.util.Protocol;
 import systems.singularity.chatfx.util.RDT;
+import systems.singularity.chatfx.util.Variables;
 import systems.singularity.chatfx.util.java.Utilities;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.HashMap;
@@ -23,124 +28,190 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
-
-    private static InetAddress inetAddress;
-    private static int port;
-    @FXML
-    private Parent root;
-    @FXML
-    private Button bt_login;
-    @FXML
-    private TextField tf_user;
-    @FXML
-    private PasswordField tf_pass;
-    @FXML
-    private TextField tf_ip;
-    @FXML
-    private TextField tf_port;
     private boolean[] logged = new boolean[3];
 
-    public static InetAddress getInetAddress() {
-        return inetAddress;
-    }
+    @FXML
+    private TextField userTextField;
 
-    public static int getPort() {
-        return port;
-    }
+    @FXML
+    private TextField portTextField;
+
+    @FXML
+    private TextField rttTextField;
+
+    @FXML
+    private VBox root;
+
+    @FXML
+    private Button loginButton;
+
+    @FXML
+    private TextField fileTextField;
+
+    @FXML
+    private TextField hostTextField;
+
+    @FXML
+    private PasswordField passTextField;
+
+    @FXML
+    private TextField chatTextField;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
-            bt_login.setOnAction(e -> {
-
-                if (!tf_user.getText().isEmpty() && !tf_pass.getText().isEmpty() && tf_pass.getText().length() >= 8) {
+            loginButton.setOnAction(e -> {
+                if (!userTextField.getText().isEmpty() && !passTextField.getText().isEmpty() && passTextField.getText().length() >= 8 && hostTextField.getText().length() > 0 && portTextField.getText().trim().length() > 0)
                     try {
-                        inetAddress = InetAddress.getByName(tf_ip.getText());
-                        port = Integer.parseInt(tf_port.getText());
-                        //ajustar para o RDT
-                        String password = Utilities.md5(tf_pass.getText());
-                        Map<String, String> map = new HashMap<>();
-                        map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
-                        map.put("Pragma", "login;chat");
+                        Variables.Server.address = InetAddress.getByName(hostTextField.getText());
+                        Variables.Server.port = Integer.parseInt(portTextField.getText());
 
-                        RDT.Sender chatSender = RDT.uniqueSender(inetAddress, port);
+                        String password = Utilities.md5(passTextField.getText());
+                        String token = new String(Base64.getEncoder().encode((userTextField.getText() + ":" + password).getBytes()));
 
-                        Singleton.getInstance().setChatReceiver(RDT.getReceiver(chatSender));
-                        Singleton.getInstance().setChatOnReceiveListener(inetAddress, (Protocol.Receiver) (address, port1, headers, message) -> {
-                            String[] pragma = headers.get("Pragma").split(";");
-                            if (pragma[0].equals("login") && !pragma[1].equals("401")) {
-                                System.out.println("\n\nLOGIN: CHAT\n\n");
-
-                                this.logged[0] = true;
-                                login();
-                            }
-                        });
-
-                        Protocol.Sender.sendMessage(chatSender, map, "Vai tomar no cu, pasg!");
-
-
-                        RDT.Sender fileSender = RDT.uniqueSender(inetAddress, port);
-
-                        map = new HashMap<>();
-                        map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
-                        map.put("Pragma", "login;file");
-
-                        Singleton.getInstance().setFileReceiver(RDT.getReceiver(fileSender));
-                        Singleton.getInstance().setFileOnReceiveListener(inetAddress, (Protocol.Receiver) (address, port1, headers, message) -> {
-                            String[] pragma = headers.get("Pragma").split(";");
-                            if (pragma[0].equals("login") && !pragma[1].equals("401")) {
-                                System.out.println("\n\nLOGIN: FILE\n\n");
-
-                                this.logged[1] = true;
-                                login();
-                            }
-                        });
-
-                        Protocol.Sender.sendMessage(fileSender, map, "Vai tomar no cu, file!");
-
-
-                        RDT.Sender rttSender = RDT.uniqueSender(inetAddress, port);
-
-                        map = new HashMap<>();
-                        map.put("Authorization", "Basic " + new String(Base64.getEncoder().encode((tf_user.getText() + ":" + password).getBytes())));
-                        map.put("Pragma", "login;rtt");
-
-                        RDT.Receiver rttReceiver = RDT.getReceiver(rttSender);
-                        rttReceiver.setOnReceiveListener(inetAddress, (Protocol.Receiver) (address, port1, headers, message) -> {
-                            String[] pragma = headers.get("Pragma").split(";");
-                            if (pragma[0].equals("login") && !pragma[1].equals("401")) {
-                                System.out.println("\n\nLOGIN: RTT\n\n");
-
-                                new RDT.RTT.Echo(rttSender).start();
-
-                                this.logged[2] = true;
-                                login();
-                            }
-                        });
-
-                        Protocol.Sender.sendMessage(rttSender, map, "Vai tomar no cu, rtt!");
+                        openChatConnection(token);
+                        openFileConnection(token);
+                        openRTTConnection(token);
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
-                } else {
-                    Alert alert = new Alert(Alert.AlertType.WARNING);
-                    alert.setTitle("Error");
-                    String error = "";
-                    if (tf_user.getText().isEmpty())
-                        error = "Username field is invalid.";
-                    else if (tf_pass.getText().isEmpty())
-                        error = "Password field is invalid.";
-                    else if (tf_pass.getText().length() < 8)
-                        error = "Password field is invalid. Minimum of 8 characters.";
-                    alert.setHeaderText(error);
-                    Button exitButton = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
-                    exitButton.setText("OK");
-                    alert.show();
-                }
+                else
+                    Platform.runLater(() -> {
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setTitle("Error");
+                        String error = "";
+                        if (userTextField.getText().isEmpty())
+                            error = "Username field is invalid.";
+                        else if (passTextField.getText().isEmpty())
+                            error = "Password field is invalid.";
+                        else if (passTextField.getText().length() < 8)
+                            error = "Password field is invalid. Minimum of 8 characters.";
+                        else if (hostTextField.getText().length() <= 0)
+                            error = "Invalid server hostname.";
+                        else if (portTextField.getText().length() <= 0)
+                            error = "Invalid server port.";
+                        alert.setHeaderText(error);
+                        Button exitButton = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
+                        exitButton.setText("OK");
+                        alert.show();
+                    });
             });
-        } catch (Exception e1) {
-            e1.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+    private void accessDenied() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setHeaderText("Access Denied");
+        alert.setContentText("Please, verify your credentials and try again.");
+        Button exitButton = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
+        exitButton.setText("OK");
+        alert.show();
+    }
+
+    private void openChatConnection(String token) throws SocketException, UnknownHostException, InterruptedException {
+        RDT.Sender chatSender = RDT.uniqueSender(Variables.Server.address, Variables.Server.port);
+
+        try {
+            RDT.Receiver chatReceiver = RDT.getReceiver(Integer.parseInt(chatTextField.getText()));
+            Field receiverSocker = chatReceiver.getClass().getDeclaredField("socket");
+            receiverSocker.setAccessible(true);
+
+            Field field = chatSender.getClass().getDeclaredField("socket");
+            field.setAccessible(true);
+            field.set(chatSender, receiverSocker.get(chatReceiver));
+        } catch (NumberFormatException | IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
+        Map<String, String> chatHeaders = new HashMap<>();
+        chatHeaders.put("Authorization", "Basic " + token);
+        chatHeaders.put("Pragma", "login;chat");
+
+        Singleton.getInstance().setChatReceiver(RDT.getReceiver(chatSender));
+        Singleton.getInstance().setChatOnReceiveListener(Variables.Server.address, (Protocol.Receiver) (address, _port, headers, _message) -> {
+            String[] pragma = headers.get("Pragma").split(";");
+            if (pragma[0].equals("login") && !pragma[1].equals("401")) {
+                System.out.println("\n\nLOGIN: CHAT\n\n");
+
+                this.logged[0] = true;
+                login();
+            } else
+                Platform.runLater(LoginController.this::accessDenied);
+        });
+
+        Protocol.Sender.sendMessage(chatSender, chatHeaders, "");
+    }
+
+    private void openFileConnection(String token) throws SocketException, UnknownHostException, InterruptedException {
+        RDT.Sender fileSender = RDT.uniqueSender(Variables.Server.address, Variables.Server.port);
+
+        try {
+            RDT.Receiver fileReceiver = RDT.getReceiver(Integer.parseInt(fileTextField.getText()));
+            Field receiverSocker = fileReceiver.getClass().getDeclaredField("socket");
+            receiverSocker.setAccessible(true);
+
+            Field field = fileSender.getClass().getDeclaredField("socket");
+            field.setAccessible(true);
+            field.set(fileSender, receiverSocker.get(fileReceiver));
+        } catch (NumberFormatException | IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
+        Map<String, String> fileHeaders = new HashMap<>();
+        fileHeaders.put("Authorization", "Basic " + token);
+        fileHeaders.put("Pragma", "login;file");
+
+        Singleton.getInstance().setFileReceiver(RDT.getReceiver(fileSender));
+        Singleton.getInstance().setFileOnReceiveListener(Variables.Server.address, (Protocol.Receiver) (address, _port, headers, _message) -> {
+            String[] pragma = headers.get("Pragma").split(";");
+            if (pragma[0].equals("login") && !pragma[1].equals("401")) {
+                System.out.println("\n\nLOGIN: FILE\n\n");
+
+                this.logged[1] = true;
+                login();
+            } else
+                Platform.runLater(LoginController.this::accessDenied);
+        });
+
+        Protocol.Sender.sendMessage(fileSender, fileHeaders, "");
+    }
+
+    private void openRTTConnection(String token) throws SocketException, UnknownHostException, InterruptedException {
+        RDT.Sender rttSender = RDT.uniqueSender(Variables.Server.address, Variables.Server.port);
+
+        try {
+            RDT.Receiver rttReceiver = RDT.getReceiver(Integer.parseInt(rttTextField.getText()));
+            Field receiverSocker = rttReceiver.getClass().getDeclaredField("socket");
+            receiverSocker.setAccessible(true);
+
+            Field field = rttSender.getClass().getDeclaredField("socket");
+            field.setAccessible(true);
+            field.set(rttSender, receiverSocker.get(rttReceiver));
+        } catch (NumberFormatException | IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
+        Map<String, String> rttHeaders = new HashMap<>();
+        rttHeaders.put("Authorization", "Basic " + token);
+        rttHeaders.put("Pragma", "login;rtt");
+
+        RDT.Receiver rttReceiver = RDT.getReceiver(rttSender);
+        rttReceiver.setOnReceiveListener(Variables.Server.address, (Protocol.Receiver) (address, _port, headers, _message) -> {
+            String[] pragma = headers.get("Pragma").split(";");
+            if (pragma[0].equals("login") && !pragma[1].equals("401")) {
+                System.out.println("\n\nLOGIN: RTT\n\n");
+
+                new RDT.RTT.Echo(rttSender).start();
+
+                this.logged[2] = true;
+                login();
+            } else
+                Platform.runLater(LoginController.this::accessDenied);
+        });
+
+        Protocol.Sender.sendMessage(rttSender, rttHeaders, "");
     }
 
     private void login() {
@@ -148,27 +219,26 @@ public class LoginController implements Initializable {
             this.logged = new boolean[3];
 
             try {
-                Singleton.getInstance().setUsername(tf_user.getText());
-                Singleton.getInstance().setToken(new String(Base64.getEncoder().encode((tf_user.getText() + ":" + Utilities.md5(tf_pass.getText())).getBytes())));
+                Singleton.getInstance().setUsername(userTextField.getText());
+                Singleton.getInstance().setToken(new String(Base64.getEncoder().encode((userTextField.getText() + ":" + Utilities.md5(passTextField.getText())).getBytes())));
             } catch (NoSuchAlgorithmException e) {
                 e.printStackTrace();
             }
 
             try {
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/main.fxml"));
-                final Parent root = fxmlLoader.load();
+                final Parent root = new FXMLLoader(getClass().getResource("/layouts/main.fxml")).load();
 
                 Platform.runLater(() -> {
                     Stage stage = new Stage();
-                    stage.setScene(new Scene(root, 720, 430));
+                    stage.setScene(new Scene(root, 720, 480));
                     stage.show();
 
                     systems.singularity.chatfx.util.javafx.Utilities.setOnCloseRequest(stage);
 
                     ((Stage) LoginController.this.root.getScene().getWindow()).close();
                 });
-            } catch (IOException e1) {
-                e1.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 
