@@ -1,154 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
-<VBox fx:id="root" maxHeight="320.0" maxWidth="320.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="320.0" prefWidth="320.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systems.singularity.chatfx.client.controllers.LoginController">
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root" maxHeight="183.0" maxWidth="285.0" minHeight="-Infinity"
+      minWidth="-Infinity" prefHeight="183.0" prefWidth="285.0" xmlns="http://javafx.com/javafx/8"
+      fx:controller="systems.singularity.chatfx.client.controllers.LoginController">
     <children>
-      <Accordion>
-        <panes>
-          <TitledPane text="Credentials">
-               <content>
-                  <VBox prefHeight="1000.0">
-                     <children>
-                        <HBox>
-                           <children>
-                              <Label alignment="CENTER_RIGHT" maxHeight="1000.0" maxWidth="72.0" prefWidth="72.0" text="Username">
-                                 <HBox.margin>
-                                    <Insets bottom="4.0" left="4.0" right="2.0" top="4.0" />
-                                 </HBox.margin>
-                              </Label>
-                              <TextField fx:id="userTextField" HBox.hgrow="ALWAYS">
-                                 <HBox.margin>
-                                    <Insets bottom="4.0" left="2.0" right="4.0" top="4.0" />
-                                 </HBox.margin>
-                              </TextField>
-                           </children>
-                        </HBox>
-                          <HBox>
-                              <children>
-                                  <Label alignment="CENTER_RIGHT" maxHeight="1000.0" maxWidth="72.0" prefWidth="72.0" text="Password" textAlignment="RIGHT">
-                                      <HBox.margin>
-                                          <Insets bottom="4.0" left="4.0" right="2.0" top="4.0" />
-                                      </HBox.margin>
-                                  </Label>
-                                  <PasswordField fx:id="passTextField" HBox.hgrow="ALWAYS">
-                                 <HBox.margin>
-                                    <Insets bottom="4.0" left="2.0" right="4.0" top="4.0" />
-                                 </HBox.margin>
-                              </PasswordField>
-                              </children>
-                              <VBox.margin>
-                                  <Insets />
-                              </VBox.margin>
-                          </HBox>
-                     </children>
-                  </VBox>
-               </content>
-          </TitledPane>
-          <TitledPane text="Server Settings">
-               <content>
-                  <VBox prefHeight="1000.0">
-                     <children>
-                        <HBox>
-                           <children>
-                              <Label alignment="CENTER_RIGHT" maxHeight="1000.0" maxWidth="72.0" prefWidth="72.0" text="Address">
-                                 <HBox.margin>
-                                    <Insets bottom="4.0" left="4.0" right="2.0" top="4.0" />
-                                 </HBox.margin>
-                              </Label>
-                              <TextField fx:id="hostTextField" promptText="localhost" HBox.hgrow="ALWAYS">
-                                 <HBox.margin>
-                                    <Insets bottom="4.0" left="2.0" right="4.0" top="4.0" />
-                                 </HBox.margin>
-                              </TextField>
-                           </children>
-                           <VBox.margin>
-                              <Insets />
-                           </VBox.margin>
-                        </HBox>
-                        <HBox>
-                           <children>
-                              <Label alignment="CENTER_RIGHT" maxHeight="1000.0" maxWidth="72.0" prefWidth="72.0" text="Port">
-                                 <HBox.margin>
-                                    <Insets bottom="4.0" left="4.0" right="2.0" top="4.0" />
-                                 </HBox.margin>
-                              </Label>
-                              <TextField fx:id="portTextField" promptText="65535" HBox.hgrow="ALWAYS">
-                                 <HBox.margin>
-                                    <Insets bottom="4.0" left="2.0" right="4.0" top="4.0" />
-                                 </HBox.margin>
-                              </TextField>
-                           </children>
-                           <VBox.margin>
-                              <Insets />
-                           </VBox.margin>
-                        </HBox>
-                     </children>
-                  </VBox>
-               </content>
-          </TitledPane>
-          <TitledPane text="Ports Settings">
-               <content>
-                  <VBox prefHeight="1000.0">
-                     <children>
-                        <HBox>
-                           <children>
-                              <Label alignment="CENTER_RIGHT" maxHeight="1000.0" maxWidth="72.0" prefWidth="72.0" text="Chat">
-                                 <HBox.margin>
-                                    <Insets bottom="4.0" left="4.0" right="2.0" top="4.0" />
-                                 </HBox.margin>
-                              </Label>
-                              <TextField fx:id="chatTextField" promptText="65535" HBox.hgrow="ALWAYS">
-                                 <HBox.margin>
-                                    <Insets bottom="4.0" left="2.0" right="4.0" top="4.0" />
-                                 </HBox.margin>
-                              </TextField>
-                           </children>
-                        </HBox>
-                        <HBox>
-                           <children>
-                              <Label alignment="CENTER_RIGHT" maxHeight="1000.0" maxWidth="72.0" prefWidth="72.0" text="File">
-                                 <HBox.margin>
-                                    <Insets bottom="4.0" left="4.0" right="2.0" top="4.0" />
-                                 </HBox.margin>
-                              </Label>
-                              <TextField fx:id="fileTextField" promptText="65535" HBox.hgrow="ALWAYS">
-                                 <HBox.margin>
-                                    <Insets bottom="4.0" left="2.0" right="4.0" top="4.0" />
-                                 </HBox.margin>
-                              </TextField>
-                           </children>
-                           <VBox.margin>
-                              <Insets />
-                           </VBox.margin>
-                        </HBox>
-                        <HBox layoutX="20.0" layoutY="51.0">
-                           <children>
-                              <Label alignment="CENTER_RIGHT" maxHeight="1000.0" maxWidth="72.0" prefWidth="72.0" text="RTT">
-                                 <HBox.margin>
-                                    <Insets bottom="4.0" left="4.0" right="2.0" top="4.0" />
-                                 </HBox.margin>
-                              </Label>
-                              <TextField fx:id="rttTextField" promptText="65535" HBox.hgrow="ALWAYS">
-                                 <HBox.margin>
-                                    <Insets bottom="4.0" left="2.0" right="4.0" top="4.0" />
-                                 </HBox.margin>
-                              </TextField>
-                           </children>
-                        </HBox>
-                     </children>
-                  </VBox>
-               </content>
-          </TitledPane>
-        </panes>
-      </Accordion>
-      <Button fx:id="loginButton" maxWidth="1000.0" mnemonicParsing="false" text="Login" VBox.vgrow="ALWAYS">
+      <HBox maxHeight="31.0" minWidth="256.0" prefHeight="31.0" prefWidth="200.0">
+         <children>
+            <Label alignment="CENTER" maxHeight="31.0" maxWidth="67.0" prefHeight="31.0" prefWidth="67.0" text="ip server">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Label>
+            <TextField fx:id="tf_ip" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0" promptText="192.168.0.1" text="172.20.4.13" />
+         </children>
          <VBox.margin>
-            <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+            <Insets bottom="2.0" left="4.0" right="4.0" top="4.0" />
          </VBox.margin>
-      </Button>
+      </HBox>
+      <HBox maxHeight="31.0" minWidth="256.0" prefHeight="31.0" prefWidth="200.0">
+         <children>
+            <Label alignment="CENTER" maxHeight="31.0" maxWidth="67.0" prefHeight="31.0" prefWidth="67.0" text="ip port">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Label>
+            <TextField fx:id="tf_port" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0" promptText="65535" text="1234">
+               <HBox.margin>
+                  <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
+               </HBox.margin>
+            </TextField>
+         </children>
+         <VBox.margin>
+            <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
+         </VBox.margin>
+      </HBox>
+        <HBox maxHeight="31.0" minWidth="256.0" prefHeight="31.0" prefWidth="200.0">
+            <children>
+                <Label maxHeight="31.0" maxWidth="67.0" prefHeight="31.0" prefWidth="67.0" text="username">
+                    <HBox.margin>
+                        <Insets />
+                    </HBox.margin>
+                </Label>
+                <TextField fx:id="tf_user" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0"
+                           promptText="user" text="g1c12"/>
+            </children>
+            <VBox.margin>
+                <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
+            </VBox.margin>
+        </HBox>
+        <HBox maxHeight="31.0" minWidth="256.0" prefHeight="31.0" prefWidth="200.0">
+            <children>
+                <Label maxHeight="31.0" maxWidth="67.0" prefHeight="31.0" prefWidth="67.0" text="password" textAlignment="RIGHT">
+                    <HBox.margin>
+                        <Insets />
+                    </HBox.margin>
+                </Label>
+                <PasswordField fx:id="tf_pass" maxHeight="31.0" maxWidth="209.0" prefHeight="31.0" prefWidth="209.0" promptText="password" text="12345678" />
+            </children>
+            <VBox.margin>
+                <Insets bottom="2.0" left="4.0" right="4.0" top="2.0" />
+            </VBox.margin>
+        </HBox>
+        <HBox maxHeight="31.0" minWidth="256.0" prefHeight="31.0" prefWidth="200.0">
+            <children>
+                <Label maxHeight="31.0" maxWidth="67.0" prefHeight="31.0" prefWidth="67.0" textAlignment="RIGHT">
+                    <HBox.margin>
+                        <Insets />
+                    </HBox.margin>
+                </Label>
+                <Button fx:id="bt_login" maxHeight="31.0" maxWidth="209.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="209.0" text="login">
+                    <HBox.margin>
+                        <Insets />
+                    </HBox.margin>
+                </Button>
+            </children>
+            <VBox.margin>
+                <Insets bottom="4.0" left="4.0" right="4.0" top="2.0" />
+            </VBox.margin>
+        </HBox>
     </children>
 </VBox>

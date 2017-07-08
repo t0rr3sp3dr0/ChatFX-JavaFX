@@ -5,20 +5,20 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root" xmlns="http://javafx.com/javafx/8"
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root" maxHeight="74.0" maxWidth="-Infinity" minHeight="-Infinity"
+      minWidth="-Infinity" prefHeight="74.0" prefWidth="285.0" xmlns="http://javafx.com/javafx/8"
       fx:controller="systems.singularity.chatfx.server.controllers.OpenServerController">
     <children>
         <HBox minWidth="256.0" prefHeight="0.0" prefWidth="0.0">
             <children>
-                <Label alignment="CENTER_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="75.0" minWidth="75.0"
-                       text="Port" HBox.hgrow="ALWAYS">
+                <Label alignment="CENTER_RIGHT" maxHeight="Infinity" maxWidth="64.0" minWidth="64.0" text="Port" HBox.hgrow="ALWAYS">
                     <HBox.margin>
-                        <Insets bottom="2.0" left="4.0" right="2.0" top="4.0"/>
+                        <Insets right="2.0" />
                     </HBox.margin>
                 </Label>
-                <TextField fx:id="tfPort" promptText="65535" HBox.hgrow="ALWAYS">
+                <TextField fx:id="tfPort" promptText="2020" HBox.hgrow="ALWAYS">
                     <HBox.margin>
-                        <Insets bottom="2.0" left="2.0" right="4.0" top="4.0"/>
+                        <Insets left="2.0" />
                     </HBox.margin>
                 </TextField>
             </children>
@@ -28,15 +28,15 @@
         </HBox>
         <HBox prefHeight="0.0" prefWidth="0.0">
             <children>
-                <Label alignment="CENTER_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="75.0" minWidth="75.0">
+                <Label alignment="CENTER_RIGHT" maxWidth="64.0" minWidth="64.0">
                     <HBox.margin>
-                        <Insets bottom="4.0" left="4.0" right="2.0" top="2.0"/>
+                        <Insets right="2.0" />
                     </HBox.margin>
                 </Label>
                 <Button fx:id="btOpen" maxWidth="Infinity" mnemonicParsing="false" text="Open Server"
                         HBox.hgrow="ALWAYS">
                     <HBox.margin>
-                        <Insets bottom="4.0" left="2.0" right="4.0" top="2.0"/>
+                        <Insets left="2.0" />
                     </HBox.margin>
                 </Button>
             </children>
