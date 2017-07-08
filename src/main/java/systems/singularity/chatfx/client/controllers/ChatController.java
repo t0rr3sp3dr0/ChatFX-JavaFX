@@ -87,14 +87,14 @@ public class ChatController implements Initializable {
         Platform.runLater(() -> {
             Pair<Dialog, ReceiveFileController> pair = Singleton.getInstance().getReceiveDialogs().computeIfAbsent(this.user, k -> {
                 try {
+                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/receive_file.fxml"));
+                    ChatController.this.receiveFileNode = fxmlLoader.load();
+
                     Dialog dialog = new Dialog();
 
                     dialog.setTitle("Receiving File");
                     dialog.initModality(Modality.NONE);
                     dialog.getDialogPane().setContent(ChatController.this.receiveFileNode);
-
-                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/layouts/receive_file.fxml"));
-                    ChatController.this.receiveFileNode = fxmlLoader.load();
 
                     return new Pair<>(dialog, fxmlLoader.getController());
                 } catch (IOException e) {

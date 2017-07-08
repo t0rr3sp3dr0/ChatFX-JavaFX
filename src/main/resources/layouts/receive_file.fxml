@@ -1,69 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="systems.singularity.chatfx.client.controllers.ReceiveFileController">
+
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="systems.singularity.chatfx.client.controllers.ReceiveFileController">
     <children>
-        <HBox maxHeight="34.0" prefHeight="100.0" prefWidth="200.0">
+        <HBox maxHeight="34.0" maxWidth="Infinity" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
             <children>
-                <VBox prefHeight="200.0" prefWidth="100.0">
+                <VBox maxWidth="Infinity" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                     <children>
-                        <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                        <HBox maxHeight="17.0" maxWidth="Infinity" prefHeight="100.0" prefWidth="200.0">
                             <children>
-                                <Label alignment="CENTER" maxWidth="Infinity" text="Progress" textAlignment="CENTER"
-                                       HBox.hgrow="ALWAYS"/>
+                                <Label alignment="CENTER" maxWidth="Infinity" text="Progress" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                             </children>
                         </HBox>
-                        <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                        <HBox maxHeight="17.0" maxWidth="Infinity" prefHeight="100.0" prefWidth="200.0">
                             <children>
-                                <Label fx:id="progressLabel" alignment="CENTER" maxWidth="Infinity" text="50%"
-                                       textAlignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="progressLabel" alignment="CENTER" maxWidth="Infinity" text="50%" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                             </children>
                         </HBox>
                     </children>
                 </VBox>
-                <VBox prefHeight="200.0" prefWidth="100.0">
+                <VBox maxWidth="Infinity" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                     <children>
-                        <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                        <HBox maxHeight="17.0" maxWidth="Infinity" prefHeight="100.0" prefWidth="200.0">
                             <children>
-                                <Label alignment="CENTER" maxWidth="Infinity" text="ETA" textAlignment="CENTER"
-                                       HBox.hgrow="ALWAYS"/>
+                                <Label alignment="CENTER" maxWidth="Infinity" text="ETA" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                             </children>
                         </HBox>
-                        <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                        <HBox maxHeight="17.0" maxWidth="Infinity" prefHeight="100.0" prefWidth="200.0">
                             <children>
-                                <Label fx:id="etaLabel" alignment="CENTER" maxWidth="Infinity" text="1s"
-                                       textAlignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="etaLabel" alignment="CENTER" maxWidth="Infinity" text="1s" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                             </children>
                         </HBox>
                     </children>
                 </VBox>
-                <VBox prefHeight="200.0" prefWidth="100.0">
+                <VBox maxWidth="Infinity" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
                     <children>
-                        <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                        <HBox maxHeight="17.0" maxWidth="Infinity" prefHeight="100.0" prefWidth="200.0">
                             <children>
-                                <Label alignment="CENTER" maxWidth="Infinity" text="Speed" textAlignment="CENTER"
-                                       HBox.hgrow="ALWAYS"/>
+                                <Label alignment="CENTER" maxWidth="Infinity" text="Speed" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                             </children>
                         </HBox>
-                        <HBox maxHeight="17.0" prefHeight="100.0" prefWidth="200.0">
+                        <HBox maxHeight="17.0" maxWidth="Infinity" prefHeight="100.0" prefWidth="200.0">
                             <children>
-                                <Label fx:id="speedLabel" alignment="CENTER" maxWidth="Infinity" text="1 Gpbs"
-                                       textAlignment="CENTER" HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="speedLabel" alignment="CENTER" maxWidth="Infinity" text="1 Gpbs" textAlignment="CENTER" HBox.hgrow="ALWAYS" />
                             </children>
                         </HBox>
                     </children>
                 </VBox>
             </children>
             <VBox.margin>
-                <Insets bottom="2.0" left="4.0" right="4.0" top="4.0"/>
+                <Insets bottom="2.0" left="4.0" right="4.0" top="4.0" />
             </VBox.margin>
         </HBox>
-        <ProgressBar fx:id="progressBar" prefWidth="200.0" progress="0.0">
+        <ProgressBar fx:id="progressBar" maxWidth="Infinity" prefWidth="200.0" progress="0.0" VBox.vgrow="ALWAYS">
             <VBox.margin>
-                <Insets bottom="4.0" left="4.0" right="4.0" top="2.0"/>
+                <Insets bottom="4.0" left="4.0" right="4.0" top="2.0" />
             </VBox.margin>
         </ProgressBar>
     </children>
