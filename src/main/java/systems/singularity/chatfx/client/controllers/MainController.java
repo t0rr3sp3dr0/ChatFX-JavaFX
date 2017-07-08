@@ -37,9 +37,6 @@ public class MainController implements Initializable {
     private MenuItem discardModuleMenuItem;
 
     @FXML
-    private MenuItem newChatMenuItem;
-
-    @FXML
     private TableView<User> tableView;
 
     @FXML
@@ -96,10 +93,6 @@ public class MainController implements Initializable {
             closeButton.setVisible(false);
 
             dialog.show();
-        });
-
-        newChatMenuItem.setOnAction(event -> {
-
         });
 
         new Thread(() -> {
