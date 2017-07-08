@@ -105,6 +105,8 @@ public class ChatController implements Initializable {
                         MessageRepository.getInstance().insert(message.status("sent").time(DateTime.now().toString()).chatId(Singleton.getInstance().getUser().getId().hashCode() + ChatController.this.user.getUsername().hashCode()));
                         Networking.sendACK(message, ChatController.this.user);
 
+                        Platform.runLater(() -> ChatController.this.messagesList.scrollTo(ChatController.this.messagesList.getItems().size() - 1));
+
                         new Thread(() -> {
                             while (!ChatController.this.selectionModel.getSelectedItem().getId().equals(ChatController.this.user.getUsername()))
                                 try {
@@ -119,9 +121,10 @@ public class ChatController implements Initializable {
                                 e.printStackTrace();
                             }
                         }).start();
-                    } else if (headers.get("Pragma").equals("ack"))
+                    } else if (headers.get("Pragma").equals("ack")) {
                         MessageRepository.getInstance().update(MessageRepository.getInstance().get(new Message().id(Integer.parseInt(headers.get("Message-ID")))).status("sent"));
-                    else if (headers.get("Pragma").equals("seen"))
+                        sendButton.setDisable(false);
+                    } else if (headers.get("Pragma").equals("seen"))
                         MessageRepository.getInstance().update(MessageRepository.getInstance().get(new Message().id(Integer.parseInt(headers.get("Message-ID")))).status("seen"));
                 } catch (SQLException | InterruptedException | SocketException | UnknownHostException e) {
                     e.printStackTrace();
@@ -231,6 +234,8 @@ public class ChatController implements Initializable {
         });
 
         sendButton.setOnAction(event -> {
+            sendButton.setDisable(true);
+
             String text = textField.getText();
 
             if (text != null) {
@@ -282,9 +287,9 @@ public class ChatController implements Initializable {
                                 info.show();
 
                                 progressBar.setProgress(0);
-                                progressLabel.setText(null);
-                                etaLabel.setText(null);
-                                speedLabel.setText(null);
+                                progressLabel.setText("--");
+                                etaLabel.setText("--");
+                                speedLabel.setText("--");
                             } else {
                                 progressBar.setProgress(progress);
                                 progressLabel.setText(String.format("%.2f%%", progress * 100));
@@ -304,10 +309,7 @@ public class ChatController implements Initializable {
             while (true)
                 try {
                     List<Message> messages = MessageRepository.getInstance().getAll().stream().filter(message -> message.getChatId().equals(Singleton.getInstance().getUser().getId().hashCode() + ChatController.this.user.getUsername().hashCode())).collect(Collectors.toList());
-                    Platform.runLater(() -> {
-                        ChatController.this.messagesList.setItems(FXCollections.observableArrayList(messages));
-                        ChatController.this.messagesList.scrollTo(messages.size() - 1);
-                    });
+                    Platform.runLater(() -> ChatController.this.messagesList.setItems(FXCollections.observableArrayList(messages)));
 
                     Thread.sleep(250);
                 } catch (SQLException | InterruptedException e) {

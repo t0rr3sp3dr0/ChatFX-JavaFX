@@ -377,7 +377,7 @@ public final class RDT {
                         synchronized (Variables.class) {
                             Variables.DiscardModule.receiverLossCount++;
                         }
-                        System.out.printf("DEBUG: message\t\t%d\tDISPOSED\tSEQ(%d)\n", packet.getAddress().hashCode(), seq);
+                        System.out.printf("DEBUG: message\t\t%d\tDISPOSED\tSEQ(%d)\n", packet.                                                                                                                                                                                                                                                                  getAddress().hashCode(), seq);
                         continue;
                     }
 
